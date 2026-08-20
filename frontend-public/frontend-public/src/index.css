@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Fallback defaults — overwritten at runtime from SiteSettings.theme once
+     the settings fetch resolves (see SettingsContext). Keeping real defaults
+     here (not blank) means the site never flashes unstyled before the API
+     responds. */
+  --color-primary: #6366f1;
+  --color-secondary: #8b5cf6;
+  --color-accent: #f59e0b;
+  --font-display: 'Space Grotesk';
+  --font-body: 'Inter';
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-surface text-slate-100 font-body antialiased transition-colors duration-300;
+  position: relative;
+}
+
+/* Subtle fixed background texture — a very low-opacity radial glow that
+   sits behind every section, not just the Hero. Kept faint on purpose so
+   it reads as texture rather than decoration competing with content. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.14;
+  background:
+    radial-gradient(circle at 15% 10%, var(--color-primary), transparent 30%),
+    radial-gradient(circle at 85% 60%, var(--color-secondary), transparent 32%),
+    radial-gradient(circle at 40% 90%, var(--color-accent), transparent 28%);
+}
+html:not(.dark) body::before {
+  opacity: 0.06;
+}
+
+/* Tightened tracking on display type reads more premium/editorial than the
+   browser default, without changing font choice or overall structure. */
+.font-display {
+  letter-spacing: -0.02em;
+}
+
+/* Light mode: swap the base surface/text without needing dark: prefixes on
+   every single element — sections opt into light-specific tweaks only where
+   the design actually needs contrast beyond this base swap. */
+html:not(.dark) body {
+  @apply bg-slate-50 text-slate-800;
+}
+html:not(.dark) .glass-card {
+  @apply bg-white/70 shadow-md;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: #0b0f19;
+}
+
+/* Signature glass-card treatment: soft blur + a 1px gradient border built
+   from the three theme tokens, so this literally re-skins from the admin
+   dashboard's theme color pickers with zero code changes. */
+.glass-card {
+  @apply relative rounded-xl2 backdrop-blur-md bg-glass shadow-glass;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: transform 0.25s ease, box-shadow 0.3s ease, background-color 0.25s ease;
+}
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.65;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+/* Soft border glow on hover — applies everywhere a .glass-card is used, so
+   individual sections don't need to repeat this rule. */
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Respect prefers-reduced-motion globally rather than per-component. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
