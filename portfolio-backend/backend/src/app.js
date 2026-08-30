@@ -32,8 +32,20 @@ if (!env.isProduction) {
   app.use(morgan('dev'));
 }
 
-app.get('/health', (req, res) => res.json({ status: 'ok', env: env.nodeEnv }));
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Portfolio backend is running'
+  });
+});
 
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: 'ok',
+    env: env.nodeEnv
+  });
+});
 app.use('/api/v1', routes);
 
 // Unknown route → 404 via the same ApiError shape as everything else.
