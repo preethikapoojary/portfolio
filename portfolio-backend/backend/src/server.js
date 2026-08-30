@@ -14,7 +14,7 @@ async function bootstrap() {
   // dashboard always have something sensible to render and reorder.
   await Section.ensureSeeded();
 
-  app.listen(env.port, () => {
+  app.listen(env.port, '0.0.0.0', () => {
     // eslint-disable-next-line no-console
     console.log(`[Server] Running on port ${env.port} in ${env.nodeEnv} mode`);
   });
