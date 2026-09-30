@@ -10,7 +10,7 @@ const errorMiddleware = require('./middlewares/error.middleware');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
-
+app.set('trust proxy', 1);
 // Security headers on every response.
 app.use(helmet());
 
