@@ -23,12 +23,17 @@ const editFields = [
 export default function TestimonialsPage() {
   const [items, setItems] = useState([]);
   const [filter, setFilter] = useState('pending');
+  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const load = () => {
+    setLoading(true);
     const params = filter === 'all' ? {} : { status: filter };
-    testimonialsApi.list(params).then((res) => setItems(res.data));
+    testimonialsApi
+      .list(params)
+      .then((res) => setItems(res.data))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, [filter]);
@@ -77,7 +82,9 @@ export default function TestimonialsPage() {
       </div>
 
       <div className="space-y-3">
-        {items.length === 0 ? (
+        {loading ? (
+          <p className="card text-sm text-muted">Loading testimonials…</p>
+        ) : items.length === 0 ? (
           <p className="card text-sm text-muted">No testimonials in this filter.</p>
         ) : (
           items.map((t) => (

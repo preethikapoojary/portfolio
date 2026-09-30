@@ -33,6 +33,9 @@ const submit = asyncHandler(async (req, res) => {
       // eslint-disable-next-line no-console
       console.error('[Email Notification Error] Failed to send contact message email:', err.message);
     });
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn('[Email Notification Warning] CONTACT_NOTIFY_TO environment variable is not set. Email notification skipped.');
   }
 
   new ApiResponse(201, { id: doc._id }, "Message sent — thank you! I'll get back to you soon.").send(res);

@@ -6,11 +6,16 @@ import Modal from '../components/ui/Modal';
 export default function MessagesPage() {
   const [messages, setMessages] = useState([]);
   const [filter, setFilter] = useState('all'); // all | unread | read
+  const [loading, setLoading] = useState(true);
   const [viewing, setViewing] = useState(null);
 
   const load = () => {
+    setLoading(true);
     const params = filter === 'all' ? {} : { isRead: filter === 'read' };
-    messagesApi.list(params).then((res) => setMessages(res.data));
+    messagesApi
+      .list(params)
+      .then((res) => setMessages(res.data))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, [filter]);
@@ -59,7 +64,9 @@ export default function MessagesPage() {
       </div>
 
       <div className="card divide-y divide-slate-100 p-0">
-        {messages.length === 0 ? (
+        {loading ? (
+          <p className="p-6 text-sm text-muted">Loading messages…</p>
+        ) : messages.length === 0 ? (
           <p className="p-6 text-sm text-muted">No messages yet.</p>
         ) : (
           messages.map((msg) => (

@@ -12,7 +12,7 @@ function refreshCookieOptions(expiresAt) {
   return {
     httpOnly: true,
     secure: env.isProduction,
-    sameSite: 'lax',
+    sameSite: env.isProduction ? 'none' : 'lax',
     expires: expiresAt,
     path: '/api/v1/admin/auth', // scoped to auth routes only
     // domain intentionally omitted — no custom domain yet (see architecture §12).
@@ -76,7 +76,7 @@ const logout = asyncHandler(async (req, res) => {
   const cookieOpts = {
     httpOnly: true,
     secure: env.isProduction,
-    sameSite: 'lax',
+    sameSite: env.isProduction ? 'none' : 'lax',
   };
 
   res.clearCookie(REFRESH_COOKIE_NAME, { ...cookieOpts, path: '/api/v1/admin/auth' });
