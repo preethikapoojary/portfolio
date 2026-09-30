@@ -63,13 +63,24 @@ const refresh = asyncHandler(async (req, res) => {
   if (!admin) throw ApiError.unauthorized('Admin account no longer exists');
 
   const accessToken = authService.signAccessToken(admin);
-  new ApiResponse(200, { accessToken }, 'Token refreshed').send(res);
+  new ApiResponse(200, {
+    accessToken,
+    admin: { id: admin._id, name: admin.name, email: admin.email, role: admin.role, lastLoginAt: admin.lastLoginAt },
+  }, 'Token refreshed').send(res);
 });
 
 const logout = asyncHandler(async (req, res) => {
   const rawToken = req.cookies[REFRESH_COOKIE_NAME];
   if (rawToken) await authService.revokeRefreshToken(rawToken);
-  res.clearCookie(REFRESH_COOKIE_NAME, { path: '/api/v1/admin/auth' });
+
+  const cookieOpts = {
+    httpOnly: true,
+    secure: env.isProduction,
+    sameSite: 'lax',
+  };
+
+  res.clearCookie(REFRESH_COOKIE_NAME, { ...cookieOpts, path: '/api/v1/admin/auth' });
+  res.clearCookie(REFRESH_COOKIE_NAME, { ...cookieOpts, path: '/' });
 
   if (req.admin) {
     activityLogService.record({

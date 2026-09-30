@@ -17,8 +17,12 @@ export function AuthProvider({ children }) {
       try {
         const { data } = await axios.post(`${baseURL}/admin/auth/refresh`, {}, { withCredentials: true });
         setAccessToken(data.data.accessToken);
-        const me = await authApi.me();
-        setAdmin(me.data);
+        if (data.data.admin) {
+          setAdmin(data.data.admin);
+        } else {
+          const me = await authApi.me();
+          setAdmin(me.data);
+        }
       } catch {
         setAdmin(null);
       } finally {

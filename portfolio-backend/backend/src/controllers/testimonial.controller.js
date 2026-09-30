@@ -4,6 +4,8 @@ const ApiResponse = require('../utils/ApiResponse');
 const Testimonial = require('../models/Testimonial');
 const uploadService = require('../services/upload.service');
 const activityLogService = require('../services/activityLog.service');
+const { sendEmail } = require('../services/email');
+const { env } = require('../config/env');
 
 // ---------------- PUBLIC ----------------
 
@@ -35,6 +37,28 @@ const submit = asyncHandler(async (req, res) => {
     avatar: avatar || undefined,
     status: 'pending', // never shown publicly until an admin approves it
   });
+
+  if (env.email.contactNotifyTo) {
+    sendEmail({
+      to: env.email.contactNotifyTo,
+      subject: `[Portfolio Alert] New Testimonial Pending Review from ${name}`,
+      html: `
+        <h2>New Testimonial Submitted</h2>
+        <p>A new testimonial is waiting for your review and approval in the admin dashboard.</p>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Role:</strong> ${role}</p>
+        ${company ? `<p><strong>Company:</strong> ${company}</p>` : ''}
+        ${email ? `<p><strong>Email:</strong> ${email}</p>` : ''}
+        <p><strong>Submitted At:</strong> ${testimonial.createdAt ? new Date(testimonial.createdAt).toLocaleString() : new Date().toLocaleString()}</p>
+        <hr />
+        <h3>Testimonial Message:</h3>
+        <p style="white-space: pre-wrap;">${message}</p>
+      `,
+    }).catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error('[Email Notification Error] Failed to send testimonial notification email:', err.message);
+    });
+  }
 
   new ApiResponse(
     201,

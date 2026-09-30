@@ -4,6 +4,11 @@ const { env } = require('../../../config/env');
 let transporter = null;
 
 function getTransporter() {
+  if (!env.email.gmailUser || !env.email.gmailAppPassword) {
+    throw new Error(
+      'GMAIL_USER or GMAIL_APP_PASSWORD environment variable is missing on the backend.'
+    );
+  }
   if (!transporter) {
     transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -17,6 +22,11 @@ function getTransporter() {
 }
 
 async function sendEmail({ to, subject, html }) {
+  if (!env.email.gmailUser || !env.email.gmailAppPassword) {
+    throw new Error(
+      'GMAIL_USER or GMAIL_APP_PASSWORD environment variable is missing on the backend.'
+    );
+  }
   const info = await getTransporter().sendMail({
     from: `"Portfolio Site" <${env.email.gmailUser}>`,
     to,

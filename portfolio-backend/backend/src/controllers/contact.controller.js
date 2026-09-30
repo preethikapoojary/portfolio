@@ -3,6 +3,8 @@ const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
 const ContactMessage = require('../models/ContactMessage');
 const activityLogService = require('../services/activityLog.service');
+const { sendEmail } = require('../services/email');
+const { env } = require('../config/env');
 
 // ---------------- PUBLIC ----------------
 
@@ -12,6 +14,27 @@ const submit = asyncHandler(async (req, res) => {
     throw ApiError.badRequest('Name, email, and message are required');
   }
   const doc = await ContactMessage.create({ name, email, subject, message });
+
+  if (env.email.contactNotifyTo) {
+    sendEmail({
+      to: env.email.contactNotifyTo,
+      subject: `[Portfolio Contact] New message from ${name}`,
+      html: `
+        <h2>New Contact Message Received</h2>
+        <p><strong>Sender Name:</strong> ${name}</p>
+        <p><strong>Sender Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject || '(No Subject)'}</p>
+        <p><strong>Submitted At:</strong> ${doc.createdAt ? new Date(doc.createdAt).toLocaleString() : new Date().toLocaleString()}</p>
+        <hr />
+        <h3>Message:</h3>
+        <p style="white-space: pre-wrap;">${message}</p>
+      `,
+    }).catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error('[Email Notification Error] Failed to send contact message email:', err.message);
+    });
+  }
+
   new ApiResponse(201, { id: doc._id }, "Message sent — thank you! I'll get back to you soon.").send(res);
 });
 
