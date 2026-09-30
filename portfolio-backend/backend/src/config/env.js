@@ -54,6 +54,8 @@ const env = {
     provider: process.env.EMAIL_PROVIDER || 'nodemailer',
     gmailUser: process.env.GMAIL_USER,
     gmailAppPassword: process.env.GMAIL_APP_PASSWORD,
+    resendApiKey: process.env.RESEND_API_KEY,
+    resendFromEmail: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
     contactNotifyTo: process.env.CONTACT_NOTIFY_TO,
   },
 

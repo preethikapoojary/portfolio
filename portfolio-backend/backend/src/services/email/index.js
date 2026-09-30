@@ -12,7 +12,7 @@ const { env } = require('../../config/env');
  */
 const providers = {
   nodemailer: () => require('./providers/nodemailer'),
-  // resend: () => require('./providers/resend'), // add when you switch providers
+  resend: () => require('./providers/resend'),
 };
 
 function getProvider() {
