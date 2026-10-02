@@ -21,7 +21,21 @@ const uploadAvatar = asyncHandler(async (req, res) => {
 });
 
 const submit = asyncHandler(async (req, res) => {
-  const { name, role, company, email, linkedinUrl, githubUrl, message, avatar } = req.body;
+  const { role, company, linkedinUrl, githubUrl, message, avatar } = req.body;
+
+  let name = req.body.name;
+  let email = req.body.email;
+  let avatarData = avatar || undefined;
+
+  // Enforce verified Google identity information if verified Google user is present
+  if (req.googleUser) {
+    name = req.googleUser.name || name;
+    email = req.googleUser.email; // NEVER allow browser to override verified Google email
+    if (!avatarData && req.googleUser.picture) {
+      avatarData = { url: req.googleUser.picture };
+    }
+  }
+
   if (!name || !role || !message) {
     throw ApiError.badRequest('Name, role, and testimonial message are required');
   }
@@ -34,7 +48,7 @@ const submit = asyncHandler(async (req, res) => {
     linkedinUrl,
     githubUrl,
     message,
-    avatar: avatar || undefined,
+    avatar: avatarData,
     status: 'pending', // never shown publicly until an admin approves it
   });
 

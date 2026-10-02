@@ -65,6 +65,7 @@ const env = {
   },
 
   turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY,
+  googleClientId: process.env.GOOGLE_CLIENT_ID,
 };
 
 module.exports = { env, validateEnv };
