@@ -63,6 +63,8 @@ const env = {
     username: process.env.GITHUB_USERNAME,
     token: process.env.GITHUB_TOKEN,
   },
+
+  turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY,
 };
 
 module.exports = { env, validateEnv };
