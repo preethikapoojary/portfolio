@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import api from '../api/endpoints';
 
 const SettingsContext = createContext(null);
@@ -15,20 +15,50 @@ export function SettingsProvider({ children }) {
   const [settings, setSettings] = useState(null);
   const [sections, setSections] = useState([]);
   const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    (async () => {
+  const fetchInitialData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
       const results = await Promise.allSettled([
         api.getProfile(),
         api.getSettings(),
         api.getSections(),
       ]);
-      if (results[0].status === 'fulfilled') setProfile(results[0].value);
-      if (results[1].status === 'fulfilled') setSettings(results[1].value);
-      if (results[2].status === 'fulfilled') setSections(results[2].value || []);
+
+      const profileRes = results[0];
+      const settingsRes = results[1];
+      const sectionsRes = results[2];
+
+      if (profileRes.status === 'fulfilled' && profileRes.value) {
+        setProfile(profileRes.value);
+      }
+      if (settingsRes.status === 'fulfilled' && settingsRes.value) {
+        setSettings(settingsRes.value);
+      }
+      if (sectionsRes.status === 'fulfilled') {
+        setSections(sectionsRes.value || []);
+      }
+
+      if (profileRes.status === 'rejected' || !profileRes.value) {
+        setError(
+          (profileRes.reason && profileRes.reason.message) ||
+            'Unable to load portfolio details. Please check your connection.'
+        );
+      }
+    } catch (err) {
+      setError(err.message || 'Unable to load portfolio details.');
+    } finally {
+      setLoading(false);
       setReady(true);
-    })();
+    }
   }, []);
+
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
 
   useEffect(() => {
     if (!settings?.theme) return;
@@ -54,7 +84,16 @@ export function SettingsProvider({ children }) {
 
   return (
     <SettingsContext.Provider
-      value={{ profile, settings, sections: orderedSections, isSectionVisible, ready }}
+      value={{
+        profile,
+        settings,
+        sections: orderedSections,
+        isSectionVisible,
+        ready,
+        loading,
+        error,
+        retry: fetchInitialData,
+      }}
     >
       {children}
     </SettingsContext.Provider>
