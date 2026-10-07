@@ -43,10 +43,9 @@ export default function Contact() {
             Have a project in mind, a job opportunity, or just want to connect? Send me a message and I&apos;ll get back to you promptly.
           </p>
 
-          {(profile?.location || profile?.phone) && (
+          {profile?.phone && (
             <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-400">
-              {profile?.location && <span>📍 {profile.location}</span>}
-              {profile?.phone && <span>📞 {profile.phone}</span>}
+              <span>📞 {profile.phone}</span>
             </div>
           )}
 

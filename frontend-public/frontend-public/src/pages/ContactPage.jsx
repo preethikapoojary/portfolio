@@ -108,7 +108,7 @@ export default function ContactPage() {
           <div className="glass-card p-6 md:p-8 space-y-4">
             <h3 className="font-display text-xl font-semibold text-slate-100">Let&apos;s Connect</h3>
             <p className="text-sm text-slate-400 leading-relaxed">
-              Have a project in mind, a job opportunity, or just want to connect? Send me a message and I&apos;ll get back to you promptly.
+              Open to internships, collaborations, and interesting conversations in tech. Feel free to reach out!
             </p>
 
             <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3.5 py-1.5 text-xs font-medium text-emerald-400 border border-emerald-500/20">
