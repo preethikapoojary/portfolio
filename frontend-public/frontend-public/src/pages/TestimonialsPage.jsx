@@ -252,6 +252,9 @@ export default function TestimonialsPage() {
                       setErrorMessage('Google Sign-In failed. Please try again.');
                     }}
                     theme="filled_dark"
+                    text="signin_with"
+                    useOneTap={false}
+                    auto_select={false}
                   />
                 </div>
 
