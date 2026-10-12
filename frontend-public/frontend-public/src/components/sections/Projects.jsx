@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FiGithub, FiExternalLink } from 'react-icons/fi';
 import SectionHeading from '../common/SectionHeading';
+import SectionNavArrow from '../common/SectionNavArrow';
 import EmptyState from '../common/EmptyState';
 import TiltCard from '../common/TiltCard';
 import useFetch from '../../hooks/useFetch';
@@ -12,12 +13,13 @@ export default function Projects() {
   const featuredProjects = projects.slice(0, 3);
 
   return (
-    <section id="projects" className="mx-auto max-w-6xl px-6 py-24">
-      <SectionHeading
-        eyebrow="Projects"
-        title="Selected work"
-        subtitle="A mix of things I've built, shipped, and broken along the way."
-      />
+    <section id="projects" className="relative w-full px-6 py-24">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading
+          eyebrow="Projects"
+          title="Selected work"
+          subtitle="A mix of things I've built, shipped, and broken along the way."
+        />
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -86,6 +88,9 @@ export default function Projects() {
           </div>
         </>
       )}
+      </div>
+
+      <SectionNavArrow currentId="projects" />
     </section>
   );
 }

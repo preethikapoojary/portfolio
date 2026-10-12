@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FiMapPin, FiExternalLink, FiAward } from 'react-icons/fi';
 import SectionHeading from '../common/SectionHeading';
+import SectionNavArrow from '../common/SectionNavArrow';
 import EmptyState from '../common/EmptyState';
 import Lightbox from '../common/Lightbox';
 import TiltCard from '../common/TiltCard';
@@ -12,8 +13,9 @@ export default function Experience() {
   const [proofImage, setProofImage] = useState(null);
 
   return (
-    <section id="experience" className="mx-auto max-w-4xl px-6 py-24">
-      <SectionHeading eyebrow="Experience" title="Where I've worked" />
+    <section id="experience" className="relative w-full px-6 py-24">
+      <div className="mx-auto max-w-4xl">
+        <SectionHeading eyebrow="Experience" title="Where I've worked" />
       {loading ? (
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -114,6 +116,7 @@ export default function Experience() {
           })}
         </div>
       )}
+      </div>
 
       {proofImage && (
         <Lightbox
@@ -122,6 +125,8 @@ export default function Experience() {
           onClose={() => setProofImage(null)}
         />
       )}
+
+      <SectionNavArrow currentId="experience" />
     </section>
   );
 }

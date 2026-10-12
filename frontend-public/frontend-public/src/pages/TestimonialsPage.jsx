@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiStar, FiLinkedin, FiGithub, FiArrowLeft, FiUpload, FiCheckCircle, FiEdit3, FiShield, FiUserCheck, FiAward } from 'react-icons/fi';
+import { FiLinkedin, FiGithub, FiArrowLeft, FiUpload, FiCheckCircle, FiEdit3, FiShield, FiUserCheck, FiAward } from 'react-icons/fi';
 import { GoogleLogin } from '@react-oauth/google';
 import { Turnstile } from '@marsidev/react-turnstile';
 import SectionHeading from '../components/common/SectionHeading';
@@ -49,6 +49,22 @@ export default function TestimonialsPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const turnstileRef = useRef(null);
+
+  useEffect(() => {
+    const cancelOneTap = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.disableAutoSelect();
+        window.google.accounts.id.cancel();
+      }
+    };
+    cancelOneTap();
+    const timer1 = setTimeout(cancelOneTap, 300);
+    const timer2 = setTimeout(cancelOneTap, 1000);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, []);
 
   const uploadAvatar = async (e) => {
     const file = e.target.files?.[0];
@@ -148,13 +164,6 @@ export default function TestimonialsPage() {
               className="glass-card p-6 transition-shadow hover:shadow-glow flex flex-col justify-between"
             >
               <div>
-                {t.rating && (
-                  <div className="mb-2 flex gap-1 text-accent">
-                    {Array.from({ length: t.rating }).map((_, j) => (
-                      <FiStar key={j} fill="currentColor" />
-                    ))}
-                  </div>
-                )}
                 <p className="text-sm text-slate-300">&ldquo;{t.message}&rdquo;</p>
               </div>
 
@@ -251,7 +260,8 @@ export default function TestimonialsPage() {
                     onError={() => {
                       setErrorMessage('Google Sign-In failed. Please try again.');
                     }}
-                    theme="filled_dark"
+                    theme="outline"
+                    shape="pill"
                     text="signin_with"
                     useOneTap={false}
                     auto_select={false}
@@ -277,6 +287,10 @@ export default function TestimonialsPage() {
                   onClick={() => {
                     setGoogleCredential(null);
                     setGoogleUser(null);
+                    if (window.google?.accounts?.id) {
+                      window.google.accounts.id.disableAutoSelect();
+                      window.google.accounts.id.cancel();
+                    }
                   }}
                   className="ml-2 text-slate-400 hover:text-slate-200 underline"
                 >

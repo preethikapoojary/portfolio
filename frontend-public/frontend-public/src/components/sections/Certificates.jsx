@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiExternalLink, FiZoomIn } from 'react-icons/fi';
 import SectionHeading from '../common/SectionHeading';
+import SectionNavArrow from '../common/SectionNavArrow';
 import EmptyState from '../common/EmptyState';
 import Lightbox from '../common/Lightbox';
 import TiltCard from '../common/TiltCard';
@@ -14,8 +15,9 @@ export default function Certificates() {
   const featuredCertificates = (certificates || []).slice(0, 3);
 
   return (
-    <section id="certificates" className="mx-auto max-w-6xl px-6 py-24">
-      <SectionHeading eyebrow="Certificates" title="Courses & credentials" />
+    <section id="certificates" className="relative w-full px-6 py-24">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading eyebrow="Certificates" title="Courses & credentials" />
       {loading ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -85,6 +87,7 @@ export default function Certificates() {
           </div>
         </>
       )}
+      </div>
 
       {active && (
         <Lightbox
@@ -94,6 +97,8 @@ export default function Certificates() {
           onClose={() => setActive(null)}
         />
       )}
+
+      <SectionNavArrow currentId="certificates" />
     </section>
   );
 }

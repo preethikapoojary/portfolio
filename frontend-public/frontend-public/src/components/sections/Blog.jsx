@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SectionHeading from '../common/SectionHeading';
+import SectionNavArrow from '../common/SectionNavArrow';
 import EmptyState from '../common/EmptyState';
 import useFetch from '../../hooks/useFetch';
 import api from '../../api/endpoints';
@@ -11,8 +12,9 @@ export default function Blog() {
   const featuredPosts = posts.slice(0, 3);
 
   return (
-    <section id="blog" className="mx-auto max-w-6xl px-6 py-24">
-      <SectionHeading eyebrow="Blog" title="Writing" subtitle="Notes on things I'm building and learning." />
+    <section id="blog" className="relative w-full px-6 py-24">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading eyebrow="Blog" title="Writing" subtitle="Notes on things I'm building and learning." />
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -66,6 +68,9 @@ export default function Blog() {
           </div>
         </>
       )}
+      </div>
+
+      <SectionNavArrow currentId="blog" />
     </section>
   );
 }

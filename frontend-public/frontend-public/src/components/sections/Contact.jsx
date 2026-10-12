@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiMail, FiArrowRight } from 'react-icons/fi';
 import SectionHeading from '../common/SectionHeading';
+import SectionNavArrow from '../common/SectionNavArrow';
 import SocialIcon from '../common/SocialIcon';
 import { useSettings } from '../../context/SettingsContext';
 import { getSocialLinks } from '../../utils/socialLinks';
@@ -11,8 +12,9 @@ export default function Contact() {
   const socialLinks = getSocialLinks(profile);
 
   return (
-    <section id="contact" className="mx-auto max-w-4xl px-6 py-24">
-      <SectionHeading eyebrow="Contact" title="Get in Touch" />
+    <section id="contact" className="relative w-full px-6 py-24">
+      <div className="mx-auto max-w-4xl">
+        <SectionHeading eyebrow="Contact" title="Get in Touch" />
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}
@@ -77,6 +79,9 @@ export default function Contact() {
           )}
         </div>
       </motion.div>
+      </div>
+
+      <SectionNavArrow currentId="contact" isLast={true} />
     </section>
   );
 }

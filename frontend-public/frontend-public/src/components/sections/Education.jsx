@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import SectionHeading from '../common/SectionHeading';
+import SectionNavArrow from '../common/SectionNavArrow';
 import EmptyState from '../common/EmptyState';
 import useFetch from '../../hooks/useFetch';
 import api from '../../api/endpoints';
@@ -10,8 +11,9 @@ export default function Education() {
   const [expandedId, setExpandedId] = useState(null);
 
   return (
-    <section id="education" className="mx-auto max-w-4xl px-6 py-24">
-      <SectionHeading eyebrow="Education" title="Academic background" />
+    <section id="education" className="relative w-full px-6 py-24">
+      <div className="mx-auto max-w-4xl">
+        <SectionHeading eyebrow="Education" title="Academic background" />
       {loading ? (
         <div className="space-y-4">
           {Array.from({ length: 2 }).map((_, i) => (
@@ -73,6 +75,9 @@ export default function Education() {
           })}
         </div>
       )}
+      </div>
+
+      <SectionNavArrow currentId="education" />
     </section>
   );
 }

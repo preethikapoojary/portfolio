@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiZoomIn } from 'react-icons/fi';
 import SectionHeading from '../common/SectionHeading';
+import SectionNavArrow from '../common/SectionNavArrow';
 import EmptyState from '../common/EmptyState';
 import Lightbox from '../common/Lightbox';
 import useFetch from '../../hooks/useFetch';
@@ -19,8 +20,9 @@ export default function Gallery() {
   const showNext = () => setActiveIndex((i) => (i + 1) % featuredImages.length);
 
   return (
-    <section id="gallery" className="mx-auto max-w-6xl px-6 py-24">
-      <SectionHeading eyebrow="Gallery" title="Moments & snapshots" />
+    <section id="gallery" className="relative w-full px-6 py-24">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading eyebrow="Gallery" title="Moments & snapshots" />
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -74,6 +76,7 @@ export default function Gallery() {
           </div>
         </>
       )}
+      </div>
 
       {active && (
         <Lightbox
@@ -85,6 +88,8 @@ export default function Gallery() {
           onNext={featuredImages.length > 1 ? showNext : undefined}
         />
       )}
+
+      <SectionNavArrow currentId="gallery" />
     </section>
   );
 }

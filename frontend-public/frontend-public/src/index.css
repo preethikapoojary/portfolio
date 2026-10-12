@@ -18,6 +18,11 @@ html {
   scroll-behavior: smooth;
 }
 
+section[id],
+[id] {
+  scroll-margin-top: 5.5rem;
+}
+
 body {
   @apply bg-surface text-slate-100 font-body antialiased transition-colors duration-300;
   position: relative;

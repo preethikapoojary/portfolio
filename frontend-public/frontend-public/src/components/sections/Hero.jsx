@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { FiArrowDown, FiDownload, FiRefreshCw, FiAlertCircle } from 'react-icons/fi';
+import { FiDownload, FiRefreshCw, FiAlertCircle } from 'react-icons/fi';
+import SectionNavArrow from '../common/SectionNavArrow';
 import { useSettings } from '../../context/SettingsContext';
 import { getSocialLinks } from '../../utils/socialLinks';
 import SocialIcon from '../common/SocialIcon';
@@ -148,15 +149,7 @@ export default function Hero() {
         )}
       </div>
 
-      <motion.a
-        href="#about"
-        aria-label="Scroll to about section"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-slate-500"
-        animate={{ y: [0, 8, 0] }}
-        transition={{ repeat: Infinity, duration: 1.8 }}
-      >
-        <FiArrowDown size={20} />
-      </motion.a>
+      <SectionNavArrow currentId="home" />
     </section>
   );
 }

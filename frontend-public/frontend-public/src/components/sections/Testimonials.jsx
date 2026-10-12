@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { FiStar, FiLinkedin, FiGithub } from 'react-icons/fi';
+import { FiLinkedin, FiGithub } from 'react-icons/fi';
 import SectionHeading from '../common/SectionHeading';
+import SectionNavArrow from '../common/SectionNavArrow';
 import EmptyState from '../common/EmptyState';
 import TiltCard from '../common/TiltCard';
 import useFetch from '../../hooks/useFetch';
@@ -11,8 +12,9 @@ export default function Testimonials() {
   const featuredTestimonials = (testimonials || []).slice(0, 3);
 
   return (
-    <section id="testimonials" className="mx-auto max-w-6xl px-6 py-24">
-      <SectionHeading eyebrow="Testimonials" title="What people say" />
+    <section id="testimonials" className="relative w-full px-6 py-24">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading eyebrow="Testimonials" title="What people say" />
 
       {loading ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -28,13 +30,6 @@ export default function Testimonials() {
             {featuredTestimonials.map((t, i) => (
               <TiltCard key={t._id} delay={i * 0.06} className="glass-card p-6 transition-shadow hover:shadow-glow flex flex-col justify-between">
                 <div>
-                  {t.rating && (
-                    <div className="mb-2 flex gap-1 text-accent">
-                      {Array.from({ length: t.rating }).map((_, j) => (
-                        <FiStar key={j} fill="currentColor" />
-                      ))}
-                    </div>
-                  )}
                   <p className="text-sm text-slate-300">&ldquo;{t.message}&rdquo;</p>
                 </div>
 
@@ -79,6 +74,9 @@ export default function Testimonials() {
           </div>
         </>
       )}
+      </div>
+
+      <SectionNavArrow currentId="testimonials" />
     </section>
   );
 }
