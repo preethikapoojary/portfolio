@@ -25,7 +25,16 @@ const list = asyncHandler(async (req, res) => {
 const upload = asyncHandler(async (req, res) => {
   if (!req.file) throw ApiError.badRequest('No file uploaded');
 
-  const file = await uploadService.uploadDocument(req.file.buffer, req.file.originalname);
+  let file;
+  try {
+    file = await uploadService.uploadDocument(req.file.buffer, req.file.originalname);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('[Resume Upload] Cloudinary/storage error:', err.message || err);
+    throw ApiError.internal(
+      `File storage failed: ${err.message || 'unable to upload to cloud storage — check Cloudinary configuration'}`
+    );
+  }
   const isFirstVersion = (await ResumeVersion.countDocuments()) === 0;
 
   const version = await ResumeVersion.create({

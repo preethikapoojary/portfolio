@@ -23,8 +23,9 @@ export default function ResumePage() {
       setLabel('');
       e.target.reset();
       await load();
-    } catch {
-      setError('Upload failed — make sure the file is a PDF under 10MB.');
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Upload failed';
+      setError(`Upload failed — ${msg}`);
     } finally {
       setUploading(false);
     }
