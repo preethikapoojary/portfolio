@@ -15,6 +15,7 @@ import GalleryPage from './pages/GalleryPage';
 import BlogPage from './pages/BlogPage';
 import BlogPost from './pages/BlogPost';
 import TestimonialsPage from './pages/TestimonialsPage';
+import ExperienceDetail from './pages/ExperienceDetail';
 import ContactPage from './pages/ContactPage';
 import NotFound from './pages/NotFound';
 
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/:slug" element={<ProjectDetail />} />
+          <Route path="/experience/:id" element={<ExperienceDetail />} />
           <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/blog" element={<BlogPage />} />

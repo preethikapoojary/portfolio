@@ -22,6 +22,7 @@ export const api = {
   getProjects: (params) => unwrap(axiosClient.get('/projects', { params })),
   getProjectBySlug: (slug) => unwrap(axiosClient.get(`/projects/${slug}`)),
   getExperience: () => unwrap(axiosClient.get('/experience')),
+  getExperienceById: (id) => unwrap(axiosClient.get(`/experience/${id}`)),
   getCertificates: () => unwrap(axiosClient.get('/certificates')),
   getAchievements: () => unwrap(axiosClient.get('/achievements')),
   getGallery: (params) => unwrap(axiosClient.get('/gallery', { params })),

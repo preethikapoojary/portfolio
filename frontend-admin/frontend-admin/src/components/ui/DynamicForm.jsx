@@ -7,7 +7,8 @@ import RichTextEditor from './RichTextEditor';
  * declare its shape, not build a bespoke form. Supported types: text,
  * textarea, richtext, number, date, checkbox, select, tags (comma-separated
  * array), lines (one-per-line array, e.g. bullet responsibilities), image
- * (single mediaSchema), images (array of mediaSchema), pdf (single document).
+ * (single mediaSchema), images (array of mediaSchema), pdf (single document),
+ * custom (provide a `render(value, onChange)` function for complex fields).
  */
 export default function DynamicForm({ fields, values, onChange }) {
   const set = (key, value) => onChange({ ...values, [key]: value });
@@ -127,6 +128,9 @@ function renderField(field, values, set) {
           <ImageUploader value={null} onChange={(media) => media && set(field.key, [...(value || []), media])} />
         </div>
       );
+
+    case 'custom':
+      return field.render(value, (v) => set(field.key, v));
 
     default:
       return <input className="input" value={value || ''} onChange={(e) => set(field.key, e.target.value)} />;
