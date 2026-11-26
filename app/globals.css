@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #6366f1;
+  --color-secondary: #8b5cf6;
+  --color-accent: #f59e0b;
+  --font-display: 'Space Grotesk';
+  --font-body: 'Inter';
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+section[id],
+[id] {
+  scroll-margin-top: 5.5rem;
+}
+
+/* Public portfolio base styling (scoped so /admin keeps its light surface) */
+body:not(.admin-body) {
+  @apply bg-surface text-slate-100 font-body antialiased transition-colors duration-300;
+  position: relative;
+}
+
+body:not(.admin-body)::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.14;
+  background:
+    radial-gradient(circle at 15% 10%, var(--color-primary), transparent 30%),
+    radial-gradient(circle at 85% 60%, var(--color-secondary), transparent 32%),
+    radial-gradient(circle at 40% 90%, var(--color-accent), transparent 28%);
+}
+
+html:not(.dark) body:not(.admin-body)::before {
+  opacity: 0.06;
+}
+
+.font-display {
+  letter-spacing: -0.02em;
+}
+
+html:not(.dark) body:not(.admin-body) {
+  @apply bg-slate-50 text-slate-800;
+}
+
+html:not(.dark) .glass-card {
+  @apply bg-white/70 shadow-md;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: #0b0f19;
+}
+
+.glass-card {
+  @apply relative rounded-xl2 backdrop-blur-md bg-glass shadow-glass;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: transform 0.25s ease, box-shadow 0.3s ease, background-color 0.25s ease;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.65;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

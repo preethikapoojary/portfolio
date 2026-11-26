@@ -1,10 +1,15 @@
 **/node_modules/
+**/.next/
 **/.env
-**/.env.local
+**/.env.*
+!.env.example
 **/dist/
 **/build/
+_legacy/
 
 
 
 
 
+
+*.tsbuildinfo

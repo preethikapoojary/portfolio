@@ -1,0 +1,27 @@
+.admin-shell {
+  --color-primary: #6366f1;
+  --color-secondary: #8b5cf6;
+  --color-accent: #f59e0b;
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.admin-shell .card {
+  @apply rounded-xl bg-white p-6 shadow-card;
+}
+
+.admin-shell .btn-primary {
+  @apply rounded-lg bg-admin-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-admin-primary-dark disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+.admin-shell .btn-secondary {
+  @apply rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-admin-ink transition hover:bg-slate-50;
+}
+
+.admin-shell .input {
+  @apply w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-admin-ink outline-none focus:border-admin-primary focus:ring-2 focus:ring-admin-primary/20;
+}
+
+.admin-shell .label {
+  @apply mb-1.5 block text-sm font-medium text-admin-ink;
+}
