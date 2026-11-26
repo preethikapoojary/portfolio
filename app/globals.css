@@ -39,19 +39,76 @@ body:not(.admin-body)::before {
 }
 
 html:not(.dark) body:not(.admin-body)::before {
-  opacity: 0.06;
+  opacity: 0.08;
 }
 
 .font-display {
   letter-spacing: -0.02em;
 }
 
+/* ============================================================================
+   Light Mode Overrides (when html does not have .dark)
+   ============================================================================ */
 html:not(.dark) body:not(.admin-body) {
-  @apply bg-slate-50 text-slate-800;
+  @apply bg-slate-50 text-slate-900;
 }
 
-html:not(.dark) .glass-card {
-  @apply bg-white/70 shadow-md;
+html:not(.dark) body:not(.admin-body) canvas {
+  filter: invert(1);
+  opacity: 0.22;
+}
+
+html:not(.dark) body:not(.admin-body) .glass-card {
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+}
+
+html:not(.dark) body:not(.admin-body) .text-slate-100,
+html:not(.dark) body:not(.admin-body) .text-slate-200 {
+  color: #0f172a;
+}
+
+html:not(.dark) body:not(.admin-body) .text-slate-300 {
+  color: #334155;
+}
+
+html:not(.dark) body:not(.admin-body) .text-slate-400 {
+  color: #475569;
+}
+
+html:not(.dark) body:not(.admin-body) .bg-white\/5 {
+  background-color: rgba(15, 23, 42, 0.04);
+}
+
+html:not(.dark) body:not(.admin-body) .bg-white\/10 {
+  background-color: rgba(15, 23, 42, 0.07);
+}
+
+html:not(.dark) body:not(.admin-body) .hover\:bg-white\/10:hover {
+  background-color: rgba(15, 23, 42, 0.1);
+}
+
+html:not(.dark) body:not(.admin-body) .border-white\/10,
+html:not(.dark) body:not(.admin-body) .border-white\/15,
+html:not(.dark) body:not(.admin-body) .border-white\/20 {
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+html:not(.dark) body:not(.admin-body) .bg-surface\/80,
+html:not(.dark) body:not(.admin-body) .bg-surface\/90,
+html:not(.dark) body:not(.admin-body) .bg-surface\/95 {
+  background-color: rgba(248, 250, 252, 0.92);
+}
+
+html:not(.dark) body:not(.admin-body) .bg-surface {
+  background-color: #f8fafc;
+}
+
+html:not(.dark) body:not(.admin-body) input,
+html:not(.dark) body:not(.admin-body) textarea,
+html:not(.dark) body:not(.admin-body) select {
+  color: #0f172a;
+  border-color: rgba(15, 23, 42, 0.18);
 }
 
 ::selection {
