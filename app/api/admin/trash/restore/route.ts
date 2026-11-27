@@ -16,6 +16,7 @@ const TABLE_MAP: Record<string, { table: string; resource: string }> = {
   blog: { table: "blog_posts", resource: "BlogPost" },
   testimonials: { table: "testimonials", resource: "Testimonial" },
   messages: { table: "contact_messages", resource: "ContactMessage" },
+  notes: { table: "admin_notes", resource: "AdminNote" },
 };
 
 const ABOUT_JSON_MAP: Record<string, { column: string; resource: string }> = {

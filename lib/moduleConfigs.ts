@@ -50,4 +50,9 @@ export const CRUD_CONFIGS: Record<string, CrudConfig> = {
     defaultOrder: { column: "created_at", ascending: false },
     hasSlug: true,
   },
+  notes: {
+    table: "admin_notes",
+    resourceName: "AdminNote",
+    defaultOrder: { column: "created_at", ascending: false },
+  },
 };

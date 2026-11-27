@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
   try {
     const supabase = getServiceSupabase();
-    const [aboutRes, projects, experience, certificates, blog, testimonials, messages] =
+    const [aboutRes, projects, experience, certificates, blog, testimonials, messages, notes] =
       await Promise.all([
         getSingletonRow("about"),
         supabase.from("projects").select("id, title, category, archived_at, updated_at").eq("is_archived", true),
@@ -22,6 +22,7 @@ export async function GET(req: Request) {
         supabase.from("blog_posts").select("id, title, category, archived_at, updated_at").eq("is_archived", true),
         supabase.from("testimonials").select("id, name, role, company, archived_at, updated_at").eq("is_archived", true),
         supabase.from("contact_messages").select("id, name, email, subject, archived_at, updated_at").eq("is_archived", true),
+        supabase.from("admin_notes").select("id, title, category, archived_at, updated_at").eq("is_archived", true),
       ]);
 
     const items: any[] = [];
@@ -51,6 +52,9 @@ export async function GET(req: Request) {
     }
     for (const r of messages.data || []) {
       items.push({ id: r.id, module: "messages", moduleLabel: "Message", title: r.subject || r.name, subtitle: r.email, archivedAt: r.archived_at || r.updated_at });
+    }
+    for (const r of notes.data || []) {
+      items.push({ id: r.id, module: "notes", moduleLabel: "Note", title: r.title, subtitle: r.category || "", archivedAt: r.archived_at || r.updated_at });
     }
 
     const aboutRow = aboutRes.row || {};

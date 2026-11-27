@@ -223,6 +223,18 @@ create table if not exists public.activity_logs (
 
 create index if not exists idx_activity_created on public.activity_logs (created_at desc);
 
+create table if not exists public.admin_notes (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  content text not null default '',
+  category text not null default 'General',
+  is_pinned boolean not null default false,
+  is_archived boolean not null default false,
+  archived_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- ------------------------------------------------------------------------------
 -- 6. Row Level Security (RLS)
 -- ------------------------------------------------------------------------------
@@ -237,6 +249,7 @@ alter table public.testimonials enable row level security;
 alter table public.contact_messages enable row level security;
 alter table public.analytics_events enable row level security;
 alter table public.activity_logs enable row level security;
+alter table public.admin_notes enable row level security;
 
 create policy "Public read about" on public.about for select using (true);
 create policy "Public read settings" on public.site_settings for select using (true);
@@ -261,6 +274,7 @@ create policy "Admin all testimonials" on public.testimonials for all using (pub
 create policy "Admin all messages" on public.contact_messages for all using (public.is_admin());
 create policy "Admin all analytics" on public.analytics_events for all using (public.is_admin());
 create policy "Admin all activity_logs" on public.activity_logs for all using (public.is_admin());
+create policy "Admin all admin_notes" on public.admin_notes for all using (public.is_admin());
 
 -- ------------------------------------------------------------------------------
 -- 7. Supabase Storage Bucket (portfolio-media)
