@@ -129,18 +129,32 @@ html.dark body:not(.admin-body) .editorial-link {
   line-height: 1.8;
 }
 
-.editorial-prose h2,
+.editorial-prose h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.85rem;
+  line-height: 1.25;
+  margin-top: 2.25rem;
+  margin-bottom: 0.85rem;
+  font-weight: 700;
+  color: #22221F;
+}
+
 .editorial-prose h3 {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  margin-top: 2rem;
+  font-size: 1.6rem;
+  line-height: 1.3;
+  margin-top: 2.25rem;
   margin-bottom: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: #22221F;
 }
 
 .editorial-prose h4 {
-  margin-top: 1.35rem;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  margin-top: 1.5rem;
   margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #22221F;
 }
 
