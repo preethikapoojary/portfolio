@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FiArrowRight } from 'react-icons/fi';
+import { FiArrowRight, FiGithub } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
@@ -78,9 +78,21 @@ export default function Projects() {
                   )}
 
                   <div className="mt-6 flex items-center justify-between gap-4">
-                    <Link href={`/projects/${project.slug}`} className="editorial-link text-[15px]">
-                      View Project <FiArrowRight size={15} />
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-5">
+                      <Link href={`/projects/${project.slug}`} className="editorial-link text-[15px]">
+                        View Project <FiArrowRight size={15} />
+                      </Link>
+                      {project.githubUrl && (
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="editorial-link text-[15px]"
+                        >
+                          <FiGithub size={14} /> GitHub Repository
+                        </a>
+                      )}
+                    </div>
                     <ShareMenu path={`/projects/${project.slug}`} title={project.title} />
                   </div>
                 </div>
