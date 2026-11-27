@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { FiArrowLeft, FiCheck } from 'react-icons/fi';
-import { supabase } from '@/lib/supabase';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -16,12 +15,15 @@ export default function ForgotPassword() {
     setError('');
     setLoading(true);
     try {
-      const redirectTo = `${window.location.origin}/admin/update-password`;
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-        email.trim(),
-        { redirectTo }
-      );
-      if (resetError) throw resetError;
+      const res = await fetch('/api/admin/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json?.success) {
+        throw new Error(json?.message || 'Unable to send magic recovery link.');
+      }
       setSent(true);
     } catch (err) {
       setError(err?.message || 'Unable to send magic recovery link.');

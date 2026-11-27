@@ -17,24 +17,38 @@ export default function UpdatePassword() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const checkRecoverySession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        setHasSession(true);
+    const verifyAdminRecoverySession = async (session) => {
+      if (!session?.access_token) {
+        setHasSession(false);
+        setReady(true);
+        return;
       }
-      setReady(true);
+      try {
+        const res = await fetch('/api/admin/auth/me', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        if (!res.ok) {
+          await supabase.auth.signOut();
+          setHasSession(false);
+        } else {
+          setHasSession(true);
+        }
+      } catch {
+        setHasSession(false);
+      } finally {
+        setReady(true);
+      }
     };
 
-    checkRecoverySession();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      verifyAdminRecoverySession(session);
+    });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' || session) {
-        setHasSession(true);
-        setReady(true);
+      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
+        verifyAdminRecoverySession(session);
       }
     });
 

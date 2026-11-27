@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
 import {
   getServiceSupabase,
   verifyAdminRequest,
@@ -8,6 +9,7 @@ import {
   logAdminActivity,
 } from "@/lib/adminAuth";
 import { getSingletonRow } from "@/lib/jsonListHandler";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const TABLE_MAP: Record<string, { table: string; resource: string }> = {
   projects: { table: "projects", resource: "Project" },
@@ -44,6 +46,18 @@ export async function POST(req: Request) {
   if (!admin) return unauthorizedResponse();
 
   try {
+    const ip = getClientIp(req);
+    const rl = checkRateLimit(`trash-perm:${admin.id}:${ip}`, 5, 15 * 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Too many password attempts. Please wait ${rl.retryAfterSec}s.`,
+        },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } }
+      );
+    }
+
     const { module, id, password } = await req.json();
     if (!module || !id) return fail("module and id are required", 400);
     if (!password) return fail("Admin password is required for permanent deletion", 400);

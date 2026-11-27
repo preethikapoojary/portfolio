@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
-import { checkIsAdmin } from "@/lib/admin";
 
 const AdminAuthContext = createContext(null);
 
@@ -16,28 +15,44 @@ export function AdminAuthProvider({ children }) {
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (!session?.user) {
+      if (!session?.user || !session?.access_token) {
         setAdmin(null);
         return;
       }
 
-      const isAdmin = await checkIsAdmin(supabase, session.user.id, session.user.email);
-      if (!isAdmin) {
+      // Server-side verification so localStorage/URL tampering cannot bypass auth
+      const res = await fetch("/api/admin/auth/me", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (!res.ok) {
+        await supabase.auth.signOut();
+        setAdmin(null);
+        return;
+      }
+
+      const json = await res.json();
+      if (!json?.success || !json?.data?.id) {
         await supabase.auth.signOut();
         setAdmin(null);
         return;
       }
 
       const nextAdmin = {
-        id: session.user.id,
-        email: session.user.email,
-        name: session.user.user_metadata?.name || session.user.email?.split("@")[0] || "Admin",
+        id: json.data.id,
+        email: json.data.email || session.user.email,
+        name:
+          session.user.user_metadata?.name ||
+          (json.data.email || session.user.email)?.split("@")[0] ||
+          "Admin",
       };
       setAdmin((prev) =>
         prev?.id === nextAdmin.id && prev?.email === nextAdmin.email && prev?.name === nextAdmin.name
           ? prev
           : nextAdmin
       );
+    } catch {
+      setAdmin(null);
     } finally {
       setLoading(false);
     }
@@ -60,20 +75,21 @@ export function AdminAuthProvider({ children }) {
   }, [loadSession]);
 
   const login = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    const isAdmin = await checkIsAdmin(supabase, data.user.id, data.user.email);
-    if (!isAdmin) {
-      await supabase.auth.signOut();
-      throw new Error("Unauthorized: not an admin account");
+    const res = await fetch("/api/admin/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const json = await res.json();
+    if (!res.ok || !json?.success) {
+      throw new Error(json?.message || "Invalid email or password.");
     }
-    const adminObj = {
-      id: data.user.id,
-      email: data.user.email,
-      name: data.user.user_metadata?.name || data.user.email?.split("@")[0] || "Admin",
-    };
-    setAdmin(adminObj);
-    return adminObj;
+
+    const { error } = await supabase.auth.setSession(json.data.session);
+    if (error) throw error;
+
+    setAdmin(json.data.admin);
+    return json.data.admin;
   };
 
   const logout = async () => {

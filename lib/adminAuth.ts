@@ -43,8 +43,8 @@ export async function verifyAdminRequest(req: Request): Promise<AdminUser | null
 
   const serviceClient = getServiceSupabase();
   const isAdmin =
-    (await checkIsAdmin(serviceClient, user.id, user.email)) ||
-    (await checkIsAdmin(userClient, user.id, user.email));
+    user.app_metadata?.is_admin === true ||
+    (await checkIsAdmin(serviceClient, user.id, user.email));
 
   if (!isAdmin) return null;
 

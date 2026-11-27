@@ -1,8 +1,23 @@
+import { NextResponse } from "next/server";
 import { getServiceSupabase, ok, fail } from "@/lib/adminAuth";
 import { rowToCamel } from "@/lib/mappers";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
+    const rl = checkRateLimit(`contact:ip:${ip}`, 5, 15 * 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Too many messages sent. Please wait ${rl.retryAfterSec}s before trying again.`,
+        },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } }
+      );
+    }
+
     const body = await req.json();
     const { name, email, subject = "", message, turnstileToken } = body;
 
@@ -10,26 +25,9 @@ export async function POST(req: Request) {
       return fail("Name, email, and message are required", 400);
     }
 
-    // Optional Turnstile verification
-    if (process.env.TURNSTILE_SECRET_KEY) {
-      if (!turnstileToken) {
-        return fail("Bot verification required", 400);
-      }
-      const verifyRes = await fetch(
-        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            secret: process.env.TURNSTILE_SECRET_KEY,
-            response: turnstileToken,
-          }),
-        }
-      );
-      const verifyData = await verifyRes.json();
-      if (!verifyData.success) {
-        return fail("Bot verification failed", 400);
-      }
+    const turnstile = await verifyTurnstileToken(turnstileToken, ip);
+    if (!turnstile.ok) {
+      return fail(turnstile.message || "Bot verification failed", 400);
     }
 
     const supabase = getServiceSupabase();

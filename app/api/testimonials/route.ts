@@ -1,5 +1,8 @@
+import { NextResponse } from "next/server";
 import { getServiceSupabase, ok, fail } from "@/lib/adminAuth";
 import { rowToCamel, rowsToCamel } from "@/lib/mappers";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export async function GET() {
   try {
@@ -21,6 +24,18 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
+    const rl = checkRateLimit(`testimonials:ip:${ip}`, 5, 15 * 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Too many submissions. Please wait ${rl.retryAfterSec}s before trying again.`,
+        },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } }
+      );
+    }
+
     const body = await req.json();
     const {
       name,
@@ -32,10 +47,16 @@ export async function POST(req: Request) {
       message,
       avatar = { url: null, publicId: null, alt: "" },
       rating = 5,
+      turnstileToken,
     } = body;
 
     if (!name?.trim() || !message?.trim()) {
       return fail("Name and message are required", 400);
+    }
+
+    const turnstile = await verifyTurnstileToken(turnstileToken, ip);
+    if (!turnstile.ok) {
+      return fail(turnstile.message || "Bot verification failed", 400);
     }
 
     const supabase = getServiceSupabase();
