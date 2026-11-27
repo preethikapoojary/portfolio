@@ -6,7 +6,6 @@ const fields = [
   { key: 'title', label: 'Title', type: 'text' },
   { key: 'description', label: 'Description', type: 'textarea' },
   { key: 'date', label: 'Date', type: 'date' },
-  { key: 'icon', label: 'Icon (react-icons name e.g. FiAward, or an image URL)', type: 'text' },
 ];
 
 const columns = [
@@ -23,7 +22,7 @@ export default function AchievementsPage() {
       api={achievementsApi}
       columns={columns}
       fields={fields}
-      emptyValues={{ title: '', description: '', icon: '' }}
+      emptyValues={{ title: '', description: '', icon: 'FiAward' }}
     />
   );
 }

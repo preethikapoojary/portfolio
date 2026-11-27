@@ -6,7 +6,6 @@ const fields = [
   { key: 'platform', label: 'Platform (e.g. LeetCode, Codeforces)', type: 'text' },
   { key: 'username', label: 'Username', type: 'text' },
   { key: 'profileUrl', label: 'Profile URL', type: 'text' },
-  { key: 'icon', label: 'Icon (react-icons name e.g. FiCode, or an image URL)', type: 'text' },
 ];
 
 const columns = [
@@ -27,7 +26,7 @@ export default function CodingProfilesPage() {
       api={codingProfilesApi}
       columns={columns}
       fields={fields}
-      emptyValues={{ platform: '', username: '', profileUrl: '', icon: '' }}
+      emptyValues={{ platform: '', username: '', profileUrl: '', icon: 'FiCode' }}
     />
   );
 }
