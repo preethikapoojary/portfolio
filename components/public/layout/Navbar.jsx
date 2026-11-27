@@ -41,6 +41,7 @@ export default function Navbar() {
       'projects',
       'experience',
       'certificates',
+      'testimonials',
       ...(hasBlogs ? ['blog'] : []),
       'contact',
     ];
@@ -115,6 +116,7 @@ export default function Navbar() {
     { key: 'projects', label: 'Projects', href: '#projects' },
     { key: 'experience', label: 'Experience', href: '#experience' },
     { key: 'certificates', label: 'Certificates', href: '#certificates' },
+    { key: 'testimonials', label: 'Testimonials', href: '#testimonials' },
     ...(hasBlogs ? [{ key: 'blog', label: 'Blog', href: '#blog' }] : []),
     { key: 'contact', label: 'Contact', href: '#contact' },
   ];

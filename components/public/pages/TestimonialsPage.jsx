@@ -1,414 +1,402 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import { FiLinkedin, FiGithub, FiArrowLeft, FiUpload, FiCheckCircle, FiEdit3, FiShield, FiUserCheck, FiAward } from 'react-icons/fi';
-import { GoogleLogin } from '@react-oauth/google';
-import { Turnstile } from '@marsidev/react-turnstile';
-import SectionHeading from '@/components/public/common/SectionHeading';
-import EmptyState from '@/components/public/common/EmptyState';
-import TiltCard from '@/components/public/common/TiltCard';
-import useFetch from '@/hooks/useFetch';
-import api from '@/api/endpoints';
 
-const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+import { useState } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { FiCheck, FiExternalLink, FiSend, FiStar, FiUpload, FiX } from 'react-icons/fi';
+import { useFetch } from '@/hooks/useFetch';
+import api from '@/api/endpoints';
+import PageHeader from '@/components/public/common/PageHeader';
+
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
-function parseJwtPayload(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch {
-    return null;
-  }
-}
-
-const emptyForm = {
-  name: '',
-  role: '',
-  company: '',
-  email: '',
-  linkedinUrl: '',
-  githubUrl: '',
-  message: '',
-  avatar: null,
-};
-
 export default function TestimonialsPage() {
-  const { data: testimonials, loading } = useFetch(api.getApprovedTestimonials, []);
-  const [form, setForm] = useState(emptyForm);
-  const [googleCredential, setGoogleCredential] = useState(null);
-  const [googleUser, setGoogleUser] = useState(null);
-  const [turnstileToken, setTurnstileToken] = useState('');
-  const [status, setStatus] = useState('idle');
-  const [errorMessage, setErrorMessage] = useState('');
+  const { data: testimonials, loading, refetch } = useFetch(api.getApprovedTestimonials, []);
+  const [form, setForm] = useState({
+    name: '',
+    role: '',
+    company: '',
+    email: '',
+    linkedinUrl: '',
+    githubUrl: '',
+    message: '',
+    rating: 5,
+    avatar: { url: null, publicId: null, alt: '' },
+  });
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const turnstileRef = useRef(null);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const cancelOneTap = () => {
-      if (window.google?.accounts?.id) {
-        window.google.accounts.id.disableAutoSelect();
-        window.google.accounts.id.cancel();
-      }
-    };
-    cancelOneTap();
-    const timer1 = setTimeout(cancelOneTap, 300);
-    const timer2 = setTimeout(cancelOneTap, 1000);
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-    };
-  }, []);
-
-  const uploadAvatar = async (e) => {
+  const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingAvatar(true);
+    setError('');
     try {
-      const media = await api.uploadTestimonialAvatar(file);
-      setForm((f) => ({ ...f, avatar: media }));
+      const uploaded = await api.uploadTestimonialAvatar(file);
+      setForm((prev) => ({ ...prev, avatar: uploaded }));
     } catch {
-      // Non-fatal — testimonial can still be submitted without a custom avatar
+      setError('Unable to upload photo. Please try a smaller image.');
     } finally {
       setUploadingAvatar(false);
     }
   };
 
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
-
-    if (googleClientId && !googleCredential) {
-      setErrorMessage('Please sign in with Google to submit your testimonial.');
+    setError('');
+    if (!form.name.trim() || !form.message.trim()) {
+      setError('Name and message are required.');
       return;
     }
-
     if (turnstileSiteKey && !turnstileToken) {
-      setErrorMessage('Please complete the security check.');
+      setError('Please complete the verification check.');
       return;
     }
 
-    setStatus('sending');
+    setSubmitting(true);
     try {
-      await api.submitTestimonial({
-        ...form,
-        ...(googleCredential ? { googleCredential, googleUser } : {}),
-        ...(turnstileToken ? { turnstileToken } : {}),
+      await api.submitTestimonial({ ...form, turnstileToken });
+      setSubmitted(true);
+      setForm({
+        name: '',
+        role: '',
+        company: '',
+        email: '',
+        linkedinUrl: '',
+        githubUrl: '',
+        message: '',
+        rating: 5,
+        avatar: { url: null, publicId: null, alt: '' },
       });
-      setStatus('sent');
-      setForm(emptyForm);
-      setGoogleCredential(null);
-      setGoogleUser(null);
-      setTurnstileToken('');
-      turnstileRef.current?.reset();
+      refetch();
     } catch (err) {
-      setStatus('error');
-      setErrorMessage(err.response?.data?.message || 'Something went wrong. Please try again.');
-      setTurnstileToken('');
-      turnstileRef.current?.reset();
+      setError(err?.response?.data?.message || 'Unable to submit testimonial. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const scrollToSubmission = () => {
-    const el = document.getElementById('leave-testimonial');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const approved = testimonials || [];
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-24 pt-32">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-        <Link
-          href="/"
-          className="glass-card inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-slate-300 transition duration-300 hover:scale-[1.04] hover:text-primary hover:shadow-glow"
-        >
-          <FiArrowLeft /> Back to Portfolio
-        </Link>
-        <button
-          onClick={scrollToSubmission}
-          className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-surface transition duration-300 hover:scale-[1.04] hover:shadow-glow"
-          style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))' }}
-        >
-          <FiEdit3 /> Leave a Testimonial
-        </button>
-      </div>
-
-      <SectionHeading
-        eyebrow="Testimonials"
+    <div className="mx-auto max-w-6xl px-6 pb-24 sm:px-8">
+      <PageHeader
+        eyebrow="Endorsements"
         title="Testimonials"
-        subtitle="Feedback from peers, teammates, and collaborators."
+        description="Reflections and endorsements from collaborators, peers, and mentors."
       />
 
-      {/* Grid of All Approved Testimonials (3 desktop / 2 tablet / 1 mobile) */}
-      {loading ? (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="glass-card h-40 animate-pulse" />
-          ))}
+      <div className="grid gap-14 py-14 lg:grid-cols-12 lg:gap-16">
+        {/* Approved Testimonials List */}
+        <div className="lg:col-span-7">
+          <p className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-[#89877F]">
+            Published Notes ({approved.length})
+          </p>
+
+          {loading ? (
+            <p className="text-sm text-[#89877F]">Loading testimonials…</p>
+          ) : approved.length === 0 ? (
+            <div className="border border-[#DCD9D1] bg-[#E9E5DC]/25 p-8">
+              <p className="font-display text-2xl text-[#22221F]">
+                No testimonials published yet.
+              </p>
+              <p className="mt-2 text-sm text-[#89877F]">
+                Be the first to share your experience working with Preethika using the form.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {approved.map((item) => (
+                <blockquote
+                  key={item._id}
+                  className="border border-[#DCD9D1] bg-[#E9E5DC]/25 p-7"
+                >
+                  <div className="mb-4 flex items-center gap-1 text-[#85806D]">
+                    {Array.from({ length: item.rating || 5 }).map((_, i) => (
+                      <FiStar key={i} size={13} className="fill-current" />
+                    ))}
+                  </div>
+
+                  <p className="text-base leading-relaxed text-[#22221F] sm:text-lg">
+                    “{item.message}”
+                  </p>
+
+                  <footer className="mt-6 flex items-center justify-between gap-4 border-t border-[#DCD9D1] pt-4">
+                    <div className="flex items-center gap-3">
+                      {item.avatar?.url ? (
+                        <img
+                          src={item.avatar.url}
+                          alt={item.name}
+                          className="h-10 w-10 rounded-full border border-[#DCD9D1] object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 items-center justify-center border border-[#DCD9D1] bg-[#E9E5DC] font-display text-sm font-semibold text-[#22221F]">
+                          {item.name?.charAt(0)?.toUpperCase() || 'T'}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-[#22221F]">{item.name}</p>
+                        {(item.role || item.company) && (
+                          <p className="text-xs text-[#89877F]">
+                            {[item.role, item.company].filter(Boolean).join(', ')}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-xs text-[#89877F]">
+                      {item.linkedinUrl && (
+                        <a
+                          href={item.linkedinUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 hover:text-[#22221F]"
+                        >
+                          LinkedIn <FiExternalLink size={11} />
+                        </a>
+                      )}
+                      {item.githubUrl && (
+                        <a
+                          href={item.githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 hover:text-[#22221F]"
+                        >
+                          GitHub <FiExternalLink size={11} />
+                        </a>
+                      )}
+                    </div>
+                  </footer>
+                </blockquote>
+              ))}
+            </div>
+          )}
         </div>
-      ) : !testimonials?.length ? (
-        <EmptyState message="Approved testimonials will appear here." />
-      ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <TiltCard
-              key={t._id}
-              delay={i * 0.05}
-              className="glass-card p-6 transition-shadow hover:shadow-glow flex flex-col justify-between"
+
+        {/* Submit Testimonial Form */}
+        <div className="lg:col-span-5">
+          <p className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-[#89877F]">
+            Write a Testimonial
+          </p>
+
+          {submitted ? (
+            <div className="border border-[#DCD9D1] bg-[#E9E5DC]/40 p-8">
+              <div className="flex items-center gap-2.5 text-[#22221F]">
+                <FiCheck size={18} />
+                <h2 className="font-display text-2xl font-medium">Thank You</h2>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#89877F]">
+                Your testimonial has been submitted and will appear once approved.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSubmitted(false)}
+                className="editorial-link mt-6"
+              >
+                Submit another note
+              </button>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-5 border border-[#DCD9D1] bg-[#E9E5DC]/25 p-6 sm:p-8"
             >
               <div>
-                <p className="text-sm text-slate-300">&ldquo;{t.message}&rdquo;</p>
+                <label
+                  htmlFor="t-name"
+                  className="mb-1.5 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]"
+                >
+                  Full Name *
+                </label>
+                <input
+                  id="t-name"
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                />
               </div>
 
-              <div className="mt-4 flex items-center gap-3">
-                {t.avatar?.url ? (
-                  <img src={t.avatar.url} alt={t.name} className="h-10 w-10 rounded-full object-cover" />
-                ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-sm text-slate-400">
-                    {t.name?.[0]}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">{t.name}</p>
-                  <p className="truncate text-xs text-slate-500">
-                    {t.role} {t.company ? `· ${t.company}` : ''}
-                  </p>
-                </div>
-                <div className="flex shrink-0 gap-2 text-slate-400">
-                  {t.linkedinUrl && (
-                    <a href={t.linkedinUrl} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="hover:text-primary">
-                      <FiLinkedin />
-                    </a>
-                  )}
-                  {t.githubUrl && (
-                    <a href={t.githubUrl} target="_blank" rel="noreferrer" aria-label="GitHub" className="hover:text-primary">
-                      <FiGithub />
-                    </a>
-                  )}
-                </div>
-              </div>
-            </TiltCard>
-          ))}
-        </div>
-      )}
-
-      {/* Leave a Testimonial Submission Container */}
-      <div id="leave-testimonial" className="mt-20">
-        {!googleUser || !googleCredential ? (
-          /* Step 1: Two-column Authentication & Moderation Intro Panel (Form hidden until Google Sign-In) */
-          <div className="glass-card p-8 md:p-10 max-w-4xl mx-auto">
-            <div className="grid gap-8 md:grid-cols-2 items-center">
-              {/* Left Column: Moderation policies */}
-              <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <h3 className="font-display text-2xl font-semibold text-slate-100">Leave a Testimonial</h3>
-                  <p className="mt-1 text-sm text-slate-400">Please review the moderation policies before submitting.</p>
-                </div>
-
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-start gap-3 rounded-xl bg-white/5 p-3.5 border border-white/10 text-xs text-slate-300">
-                    <FiShield className="text-lg text-primary shrink-0 mt-0.5" />
-                    <span>All testimonials are manually reviewed by admin before publication.</span>
-                  </div>
-                  <div className="flex items-start gap-3 rounded-xl bg-white/5 p-3.5 border border-white/10 text-xs text-slate-300">
-                    <FiUserCheck className="text-lg text-primary shrink-0 mt-0.5" />
-                    <span>Verified profiles help maintain authenticity and reduce spam.</span>
-                  </div>
-                  <div className="flex items-start gap-3 rounded-xl bg-white/5 p-3.5 border border-white/10 text-xs text-slate-300">
-                    <FiAward className="text-lg text-primary shrink-0 mt-0.5" />
-                    <span>Public testimonials display your name, role, avatar, and verified links.</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Google Authentication Panel */}
-              <div className="glass-card p-6 md:p-8 flex flex-col items-center justify-center text-center space-y-4 bg-white/[0.02] border-white/10">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-xl text-primary">
-                  <FiEdit3 />
-                </div>
-                <div>
-                  <h4 className="font-display text-xl font-semibold text-slate-100">Join to Leave a Testimonial</h4>
-                  <p className="mt-1 text-xs text-slate-400 max-w-xs mx-auto">
-                    Google sign-in helps maintain authentic and trusted testimonials.
-                  </p>
-                </div>
-
-                <div className="pt-2">
-                  <GoogleLogin
-                    onSuccess={(credentialResponse) => {
-                      if (credentialResponse.credential) {
-                        setGoogleCredential(credentialResponse.credential);
-                        const payload = parseJwtPayload(credentialResponse.credential);
-                        if (payload) {
-                          setGoogleUser({ name: payload.name, email: payload.email, picture: payload.picture });
-                          setForm((f) => ({
-                            ...f,
-                            name: payload.name || f.name,
-                            email: payload.email || f.email,
-                          }));
-                        }
-                        setErrorMessage('');
-                      }
-                    }}
-                    onError={() => {
-                      setErrorMessage('Google Sign-In failed. Please try again.');
-                    }}
-                    theme="outline"
-                    shape="pill"
-                    text="signin_with"
-                    useOneTap={false}
-                    auto_select={false}
+                  <label
+                    htmlFor="t-role"
+                    className="mb-1.5 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]"
+                  >
+                    Role / Title
+                  </label>
+                  <input
+                    id="t-role"
+                    type="text"
+                    value={form.role}
+                    onChange={(e) => setForm({ ...form, role: e.target.value })}
+                    placeholder="e.g. Software Engineer"
+                    className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
                   />
                 </div>
 
-                {errorMessage && <p className="text-xs text-red-400 mt-2">{errorMessage}</p>}
+                <div>
+                  <label
+                    htmlFor="t-company"
+                    className="mb-1.5 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]"
+                  >
+                    Organization
+                  </label>
+                  <input
+                    id="t-company"
+                    type="text"
+                    value={form.company}
+                    onChange={(e) => setForm({ ...form, company: e.target.value })}
+                    placeholder="e.g. NMAMIT"
+                    className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                  />
+                </div>
               </div>
-            </div>
-          </div>
-        ) : (
-          /* Step 2: Testimonial Form (Revealed ONLY after successful Google Sign-In) */
-          <div className="glass-card max-w-2xl mx-auto p-8 space-y-6">
-            <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="t-linkedin"
+                    className="mb-1.5 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]"
+                  >
+                    LinkedIn URL
+                  </label>
+                  <input
+                    id="t-linkedin"
+                    type="url"
+                    value={form.linkedinUrl}
+                    onChange={(e) => setForm({ ...form, linkedinUrl: e.target.value })}
+                    placeholder="https://linkedin.com/in/..."
+                    className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="t-email"
+                    className="mb-1.5 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]"
+                  >
+                    Email (Private)
+                  </label>
+                  <input
+                    id="t-email"
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                  />
+                </div>
+              </div>
+
+              {/* Rating */}
               <div>
-                <h3 className="font-display text-xl font-semibold text-slate-100">Leave a Testimonial</h3>
-                <p className="text-xs text-slate-400">Fill in your details below to submit your review for moderation.</p>
+                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                  Rating
+                </span>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setForm({ ...form, rating: star })}
+                      aria-label={`Rate ${star} stars`}
+                      className={`p-1 transition-colors ${
+                        star <= form.rating ? 'text-[#22221F]' : 'text-[#DCD9D1]'
+                      }`}
+                    >
+                      <FiStar
+                        size={18}
+                        className={star <= form.rating ? 'fill-current' : ''}
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="flex items-center gap-3 rounded-full bg-emerald-500/10 px-4 py-2 text-xs text-emerald-400 border border-emerald-500/20">
-                <FiCheckCircle /> Verified: {googleUser.name}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setGoogleCredential(null);
-                    setGoogleUser(null);
-                    if (window.google?.accounts?.id) {
-                      window.google.accounts.id.disableAutoSelect();
-                      window.google.accounts.id.cancel();
-                    }
-                  }}
-                  className="ml-2 text-slate-400 hover:text-slate-200 underline"
-                >
-                  Change Account
-                </button>
-              </div>
-            </div>
 
-            <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2 flex items-center gap-4 py-1">
-                {form.avatar?.url || googleUser?.picture ? (
-                  <img src={form.avatar?.url || googleUser?.picture} alt="" className="h-12 w-12 rounded-full object-cover" />
-                ) : (
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-slate-500">
-                    <FiUpload />
+              {/* Optional Photo Upload */}
+              <div>
+                <span className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                  Photo (Optional)
+                </span>
+                {form.avatar?.url ? (
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={form.avatar.url}
+                      alt="Uploaded avatar"
+                      className="h-11 w-11 rounded-full border border-[#DCD9D1] object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm({ ...form, avatar: { url: null, publicId: null, alt: '' } })
+                      }
+                      className="inline-flex items-center gap-1 text-xs text-[#89877F] hover:text-[#22221F]"
+                    >
+                      <FiX size={13} /> Remove
+                    </button>
                   </div>
+                ) : (
+                  <label className="inline-flex cursor-pointer items-center gap-2 border border-[#DCD9D1] bg-[#F6F4EF] px-4 py-2 text-xs font-medium text-[#22221F] transition-colors hover:border-[#22221F]">
+                    <FiUpload size={13} />
+                    <span>{uploadingAvatar ? 'Uploading…' : 'Upload Photo'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      disabled={uploadingAvatar}
+                      className="hidden"
+                    />
+                  </label>
                 )}
-                <label className="cursor-pointer text-sm text-primary hover:underline">
-                  {uploadingAvatar ? 'Uploading…' : 'Upload custom photo (optional)'}
-                  <input type="file" accept="image/*" className="hidden" onChange={uploadAvatar} disabled={uploadingAvatar} />
-                </label>
               </div>
 
-              <input
-                required
-                placeholder="Full name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                readOnly={Boolean(googleUser?.name)}
-                className={`rounded-lg bg-white/5 px-4 py-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                  googleUser?.name ? 'opacity-80 cursor-not-allowed' : ''
-                }`}
-              />
-              <input
-                required
-                placeholder="Role / Designation (e.g. Student, Peer, Developer)"
-                value={form.role}
-                onChange={(e) => setForm({ ...form, role: e.target.value })}
-                className="rounded-lg bg-white/5 px-4 py-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              />
-              <input
-                placeholder="Company / College (optional)"
-                value={form.company}
-                onChange={(e) => setForm({ ...form, company: e.target.value })}
-                className="rounded-lg bg-white/5 px-4 py-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              />
-              <input
-                type="email"
-                placeholder="Email (verified via Google)"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                readOnly={Boolean(googleUser?.email)}
-                className={`rounded-lg bg-white/5 px-4 py-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                  googleUser?.email ? 'opacity-80 cursor-not-allowed' : ''
-                }`}
-              />
-              <input
-                placeholder="LinkedIn profile URL (optional)"
-                value={form.linkedinUrl}
-                onChange={(e) => setForm({ ...form, linkedinUrl: e.target.value })}
-                className="rounded-lg bg-white/5 px-4 py-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              />
-              <input
-                placeholder="GitHub profile URL (optional)"
-                value={form.githubUrl}
-                onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
-                className="rounded-lg bg-white/5 px-4 py-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              />
-              <textarea
-                required
-                placeholder="Share your experience working or collaborating with me..."
-                value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
-                rows={4}
-                className="rounded-lg bg-white/5 px-4 py-2.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary sm:col-span-2"
-              />
+              <div>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <label
+                    htmlFor="t-message"
+                    className="block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]"
+                  >
+                    Testimonial *
+                  </label>
+                  <span className="text-[11px] text-[#89877F]">
+                    {form.message.length}/600
+                  </span>
+                </div>
+                <textarea
+                  id="t-message"
+                  rows={4}
+                  required
+                  maxLength={600}
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  placeholder="Share your experience collaborating or working together…"
+                  className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                />
+              </div>
 
               {turnstileSiteKey && (
-                <div className="sm:col-span-2 my-1 flex justify-center">
-                  <Turnstile
-                    ref={turnstileRef}
-                    siteKey={turnstileSiteKey}
-                    onSuccess={(token) => {
-                      setTurnstileToken(token);
-                      setErrorMessage('');
-                    }}
-                    onExpire={() => setTurnstileToken('')}
-                    onError={() => setTurnstileToken('')}
-                    options={{ theme: 'dark' }}
-                  />
-                </div>
+                <Turnstile
+                  siteKey={turnstileSiteKey}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                />
               )}
+
+              {error && <p className="text-xs text-red-700">{error}</p>}
 
               <button
                 type="submit"
-                disabled={
-                  status === 'sending' ||
-                  (Boolean(googleClientId) && !googleCredential) ||
-                  (Boolean(turnstileSiteKey) && !turnstileToken)
-                }
-                className="justify-self-start rounded-full px-6 py-2.5 text-sm font-medium text-surface transition duration-300 hover:scale-[1.04] hover:shadow-glow disabled:opacity-60 sm:col-span-2"
-                style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))' }}
+                disabled={submitting}
+                className="inline-flex w-full items-center justify-center gap-2 border border-[#22221F] bg-[#22221F] px-6 py-3 text-xs font-medium uppercase tracking-[0.14em] text-[#F6F4EF] transition-colors hover:border-[#85806D] hover:bg-[#85806D] disabled:opacity-60"
               >
-                {status === 'sending' ? 'Submitting…' : 'Submit Testimonial'}
+                <FiSend size={13} />
+                {submitting ? 'Submitting…' : 'Submit Testimonial'}
               </button>
-
-              {status === 'sent' && (
-                <p className="text-sm text-emerald-400 sm:col-span-2">
-                  Thanks! Your testimonial has been submitted and is pending admin approval.
-                </p>
-              )}
-              {(status === 'error' || errorMessage) && (
-                <p className="text-sm text-red-400 sm:col-span-2">{errorMessage || 'Something went wrong. Please try again.'}</p>
-              )}
             </form>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

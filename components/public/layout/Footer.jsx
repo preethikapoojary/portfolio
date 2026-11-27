@@ -13,6 +13,9 @@ export default function Footer() {
       !['gmail', 'email'].includes((link.icon || '').toLowerCase())
   );
   const fullName = profile?.name ? `${profile.name} Poojary` : 'Preethika Poojary';
+  const startYear = 2026;
+  const currentYear = new Date().getFullYear();
+  const yearText = currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`;
 
   return (
     <footer className="border-t border-[#DCD9D1] bg-[#E9E5DC]/50">
@@ -43,7 +46,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-[#DCD9D1] pt-6 text-xs text-[#89877F] sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} {fullName}. All rights reserved.</p>
+          <p>© {yearText} {fullName}. All rights reserved.</p>
           <Link href="/admin" className="hover:text-[#22221F]">
             Admin
           </Link>
