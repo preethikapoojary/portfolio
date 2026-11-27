@@ -21,7 +21,7 @@ export default function SectionsPage() {
   };
 
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="space-y-4">
       <div>
         <h1 className="text-xl font-semibold">Sections</h1>
         <p className="text-sm text-muted">Drag to reorder, toggle to show/hide on the public site.</p>

@@ -11,13 +11,21 @@ export async function GET(req: Request) {
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
+  const { searchParams } = new URL(req.url);
+  const status = searchParams.get("status");
+
   const supabase = getServiceSupabase();
-  const { data, error } = await supabase
+  let query = supabase
     .from("testimonials")
     .select("*")
     .eq("is_archived", false)
     .order("created_at", { ascending: false });
 
+  if (status && ["pending", "approved", "rejected"].includes(status)) {
+    query = query.eq("status", status);
+  }
+
+  const { data, error } = await query;
   if (error) return fail(error.message, 500);
   return ok(rowsToCamel(data));
 }

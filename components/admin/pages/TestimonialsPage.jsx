@@ -23,7 +23,7 @@ const editFields = [
 
 export default function TestimonialsPage() {
   const [items, setItems] = useState([]);
-  const [filter, setFilter] = useState('pending');
+  const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -61,19 +61,21 @@ export default function TestimonialsPage() {
   };
 
   return (
-    <div className="max-w-3xl space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold">Testimonials</h1>
           <p className="text-sm text-muted">Only approved & visible testimonials show on the public site.</p>
         </div>
         <div className="flex gap-2">
-          {['pending', 'approved', 'rejected', 'all'].map((f) => (
+          {['all', 'approved', 'pending', 'rejected'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`rounded-lg px-3 py-1.5 text-sm capitalize ${
-                filter === f ? 'bg-primary/10 text-primary' : 'text-muted hover:bg-slate-100'
+              className={`border px-3 py-1.5 text-xs font-medium uppercase tracking-[0.08em] transition-colors ${
+                filter === f
+                  ? 'border-[#22221F] bg-[#22221F] text-[#F6F4EF]'
+                  : 'border-[#DCD9D1] text-muted hover:border-[#22221F] hover:text-ink'
               }`}
             >
               {f}
