@@ -109,17 +109,32 @@ export default function Navbar() {
     };
   }, [mobileOpen, toggle]);
 
-  const navLinks = [
+  const homeNavLinks = [
     { key: 'home', label: 'Home', href: '/' },
-    { key: 'about', label: 'About', href: isHome ? '#about' : '/#about' },
-    { key: 'projects', label: 'Projects', href: isHome ? '#projects' : '/#projects' },
-    { key: 'experience', label: 'Experience', href: isHome ? '#experience' : '/#experience' },
-    { key: 'certificates', label: 'Certificates', href: isHome ? '#certificates' : '/#certificates' },
-    ...(hasBlogs
-      ? [{ key: 'blog', label: 'Blog', href: isHome ? '#blog' : '/#blog' }]
-      : []),
-    { key: 'contact', label: 'Contact', href: isHome ? '#contact' : '/#contact' },
+    { key: 'about', label: 'About', href: '#about' },
+    { key: 'projects', label: 'Projects', href: '#projects' },
+    { key: 'experience', label: 'Experience', href: '#experience' },
+    { key: 'certificates', label: 'Certificates', href: '#certificates' },
+    ...(hasBlogs ? [{ key: 'blog', label: 'Blog', href: '#blog' }] : []),
+    { key: 'contact', label: 'Contact', href: '#contact' },
   ];
+
+  // Contextual links for sub-pages:
+  // - Top-level sub-pages (/about, /projects, etc.): Home + theme toggle
+  // - Detail pages (/projects/[slug], /experience/[id], /blog/[slug]): Home + parent section + theme toggle
+  const getSubPageLinks = () => {
+    const links = [{ key: 'home', label: 'Home', href: '/' }];
+    if (pathname?.startsWith('/projects/') && pathname !== '/projects') {
+      links.push({ key: 'projects', label: 'Projects', href: '/projects' });
+    } else if (pathname?.startsWith('/experience/') && pathname !== '/experience') {
+      links.push({ key: 'experience', label: 'Experience', href: '/experience' });
+    } else if (pathname?.startsWith('/blog/') && pathname !== '/blog') {
+      links.push({ key: 'blog', label: 'Blog', href: '/blog' });
+    }
+    return links;
+  };
+
+  const navLinks = isHome ? homeNavLinks : getSubPageLinks();
 
   const isLinkActive = (key) => {
     if (isHome) return activeKey === key;
