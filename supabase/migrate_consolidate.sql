@@ -175,6 +175,50 @@ alter table public.admin_notes enable row level security;
 drop policy if exists "Admin all admin_notes" on public.admin_notes;
 create policy "Admin all admin_notes" on public.admin_notes for all using (public.is_admin());
 
+-- 7. Full Analytics tables (page_views, section_views, extended analytics_events)
+alter table public.analytics_events
+  drop constraint if exists analytics_events_type_check;
+alter table public.analytics_events
+  add column if not exists event_type text not null default '',
+  add column if not exists session_id text not null default '',
+  add column if not exists target_id text,
+  add column if not exists metadata jsonb not null default '{}'::jsonb;
+
+create table if not exists public.page_views (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null,
+  path text not null,
+  title text not null default '',
+  referrer text not null default 'Direct',
+  browser text not null default 'Unknown',
+  os text not null default 'Unknown',
+  device_type text not null default 'Desktop',
+  country text not null default 'Unknown',
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_page_views_created on public.page_views (created_at desc);
+
+create table if not exists public.section_views (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null,
+  section_id text not null,
+  time_spent_ms integer not null default 0,
+  max_scroll_depth_percent integer not null default 0,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_section_views_created on public.section_views (created_at desc);
+
+alter table public.page_views enable row level security;
+alter table public.section_views enable row level security;
+drop policy if exists "Public log page_views" on public.page_views;
+create policy "Public log page_views" on public.page_views for insert with check (true);
+drop policy if exists "Public log section_views" on public.section_views;
+create policy "Public log section_views" on public.section_views for insert with check (true);
+drop policy if exists "Admin all page_views" on public.page_views;
+create policy "Admin all page_views" on public.page_views for all using (public.is_admin());
+drop policy if exists "Admin all section_views" on public.section_views;
+create policy "Admin all section_views" on public.section_views for all using (public.is_admin());
+
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;

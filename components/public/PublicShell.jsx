@@ -7,6 +7,7 @@ import { SettingsProvider, useSettings } from '@/context/SettingsContext';
 import Navbar from '@/components/public/layout/Navbar';
 import Footer from '@/components/public/layout/Footer';
 import LoadingScreen from '@/components/public/layout/LoadingScreen';
+import AnalyticsTracker from '@/components/public/AnalyticsTracker';
 
 function PublicContent({ children }) {
   const { ready } = useSettings();
@@ -22,6 +23,7 @@ function PublicContent({ children }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F6F4EF] text-[#22221F] transition-colors duration-200">
+      <AnalyticsTracker />
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />

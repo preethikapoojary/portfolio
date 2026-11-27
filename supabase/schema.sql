@@ -201,14 +201,44 @@ create table if not exists public.contact_messages (
 
 create table if not exists public.analytics_events (
   id uuid primary key default gen_random_uuid(),
-  type text not null check (type in ('page_view', 'project_view', 'resume_download')),
+  type text not null default 'event',
+  event_type text not null default '',
+  session_id text not null default '',
+  target_id text,
+  metadata jsonb not null default '{}'::jsonb,
   ref_id uuid,
-  visitor_hash text not null,
+  visitor_hash text not null default 'anonymous',
   path text not null default '',
   created_at timestamptz not null default now()
 );
 
 create index if not exists idx_analytics_type_created on public.analytics_events (type, created_at desc);
+
+create table if not exists public.page_views (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null,
+  path text not null,
+  title text not null default '',
+  referrer text not null default 'Direct',
+  browser text not null default 'Unknown',
+  os text not null default 'Unknown',
+  device_type text not null default 'Desktop',
+  country text not null default 'Unknown',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_page_views_created on public.page_views (created_at desc);
+
+create table if not exists public.section_views (
+  id uuid primary key default gen_random_uuid(),
+  session_id text not null,
+  section_id text not null,
+  time_spent_ms integer not null default 0,
+  max_scroll_depth_percent integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_section_views_created on public.section_views (created_at desc);
 
 create table if not exists public.activity_logs (
   id uuid primary key default gen_random_uuid(),
@@ -249,6 +279,8 @@ alter table public.blog_posts enable row level security;
 alter table public.testimonials enable row level security;
 alter table public.contact_messages enable row level security;
 alter table public.analytics_events enable row level security;
+alter table public.page_views enable row level security;
+alter table public.section_views enable row level security;
 alter table public.activity_logs enable row level security;
 alter table public.admin_notes enable row level security;
 
@@ -263,6 +295,8 @@ create policy "Public read approved testimonials" on public.testimonials for sel
 create policy "Public submit contact" on public.contact_messages for insert with check (true);
 create policy "Public submit testimonial" on public.testimonials for insert with check (status = 'pending');
 create policy "Public log analytics" on public.analytics_events for insert with check (true);
+create policy "Public log page_views" on public.page_views for insert with check (true);
+create policy "Public log section_views" on public.section_views for insert with check (true);
 
 create policy "Admin all admin_users" on public.admin_users for all using (public.is_admin());
 create policy "Admin all about" on public.about for all using (public.is_admin());
@@ -274,6 +308,8 @@ create policy "Admin all blog" on public.blog_posts for all using (public.is_adm
 create policy "Admin all testimonials" on public.testimonials for all using (public.is_admin());
 create policy "Admin all messages" on public.contact_messages for all using (public.is_admin());
 create policy "Admin all analytics" on public.analytics_events for all using (public.is_admin());
+create policy "Admin all page_views" on public.page_views for all using (public.is_admin());
+create policy "Admin all section_views" on public.section_views for all using (public.is_admin());
 create policy "Admin all activity_logs" on public.activity_logs for all using (public.is_admin());
 create policy "Admin all admin_notes" on public.admin_notes for all using (public.is_admin());
 
