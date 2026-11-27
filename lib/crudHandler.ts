@@ -114,7 +114,7 @@ async function isSlugTaken(
   return Boolean(data && data.length > 0);
 }
 
-async function resolveUniqueSlug(
+export async function resolveUniqueSlug(
   supabase: ReturnType<typeof getServiceSupabase>,
   table: string,
   rawSlug: string | undefined,

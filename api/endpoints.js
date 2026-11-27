@@ -30,6 +30,7 @@ export const api = {
   getBlogPosts: (params) => unwrap(axiosClient.get('/blog', { params })),
   getBlogPostBySlug: (slug) => unwrap(axiosClient.get(`/blog/${slug}`)),
   getApprovedTestimonials: () => unwrap(axiosClient.get('/testimonials')),
+  getTestimonialBySlug: (slug) => unwrap(axiosClient.get(`/testimonials/${slug}`)),
   getCodingProfiles: () => unwrap(axiosClient.get('/coding-profiles')),
   getGithub: () => unwrap(axiosClient.get('/github')),
 

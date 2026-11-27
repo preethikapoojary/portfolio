@@ -240,6 +240,26 @@ where c.id = r.id and r.rn > 1;
 
 create unique index if not exists certificates_slug_key on public.certificates(slug);
 
+-- 9. Testimonials unique slug
+alter table public.testimonials
+  add column if not exists slug text not null default '';
+
+update public.testimonials
+set slug = trim(both '-' from regexp_replace(lower(name), '[^a-z0-9]+', '-', 'g'))
+where slug = '' or slug is null;
+
+with ranked_testimonials as (
+  select id, slug,
+         row_number() over (partition by slug order by created_at asc, id asc) as rn
+  from public.testimonials
+)
+update public.testimonials t
+set slug = r.slug || '-' || r.rn
+from ranked_testimonials r
+where t.id = r.id and r.rn > 1;
+
+create unique index if not exists testimonials_slug_key on public.testimonials(slug);
+
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;

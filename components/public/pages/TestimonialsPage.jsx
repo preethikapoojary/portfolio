@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { Turnstile } from '@marsidev/react-turnstile';
 import {
@@ -16,6 +17,7 @@ import {
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
+import { downloadTestimonialImage } from '@/utils/downloadTestimonialImage';
 
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -311,36 +313,42 @@ export default function TestimonialsPage() {
         <p className="py-12 text-center text-sm text-[#89877F]">Loading testimonials…</p>
       ) : approved.length > 0 ? (
         <section className="mb-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {approved.map((item) => (
+          {approved.map((item) => {
+            const itemPath = `/testimonials-${item.slug || item._id}`;
+            return (
             <blockquote
               key={item._id}
-              className="flex flex-col justify-between border border-[#DCD9D1] bg-[#E9E5DC]/25 p-6"
+              className="flex flex-col justify-between border border-[#DCD9D1] bg-[#E9E5DC]/25 p-6 transition-colors hover:border-[#85806D]"
             >
-              <p className="text-center text-sm italic leading-relaxed text-[#22221F] sm:text-[15px]">
-                “{item.message}”
-              </p>
+              <Link href={itemPath} className="block flex-1">
+                <p className="text-center text-sm italic leading-relaxed text-[#22221F] sm:text-[15px]">
+                  “{item.message}”
+                </p>
+              </Link>
 
               <footer className="mt-6 flex items-center gap-3.5 border-t border-[#DCD9D1] pt-4">
-                {item.avatar?.url ? (
-                  <img
-                    src={item.avatar.url}
-                    alt={item.name}
-                    className="h-11 w-11 shrink-0 rounded-full border border-[#DCD9D1] object-cover"
-                  />
-                ) : (
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#DCD9D1] bg-[#E9E5DC] font-display text-base font-semibold text-[#22221F]">
-                    {item.name?.charAt(0)?.toUpperCase() || 'T'}
-                  </div>
-                )}
-
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-[#22221F]">{item.name}</p>
-                  {(item.role || item.company) && (
-                    <p className="truncate text-xs text-[#89877F]">
-                      {[item.role, item.company].filter(Boolean).join(', ')}
-                    </p>
+                <Link href={itemPath} className="flex min-w-0 flex-1 items-center gap-3.5">
+                  {item.avatar?.url ? (
+                    <img
+                      src={item.avatar.url}
+                      alt={item.name}
+                      className="h-11 w-11 shrink-0 rounded-full border border-[#DCD9D1] object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#DCD9D1] bg-[#E9E5DC] font-display text-base font-semibold text-[#22221F]">
+                      {item.name?.charAt(0)?.toUpperCase() || 'T'}
+                    </div>
                   )}
-                </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-[#22221F]">{item.name}</p>
+                    {(item.role || item.company) && (
+                      <p className="truncate text-xs text-[#89877F]">
+                        {[item.role, item.company].filter(Boolean).join(', ')}
+                      </p>
+                    )}
+                  </div>
+                </Link>
 
                 <div className="flex shrink-0 items-center gap-2">
                   {(item.linkedinUrl || item.githubUrl) && (
@@ -369,11 +377,16 @@ export default function TestimonialsPage() {
                       )}
                     </div>
                   )}
-                  <ShareMenu path="/testimonials" title={`Testimonial by ${item.name}`} />
+                  <ShareMenu
+                    path={itemPath}
+                    title={`Testimonial by ${item.name}`}
+                    onDownload={() => downloadTestimonialImage(item)}
+                  />
                 </div>
               </footer>
             </blockquote>
-          ))}
+            );
+          })}
         </section>
       ) : (
         <div className="mb-20 border border-[#DCD9D1] bg-[#E9E5DC]/25 p-10 text-center">

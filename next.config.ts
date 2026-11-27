@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**" },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/testimonials-:slug",
+        destination: "/testimonials/:slug",
+      },
+    ];
+  },
   async headers() {
     return [
       {

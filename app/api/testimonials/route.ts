@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase, ok, fail } from "@/lib/adminAuth";
+import { resolveUniqueSlug } from "@/lib/crudHandler";
 import { rowToCamel, rowsToCamel } from "@/lib/mappers";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
@@ -60,10 +61,16 @@ export async function POST(req: Request) {
     }
 
     const supabase = getServiceSupabase();
+    const resolvedSlug = await resolveUniqueSlug(supabase, "testimonials", undefined, name.trim());
+    if (resolvedSlug.error || !resolvedSlug.slug) {
+      return fail(resolvedSlug.error || "Failed to generate unique slug", 400);
+    }
+
     const { data, error } = await supabase
       .from("testimonials")
       .insert({
         name: name.trim(),
+        slug: resolvedSlug.slug,
         role: role.trim(),
         company: company.trim(),
         email: email.trim(),

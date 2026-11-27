@@ -14,6 +14,7 @@ const STATUS_STYLES = {
 const editFields = [
   { key: 'avatar', label: 'Profile Photo', type: 'image' },
   { key: 'name', label: 'Full Name', type: 'text' },
+  { key: 'slug', label: 'Slug (auto-generated from name)', type: 'text' },
   { key: 'role', label: 'Role / Designation', type: 'text' },
   { key: 'company', label: 'Company / College', type: 'text' },
   { key: 'email', label: 'Email', type: 'text' },
@@ -159,7 +160,15 @@ export default function TestimonialsPage() {
       {editing && (
         <AdminDrawer isOpen={!!editing} title="Edit Testimonial" onClose={() => setEditing(null)} maxWidth="640px">
           <form onSubmit={submitEdit}>
-            <DynamicForm fields={editFields} values={editing} onChange={setEditing} />
+            <DynamicForm
+              fields={editFields}
+              values={editing}
+              onChange={setEditing}
+              existingSlugs={items
+                .filter((r) => r._id !== editing?._id)
+                .map((r) => r.slug)
+                .filter(Boolean)}
+            />
             <div className="mt-6 flex justify-end gap-3 border-t border-[#DCD9D1] pt-4">
               <button type="button" onClick={() => setEditing(null)} className="btn-secondary">
                 Cancel

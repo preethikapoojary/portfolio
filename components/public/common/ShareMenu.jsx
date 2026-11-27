@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { FiCheck, FiCopy, FiMoreVertical, FiShare2 } from 'react-icons/fi';
+import { FiCheck, FiCopy, FiDownload, FiMoreVertical, FiShare2 } from 'react-icons/fi';
 
-export default function ShareMenu({ path = '', title = '' }) {
+export default function ShareMenu({ path = '', title = '', onDownload, downloadLabel = 'Download' }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -45,6 +46,17 @@ export default function ShareMenu({ path = '', title = '' }) {
         setOpen(false);
       }, 1200);
     } catch {
+      setOpen(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!onDownload || downloading) return;
+    setDownloading(true);
+    try {
+      await onDownload();
+    } finally {
+      setDownloading(false);
       setOpen(false);
     }
   };
@@ -95,6 +107,17 @@ export default function ShareMenu({ path = '', title = '' }) {
             {copied ? <FiCheck size={13} className="text-[#85806D]" /> : <FiCopy size={13} />}
             <span>{copied ? 'Copied!' : 'Copy link'}</span>
           </button>
+          {onDownload && (
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading}
+              className="flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-xs font-medium text-[#22221F] transition-colors hover:bg-[#E9E5DC]/60 disabled:opacity-60"
+            >
+              <FiDownload size={13} />
+              <span>{downloading ? 'Saving…' : downloadLabel}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={handleShare}

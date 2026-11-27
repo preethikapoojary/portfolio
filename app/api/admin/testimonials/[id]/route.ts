@@ -6,6 +6,7 @@ import {
   fail,
   logAdminActivity,
 } from "@/lib/adminAuth";
+import { resolveUniqueSlug } from "@/lib/crudHandler";
 import { rowToCamel, camelToRow } from "@/lib/mappers";
 
 export async function PUT(
@@ -21,6 +22,20 @@ export async function PUT(
   row.updated_at = new Date().toISOString();
 
   const supabase = getServiceSupabase();
+  if ("slug" in row || "name" in row) {
+    if ("slug" in row) {
+      const resolved = await resolveUniqueSlug(
+        supabase,
+        "testimonials",
+        row.slug,
+        row.name || "testimonial",
+        id
+      );
+      if (resolved.error) return fail(resolved.error, 409);
+      row.slug = resolved.slug;
+    }
+  }
+
   const { data, error } = await supabase
     .from("testimonials")
     .update(row)
@@ -28,7 +43,12 @@ export async function PUT(
     .select()
     .maybeSingle();
 
-  if (error) return fail(error.message, 400);
+  if (error) {
+    if (error.code === "23505") {
+      return fail("This slug/URL is already in use. Please choose a unique value.", 409);
+    }
+    return fail(error.message, 400);
+  }
   if (!data) return fail("Testimonial not found", 404);
   return ok(rowToCamel(data));
 }

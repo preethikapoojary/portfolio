@@ -5,6 +5,7 @@ import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
+import { downloadTestimonialImage } from '@/utils/downloadTestimonialImage';
 
 export default function Testimonials() {
   const { data: items, loading } = useFetch(api.getApprovedTestimonials, []);
@@ -29,16 +30,20 @@ export default function Testimonials() {
 
         {approved.length > 0 ? (
           <div className="grid gap-8 md:grid-cols-2">
-            {approved.slice(0, 4).map((t) => (
+            {approved.slice(0, 4).map((t) => {
+              const itemPath = `/testimonials-${t.slug || t._id}`;
+              return (
               <blockquote
                 key={t._id}
-                className="flex flex-col justify-between border border-[#DCD9D1] bg-[#E9E5DC]/25 p-7"
+                className="flex flex-col justify-between border border-[#DCD9D1] bg-[#E9E5DC]/25 p-7 transition-colors hover:border-[#85806D]"
               >
-                <p className="text-base leading-relaxed text-[#22221F] sm:text-lg">
-                  “{t.message}”
-                </p>
+                <Link href={itemPath} className="block flex-1">
+                  <p className="text-base leading-relaxed text-[#22221F] sm:text-lg">
+                    “{t.message}”
+                  </p>
+                </Link>
                 <footer className="mt-6 flex items-center justify-between gap-3 border-t border-[#DCD9D1] pt-4">
-                  <div className="flex items-center gap-3">
+                  <Link href={itemPath} className="flex min-w-0 flex-1 items-center gap-3">
                     {t.avatar?.url && (
                       <img
                         src={t.avatar.url}
@@ -46,19 +51,24 @@ export default function Testimonials() {
                         className="h-10 w-10 rounded-full object-cover"
                       />
                     )}
-                    <div>
-                      <p className="text-sm font-medium text-[#22221F]">{t.name}</p>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-[#22221F]">{t.name}</p>
                       {(t.role || t.company) && (
-                        <p className="text-xs text-[#89877F]">
+                        <p className="truncate text-xs text-[#89877F]">
                           {[t.role, t.company].filter(Boolean).join(', ')}
                         </p>
                       )}
                     </div>
-                  </div>
-                  <ShareMenu path="/testimonials" title={`Testimonial by ${t.name}`} />
+                  </Link>
+                  <ShareMenu
+                    path={itemPath}
+                    title={`Testimonial by ${t.name}`}
+                    onDownload={() => downloadTestimonialImage(t)}
+                  />
                 </footer>
               </blockquote>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <p className="py-8 text-center text-base text-[#89877F]">

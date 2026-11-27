@@ -169,6 +169,7 @@ create table if not exists public.blog_posts (
 create table if not exists public.testimonials (
   id uuid primary key default gen_random_uuid(),
   name text not null,
+  slug text not null unique,
   role text not null default '',
   company text not null default '',
   email text not null default '',
