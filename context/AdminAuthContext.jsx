@@ -28,11 +28,16 @@ export function AdminAuthProvider({ children }) {
         return;
       }
 
-      setAdmin({
+      const nextAdmin = {
         id: session.user.id,
         email: session.user.email,
         name: session.user.user_metadata?.name || session.user.email?.split("@")[0] || "Admin",
-      });
+      };
+      setAdmin((prev) =>
+        prev?.id === nextAdmin.id && prev?.email === nextAdmin.email && prev?.name === nextAdmin.name
+          ? prev
+          : nextAdmin
+      );
     } finally {
       setLoading(false);
     }
@@ -42,11 +47,12 @@ export function AdminAuthProvider({ children }) {
     loadSession();
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "INITIAL_SESSION") return;
       if (!session?.user) {
         setAdmin(null);
         setLoading(false);
-      } else {
+      } else if (event === "SIGNED_IN" || event === "USER_UPDATED") {
         loadSession();
       }
     });
