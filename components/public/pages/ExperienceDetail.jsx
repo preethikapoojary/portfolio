@@ -42,10 +42,6 @@ export default function ExperienceDetail() {
 
   return (
     <article className="mx-auto max-w-4xl px-6 pb-20 pt-12 sm:px-8 sm:pt-16">
-      <Link href="/experience" className="editorial-link mb-8">
-        <FiArrowLeft size={14} /> All Experience
-      </Link>
-
       <header className="border-b border-[#DCD9D1] pb-8">
         <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
           {formatRange(exp.startDate, exp.endDate, exp.isCurrent)}

@@ -168,7 +168,7 @@ export async function handleAdminCreate(req: Request, config: CrudConfig) {
         supabase,
         config.table,
         row.slug,
-        row.title || config.resourceName
+        row.title || row.role || row.company || config.resourceName
       );
       if (resolved.error) return fail(resolved.error, 409);
       row.slug = resolved.slug;
@@ -244,13 +244,13 @@ export async function handleAdminUpdateById(req: Request, id: string, config: Cr
 
     const supabase = getServiceSupabase();
 
-    if (config.hasSlug && ("slug" in row || "title" in row)) {
+    if (config.hasSlug && ("slug" in row || "title" in row || "role" in row)) {
       if ("slug" in row) {
         const resolved = await resolveUniqueSlug(
           supabase,
           config.table,
           row.slug,
-          row.title || config.resourceName,
+          row.title || row.role || row.company || config.resourceName,
           id
         );
         if (resolved.error) return fail(resolved.error, 409);

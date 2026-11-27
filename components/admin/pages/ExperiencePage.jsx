@@ -74,6 +74,7 @@ function RelatedProjectsEditor(value, onChange) {
 /* ---------- Field configuration ---------- */
 const fields = [
   { key: 'role', label: 'Role / Job Title', type: 'text' },
+  { key: 'slug', label: 'Slug (optional — auto-generated from role)', type: 'text' },
   { key: 'company', label: 'Company / Organization', type: 'text' },
   { key: 'location', label: 'Location (optional)', type: 'text' },
   { key: 'startDate', label: 'Start Date', type: 'date' },
@@ -136,6 +137,7 @@ export default function ExperiencePage() {
       wideForm
       emptyValues={{
         role: '',
+        slug: '',
         company: '',
         location: '',
         isCurrent: false,

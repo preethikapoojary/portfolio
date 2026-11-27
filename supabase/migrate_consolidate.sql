@@ -283,6 +283,26 @@ do $$ begin
 exception when duplicate_object then null;
 end $$;
 
+-- 11. Experience unique slug
+alter table public.experience
+  add column if not exists slug text not null default '';
+
+update public.experience
+set slug = trim(both '-' from regexp_replace(lower(coalesce(nullif(role, ''), nullif(title, ''), nullif(company, ''), id::text)), '[^a-z0-9]+', '-', 'g'))
+where slug = '' or slug is null;
+
+with ranked_experience as (
+  select id, slug,
+         row_number() over (partition by slug order by created_at asc, id asc) as rn
+  from public.experience
+)
+update public.experience e
+set slug = r.slug || '-' || r.rn
+from ranked_experience r
+where e.id = r.id and r.rn > 1;
+
+create unique index if not exists experience_slug_key on public.experience(slug);
+
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;

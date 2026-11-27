@@ -96,7 +96,7 @@ export default function ExperiencePage() {
                   )}
 
                   <div className="mt-6">
-                    <Link href={`/experience/${exp._id}`} className="editorial-link">
+                    <Link href={`/experience/${exp.slug || exp._id}`} className="editorial-link">
                       View role details &amp; artifacts <FiArrowRight size={14} />
                     </Link>
                   </div>

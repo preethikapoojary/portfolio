@@ -106,6 +106,7 @@ create table if not exists public.experience (
   company text not null default '',
   role text not null default '',
   title text not null default '',
+  slug text not null unique,
   location text not null default '',
   start_date timestamptz,
   end_date timestamptz,

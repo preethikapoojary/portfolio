@@ -83,7 +83,7 @@ export default function Experience() {
                   )}
 
                   <div className="mt-6">
-                    <Link href={`/experience/${exp._id}`} className="editorial-link text-[15px]">
+                    <Link href={`/experience/${exp.slug || exp._id}`} className="editorial-link text-[15px]">
                       View details <FiArrowRight size={15} />
                     </Link>
                   </div>

@@ -40,9 +40,14 @@ export default function DynamicForm({ fields, values, onChange, existingSlugs = 
 
   const set = (key, value) => {
     const next = { ...values, [key]: value };
-    if (key === 'title' && hasSlugField) {
-      const prevAutoSlug = makeUniqueSlug(values.title, existingSlugs);
-      if (!values.slug || values.slug === prevAutoSlug || values.slug === makeSlug(values.title)) {
+    const sourceKey = fields.some((f) => f.key === 'title')
+      ? 'title'
+      : fields.some((f) => f.key === 'role')
+        ? 'role'
+        : null;
+    if (sourceKey && key === sourceKey && hasSlugField) {
+      const prevAutoSlug = makeUniqueSlug(values[sourceKey], existingSlugs);
+      if (!values.slug || values.slug === prevAutoSlug || values.slug === makeSlug(values[sourceKey])) {
         next.slug = makeUniqueSlug(value, existingSlugs);
       }
     }

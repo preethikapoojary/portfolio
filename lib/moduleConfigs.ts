@@ -32,12 +32,14 @@ export const CRUD_CONFIGS: Record<string, CrudConfig> = {
     resourceName: "Experience",
     defaultOrder: { column: "order", ascending: true },
     fixedFilter: { entry_type: "experience" },
+    hasSlug: true,
   },
   achievements: {
     table: "experience",
     resourceName: "Achievement",
     defaultOrder: { column: "order", ascending: true },
     fixedFilter: { entry_type: "achievement" },
+    hasSlug: true,
   },
   certificates: {
     table: "certificates",
