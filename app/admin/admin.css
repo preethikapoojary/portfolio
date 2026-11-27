@@ -121,3 +121,120 @@
 .admin-shell .bg-slate-100 {
   background-color: rgba(233, 229, 220, 0.45);
 }
+
+/* Editorial Warm Charcoal Dark Mode for Admin */
+html.dark body.admin-body {
+  background-color: #191917;
+  color: #f2efe9;
+}
+
+html.dark .admin-shell {
+  --color-primary: #f2efe9;
+  --color-secondary: #a6a39b;
+  --color-accent: #a69f8a;
+  background-color: #191917;
+  color: #f2efe9;
+}
+
+html.dark .admin-shell .card {
+  border-color: #32322e;
+  background-color: #1f1f1c;
+}
+
+html.dark .admin-shell .btn-primary {
+  border-color: #f2efe9;
+  background-color: #f2efe9;
+  color: #191917;
+}
+
+html.dark .admin-shell .btn-primary:hover:not(:disabled) {
+  border-color: #d6d1c6;
+  background-color: #d6d1c6;
+}
+
+html.dark .admin-shell .btn-secondary {
+  border-color: #32322e;
+  color: #f2efe9;
+}
+
+html.dark .admin-shell .btn-secondary:hover {
+  border-color: #a6a39b;
+  background-color: rgba(50, 50, 46, 0.55);
+}
+
+html.dark .admin-shell .input {
+  border-color: #32322e;
+  background-color: #232320;
+  color: #f2efe9;
+}
+
+html.dark .admin-shell .input::placeholder {
+  color: #7c7970;
+}
+
+html.dark .admin-shell .input:focus {
+  border-color: #f2efe9;
+}
+
+html.dark .admin-shell .label,
+html.dark .admin-shell .text-muted,
+html.dark .admin-shell .text-\[\#89877F\],
+html.dark .admin-shell .text-slate-500,
+html.dark .admin-shell .text-slate-600,
+html.dark .admin-shell .text-gray-500,
+html.dark .admin-shell .text-gray-600 {
+  color: #a6a39b;
+}
+
+html.dark .admin-shell .text-ink,
+html.dark .admin-shell .text-primary,
+html.dark .admin-shell .text-\[\#22221F\],
+html.dark .admin-shell .hover\:text-\[\#22221F\]:hover,
+html.dark .admin-shell .text-slate-700,
+html.dark .admin-shell .text-slate-800,
+html.dark .admin-shell .text-slate-900,
+html.dark .admin-shell .text-gray-700,
+html.dark .admin-shell .text-gray-800,
+html.dark .admin-shell .text-gray-900 {
+  color: #f2efe9;
+}
+
+html.dark .admin-shell .bg-panel,
+html.dark .admin-shell .bg-surface,
+html.dark .admin-shell .bg-\[\#F6F4EF\],
+html.dark .admin-shell .bg-white {
+  background-color: #191917;
+}
+
+html.dark .admin-shell .bg-\[\#E9E5DC\],
+html.dark .admin-shell .bg-\[\#E9E5DC\]\/30,
+html.dark .admin-shell .bg-\[\#E9E5DC\]\/35,
+html.dark .admin-shell .bg-\[\#E9E5DC\]\/40,
+html.dark .admin-shell .bg-\[\#E9E5DC\]\/60,
+html.dark .admin-shell .hover\:bg-\[\#E9E5DC\]\/40:hover,
+html.dark .admin-shell .bg-slate-50,
+html.dark .admin-shell .bg-slate-100,
+html.dark .admin-shell .hover\:bg-slate-50:hover,
+html.dark .admin-shell .hover\:bg-slate-100:hover,
+html.dark .admin-shell .bg-gray-50,
+html.dark .admin-shell .bg-gray-100 {
+  background-color: #232320;
+}
+
+html.dark .admin-shell .bg-primary {
+  background-color: #f2efe9;
+  color: #191917;
+}
+
+html.dark .admin-shell .border-\[\#DCD9D1\],
+html.dark .admin-shell .border-slate-200,
+html.dark .admin-shell .border-slate-300,
+html.dark .admin-shell .border-gray-200,
+html.dark .admin-shell .border-gray-300,
+html.dark .admin-shell .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #32322e;
+}
+
+html.dark .admin-shell .border-\[\#22221F\] {
+  border-color: #f2efe9;
+}

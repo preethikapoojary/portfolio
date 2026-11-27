@@ -10,13 +10,7 @@ export default function Sidebar() {
     <aside className="hidden w-64 shrink-0 border-r border-[#DCD9D1] bg-[#E9E5DC]/35 p-5 md:block">
       <div className="mb-6 flex items-center justify-between border-b border-[#DCD9D1] pb-4">
         <Link href="/admin" className="font-display text-lg font-semibold text-[#22221F]">
-          Portfolio CMS
-        </Link>
-        <Link
-          href="/"
-          className="text-xs font-medium text-[#89877F] transition-colors hover:text-[#22221F]"
-        >
-          View Site ↗
+          Admin Panel
         </Link>
       </div>
       <nav className="space-y-1">
