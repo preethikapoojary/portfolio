@@ -52,33 +52,33 @@ export default function Certificates() {
                 {cert.title}
               </h3>
 
-              <div className="mt-2 flex items-center justify-between gap-2 text-sm text-[#89877F]">
-                <span>{cert.issuer}</span>
-                {cert.issueDate && (
-                  <span>
-                    {new Date(cert.issueDate).toLocaleDateString('en-US', {
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </span>
-                )}
+              <div className="mt-2 flex items-start justify-between gap-3">
+                <div className="min-w-0 text-sm text-[#89877F]">
+                  {cert.issuer && <p>{cert.issuer}</p>}
+                  {cert.issueDate && (
+                    <p className="mt-1 text-xs">
+                      {new Date(cert.issueDate).toLocaleDateString('en-US', {
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  )}
+                </div>
+                <div className="shrink-0">
+                  <ShareMenu path={cert.credentialUrl || '/certificates'} title={cert.title} />
+                </div>
               </div>
 
-              <div className="mt-3 flex items-center justify-between gap-2">
-                {cert.credentialUrl ? (
-                  <a
-                    href={cert.credentialUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-[#22221F] hover:text-[#85806D]"
-                  >
-                    Verify credential <FiExternalLink size={12} />
-                  </a>
-                ) : (
-                  <span />
-                )}
-                <ShareMenu path={cert.credentialUrl || '/certificates'} title={cert.title} />
-              </div>
+              {cert.credentialUrl && (
+                <a
+                  href={cert.credentialUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-medium text-[#22221F] hover:text-[#85806D]"
+                >
+                  Verify credential <FiExternalLink size={12} />
+                </a>
+              )}
             </article>
           ))}
         </div>
