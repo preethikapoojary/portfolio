@@ -46,6 +46,17 @@ export default function ProjectDetail() {
           {project.title}
         </h1>
 
+        {project.coverImage?.url && (
+          <div className="my-6 border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2 md:hidden">
+            <img
+              src={project.coverImage.url}
+              alt={project.title}
+              className="w-full cursor-pointer object-cover"
+              onClick={() => setPreviewImg(project.coverImage.url)}
+            />
+          </div>
+        )}
+
         {project.shortDescription && (
           <p className="mt-4 text-base leading-relaxed text-[#89877F] sm:text-lg">
             {project.shortDescription}
@@ -91,7 +102,7 @@ export default function ProjectDetail() {
       </header>
 
       {project.coverImage?.url && (
-        <div className="my-10 border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2">
+        <div className="my-10 hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2 md:block">
           <img
             src={project.coverImage.url}
             alt={project.title}

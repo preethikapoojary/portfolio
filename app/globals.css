@@ -137,6 +137,13 @@ html.dark body:not(.admin-body) .editorial-link {
   font-weight: 600;
 }
 
+.editorial-prose h4 {
+  margin-top: 1.35rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #22221F;
+}
+
 .editorial-prose ul,
 .editorial-prose ol {
   margin-bottom: 1.25rem;
@@ -147,6 +154,38 @@ html.dark body:not(.admin-body) .editorial-link {
 .editorial-prose li {
   margin-bottom: 0.4rem;
   line-height: 1.7;
+}
+
+.editorial-prose blockquote {
+  margin: 1.5rem 0;
+  border-left: 2px solid #85806D;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #89877F;
+}
+
+.editorial-prose figure {
+  margin: 1.75rem auto;
+  max-width: 36rem;
+  border: 1px solid #DCD9D1;
+  background-color: rgba(233, 229, 220, 0.35);
+  padding: 0.75rem;
+}
+
+.editorial-prose figure img {
+  display: block;
+  margin: 0 auto;
+  max-height: 26rem;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.editorial-prose figcaption {
+  margin-top: 0.6rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #89877F;
 }
 
 @media (prefers-reduced-motion: reduce) {

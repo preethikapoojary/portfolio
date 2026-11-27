@@ -57,7 +57,7 @@ export default function ProjectsPage() {
               key={project._id}
               className="grid items-start gap-8 py-12 lg:grid-cols-12 lg:gap-12"
             >
-              <div className="lg:col-span-5">
+              <div className="hidden lg:col-span-5 lg:block">
                 <Link
                   href={`/projects/${project.slug}`}
                   className="group block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40"
@@ -87,6 +87,25 @@ export default function ProjectsPage() {
                   <h2 className="font-display text-3xl font-medium tracking-tight text-[#22221F] transition-colors group-hover:text-[#85806D]">
                     {project.title}
                   </h2>
+                </Link>
+
+                <Link
+                  href={`/projects/${project.slug}`}
+                  className="group my-4 block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 lg:hidden"
+                >
+                  {project.coverImage?.url ? (
+                    <img
+                      src={project.coverImage.url}
+                      alt={project.title}
+                      className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    />
+                  ) : (
+                    <div className="flex aspect-[16/10] items-center justify-center bg-[#E9E5DC] p-6 text-center">
+                      <span className="font-display text-2xl text-[#85806D]">
+                        {project.title}
+                      </span>
+                    </div>
+                  )}
                 </Link>
 
                 {project.shortDescription && (

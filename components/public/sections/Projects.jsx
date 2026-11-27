@@ -58,6 +58,25 @@ export default function Projects() {
                     </h3>
                   </Link>
 
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    className="group my-5 block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 lg:hidden"
+                  >
+                    {project.coverImage?.url ? (
+                      <img
+                        src={project.coverImage.url}
+                        alt={project.title}
+                        className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="flex aspect-[16/10] w-full items-center justify-center bg-[#E9E5DC] px-6 text-center">
+                        <span className="font-display text-3xl text-[#85806D]">
+                          {project.title}
+                        </span>
+                      </div>
+                    )}
+                  </Link>
+
                   {project.shortDescription && (
                     <p className="mt-4 text-base leading-relaxed text-[#89877F] sm:text-lg">
                       {project.shortDescription}
@@ -98,7 +117,7 @@ export default function Projects() {
                 </div>
 
                 <div
-                  className={`lg:col-span-6 ${
+                  className={`hidden lg:block lg:col-span-6 ${
                     imageFirst ? 'lg:order-1' : 'lg:order-2'
                   }`}
                 >
