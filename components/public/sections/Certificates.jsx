@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { FiExternalLink } from 'react-icons/fi';
+import Link from 'next/link';
+import { FiArrowRight, FiExternalLink } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
-import SectionHeading from '@/components/public/common/SectionHeading';
 import Lightbox from '@/components/public/common/Lightbox';
 
 export default function Certificates() {
@@ -21,13 +21,14 @@ export default function Certificates() {
       className="flex flex-col justify-center border-t border-[#DCD9D1] bg-[#E9E5DC]/35 py-16 lg:min-h-[calc(100vh-4rem)] lg:py-20"
     >
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
-        <SectionHeading
-          number="05"
-          eyebrow="Credentials"
-          title="Certificates"
-          actionLabel="View All Certificates"
-          actionHref="/certificates"
-        />
+        <div className="mb-10 border-b border-[#DCD9D1] pb-6 text-center">
+          <h2 className="font-display text-4xl font-medium tracking-tight text-[#22221F] sm:text-5xl">
+            Certificates
+          </h2>
+          <p className="mt-2.5 text-sm text-[#89877F] sm:text-base">
+            Verified coursework, technical specializations, and workshop credentials.
+          </p>
+        </div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {previewItems.map((cert) => (
@@ -74,6 +75,12 @@ export default function Certificates() {
               )}
             </article>
           ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link href="/certificates" className="editorial-link text-base">
+            View All Certificates <FiArrowRight size={15} />
+          </Link>
         </div>
       </div>
 
