@@ -14,6 +14,14 @@ function formatRange(start, end, isCurrent) {
   return [s, e].filter(Boolean).join(' – ');
 }
 
+function summarizeDescription(text) {
+  if (!text) return '';
+  if (!/<[a-z][\s\S]*>/i.test(text)) return text;
+  const firstPara = text.match(/<p[^>]*>([\s\S]*?)<\/p>/i)?.[1] || text;
+  const plain = firstPara.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return plain.length > 280 ? `${plain.slice(0, 277).trimEnd()}…` : plain;
+}
+
 export default function ExperiencePage() {
   const { data: experience, loading: expLoading } = useFetch(api.getExperience, []);
   const { data: achievements, loading: achLoading } = useFetch(api.getAchievements, []);
@@ -62,7 +70,7 @@ export default function ExperiencePage() {
 
                   {exp.description && (
                     <p className="mt-3 text-sm leading-relaxed text-[#22221F]/85 sm:text-base">
-                      {exp.description}
+                      {summarizeDescription(exp.description)}
                     </p>
                   )}
 

@@ -61,9 +61,16 @@ export default function ExperienceDetail() {
 
       <div className="space-y-10 py-10">
         {exp.description && (
-          <p className="text-base leading-relaxed text-[#22221F] sm:text-lg">
-            {exp.description}
-          </p>
+          /<[a-z][\s\S]*>/i.test(exp.description) ? (
+            <div
+              className="editorial-prose text-base"
+              dangerouslySetInnerHTML={{ __html: exp.description }}
+            />
+          ) : (
+            <p className="text-base leading-relaxed text-[#22221F] sm:text-lg">
+              {exp.description}
+            </p>
+          )
         )}
 
         {exp.responsibilities?.length > 0 && (
