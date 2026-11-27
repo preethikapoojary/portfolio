@@ -92,7 +92,7 @@ export default function Certificates() {
                   </div>
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-4">
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-4">
                   {cert.image?.url && (
                     <button
                       type="button"

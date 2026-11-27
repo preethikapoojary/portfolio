@@ -11,8 +11,26 @@ import RichTextEditor from './RichTextEditor';
  * (single mediaSchema), images (array of mediaSchema), pdf (single document),
  * custom (provide a `render(value, onChange)` function for complex fields).
  */
+function makeSlug(text) {
+  return String(text || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export default function DynamicForm({ fields, values, onChange }) {
-  const set = (key, value) => onChange({ ...values, [key]: value });
+  const hasSlugField = fields.some((f) => f.key === 'slug');
+  const set = (key, value) => {
+    const next = { ...values, [key]: value };
+    if (key === 'title' && hasSlugField) {
+      const prevAutoSlug = makeSlug(values.title);
+      if (!values.slug || values.slug === prevAutoSlug) {
+        next.slug = makeSlug(value);
+      }
+    }
+    onChange(next);
+  };
 
   return (
     <div className="space-y-4">

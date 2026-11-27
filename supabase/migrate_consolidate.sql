@@ -225,7 +225,7 @@ alter table public.certificates
   add column if not exists home_order integer;
 
 update public.certificates
-set slug = trim(both '-' from regexp_replace(lower(title), '[^a-z0-9]+', '-', 'g')) || '-' || left(id::text, 6)
+set slug = trim(both '-' from regexp_replace(lower(title), '[^a-z0-9]+', '-', 'g'))
 where slug = '' or slug is null;
 
 grant usage on schema public to anon, authenticated, service_role;

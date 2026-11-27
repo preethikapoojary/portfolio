@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FiArrowLeft, FiDownload, FiExternalLink } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowRight, FiDownload, FiExternalLink } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
@@ -48,13 +48,6 @@ export default function CertificateDetail({ slug }) {
 
   return (
     <div className="mx-auto max-w-4xl px-6 pb-24 pt-12 sm:px-8">
-      <Link
-        href="/certificates"
-        className="mb-8 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[#89877F] transition-colors hover:text-[#22221F]"
-      >
-        <FiArrowLeft size={13} /> All Certificates
-      </Link>
-
       <header className="border-b border-[#DCD9D1] pb-8">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
           Credential
@@ -113,6 +106,12 @@ export default function CertificateDetail({ slug }) {
           />
         </div>
       )}
+
+      <div className="mt-12 text-center">
+        <Link href="/certificates" className="editorial-link text-base">
+          All Certificates <FiArrowRight size={15} />
+        </Link>
+      </div>
     </div>
   );
 }
