@@ -22,8 +22,11 @@ export default function About() {
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
         <div className="mb-10 border-b border-[#DCD9D1] pb-6 text-center">
           <h2 className="font-display text-4xl font-medium tracking-tight text-[#22221F] sm:text-5xl">
-            About
+            About Me
           </h2>
+          <p className="mt-2.5 text-sm text-[#89877F] sm:text-base">
+            Background, academic journey, and technical focus.
+          </p>
         </div>
 
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
