@@ -1,47 +1,79 @@
 'use client';
+
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { FiArrowLeft } from 'react-icons/fi';
-import useFetch from '@/hooks/useFetch';
+import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
-import LoadingScreen from '@/components/public/layout/LoadingScreen';
 
 export default function BlogPost() {
   const { slug } = useParams();
-  const { data: post, loading, error } = useFetch(() => api.getBlogPostBySlug(slug), [slug]);
+  const { data: post, loading } = useFetch(() => api.getBlogPostBySlug(slug), [slug]);
 
-  if (loading) return <LoadingScreen />;
-
-  if (error || !post) {
+  if (loading) {
     return (
-      <div className="mx-auto max-w-2xl px-6 pt-40 text-center">
-        <h1 className="font-display text-2xl">Post not found</h1>
-        <Link href="/#blog" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to blog
+      <div className="mx-auto max-w-3xl px-6 py-20 sm:px-8">
+        <p className="text-sm text-[#89877F]">Loading article…</p>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="mx-auto max-w-3xl px-6 py-20 sm:px-8">
+        <p className="font-display text-2xl text-[#22221F]">Article not found</p>
+        <Link href="/blog" className="editorial-link mt-4">
+          <FiArrowLeft size={14} /> Back to Blog
         </Link>
       </div>
     );
   }
 
   return (
-    <article className="mx-auto max-w-3xl px-6 pb-24 pt-32">
-      <Link href="/#blog" className="mb-8 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white">
-        <FiArrowLeft /> Back to blog
+    <article className="mx-auto max-w-3xl px-6 pb-20 pt-12 sm:px-8 sm:pt-16">
+      <Link href="/blog" className="editorial-link mb-8">
+        <FiArrowLeft size={14} /> All Articles
       </Link>
 
+      <header className="border-b border-[#DCD9D1] pb-8">
+        <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
+          {post.category || 'Article'}
+          {post.publishedAt
+            ? ` · ${new Date(post.publishedAt).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}`
+            : ''}
+        </p>
+
+        <h1 className="font-display text-4xl font-medium leading-[1.12] tracking-tight text-[#22221F] sm:text-5xl">
+          {post.title}
+        </h1>
+
+        {post.excerpt && (
+          <p className="mt-4 text-base leading-relaxed text-[#89877F] sm:text-lg">
+            {post.excerpt}
+          </p>
+        )}
+      </header>
+
       {post.coverImage?.url && (
-        <img src={post.coverImage.url} alt={post.title} className="glass-card mb-8 aspect-video w-full object-cover" />
+        <div className="my-10 border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2">
+          <img
+            src={post.coverImage.url}
+            alt={post.title}
+            className="w-full object-cover"
+          />
+        </div>
       )}
 
-      <p className="font-mono text-xs text-slate-500">
-        {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : ''}
-      </p>
-      <h1 className="mt-2 font-display text-4xl font-semibold">{post.title}</h1>
-
-      <div
-        className="prose prose-invert mt-8 max-w-none"
-        dangerouslySetInnerHTML={{ __html: post.content || '' }}
-      />
+      {post.content && (
+        <div
+          className="editorial-prose mt-10 text-base"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
+      )}
     </article>
   );
 }

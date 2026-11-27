@@ -1,156 +1,127 @@
 'use client';
-import { motion } from 'framer-motion';
-import { FiDownload, FiRefreshCw, FiAlertCircle } from 'react-icons/fi';
-import SectionNavArrow from '../common/SectionNavArrow';
+
+import Link from 'next/link';
+import { FiArrowRight, FiDownload, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 import { useSettings } from '@/context/SettingsContext';
 import { getSocialLinks } from '@/utils/socialLinks';
-import SocialIcon from '../common/SocialIcon';
 import api from '@/api/endpoints';
 
 export default function Hero() {
   const { profile, settings, loading, error, retry } = useSettings();
   const hero = settings?.hero || {};
-  const socialLinks = getSocialLinks(profile);
-
+  const socialLinks = getSocialLinks(profile).filter(
+    (link) =>
+      !link.url?.startsWith('mailto:') &&
+      !['gmail', 'email'].includes((link.platform || '').toLowerCase()) &&
+      !['gmail', 'email'].includes((link.icon || '').toLowerCase())
+  );
   const isHeroLoading = loading || (!profile && !error);
 
-  return (
-    <section
-      id="home"
-      className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-28"
-    >
-      {/* Cover/banner image, when set */}
-      {profile?.coverBanner?.url && (
-        <div className="absolute inset-0 overflow-hidden">
-          <img
-            src={profile.coverBanner.url}
-            alt=""
-            className="h-full w-full object-cover"
-            style={{ opacity: 0.5, filter: 'contrast(1.15) saturate(1.08)' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-surface/45 via-surface/70 to-surface" />
+  if (isHeroLoading) {
+    return (
+      <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center px-6 py-16 sm:px-8">
+        <div className="grid w-full items-center gap-12 lg:grid-cols-12">
+          <div className="space-y-5 lg:col-span-7">
+            <div className="h-4 w-56 animate-pulse bg-[#E9E5DC]" />
+            <div className="h-16 w-full max-w-2xl animate-pulse bg-[#E9E5DC]" />
+            <div className="h-6 w-4/5 animate-pulse bg-[#E9E5DC]" />
+          </div>
+          <div className="aspect-[4/5] w-full max-w-md animate-pulse bg-[#E9E5DC] lg:col-span-5" />
         </div>
-      )}
+      </section>
+    );
+  }
 
-      {/* Ambient blue-purple glow centered behind the hero content */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-45 blur-3xl"
-        style={{
-          background:
-            'radial-gradient(ellipse 55% 45% at 50% 38%, var(--color-primary), transparent 65%), radial-gradient(ellipse 45% 40% at 50% 58%, var(--color-secondary), transparent 68%)',
-        }}
-      />
-
-      <div className="relative z-10 mx-auto max-w-4xl text-center">
-        {isHeroLoading ? (
-          <div className="flex flex-col items-center justify-center">
-            <div className="mb-4 h-4 w-44 animate-pulse rounded bg-white/10" />
-            <div className="mb-3 h-12 w-3/4 max-w-xl animate-pulse rounded-lg bg-white/10 sm:h-16" />
-            <div className="mt-6 h-6 w-2/3 max-w-md animate-pulse rounded bg-white/10" />
-            <div className="mt-10 flex items-center justify-center gap-4">
-              <div className="h-12 w-36 animate-pulse rounded-full bg-white/10" />
-              <div className="h-12 w-36 animate-pulse rounded-full bg-white/10" />
-            </div>
+  if (error && !profile) {
+    return (
+      <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center px-6 py-16 sm:px-8">
+        <div className="max-w-md border border-[#DCD9D1] bg-[#E9E5DC]/40 p-6">
+          <div className="flex items-center gap-2 text-[#22221F]">
+            <FiAlertCircle size={18} />
+            <p className="text-base font-medium">Unable to load portfolio details</p>
           </div>
-        ) : error && !profile ? (
-          <div className="glass-card mx-auto max-w-md p-8 text-center">
-            <FiAlertCircle className="mx-auto mb-3 text-3xl text-amber-400" />
-            <p className="font-medium text-slate-200">Unable to load portfolio details</p>
-            <p className="mt-1 text-sm text-slate-400">{error}</p>
-            {retry && (
-              <button
-                onClick={retry}
-                className="mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-surface transition duration-300 hover:scale-[1.04]"
-                style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))' }}
-              >
-                <FiRefreshCw /> Try Again
-              </button>
-            )}
+          <p className="mt-2 text-sm text-[#89877F]">{error}</p>
+          {retry && (
+            <button
+              type="button"
+              onClick={retry}
+              className="mt-5 inline-flex items-center gap-2 border border-[#22221F] bg-[#22221F] px-5 py-2.5 text-xs font-medium text-[#F6F4EF] transition-colors hover:border-[#85806D] hover:bg-[#85806D]"
+            >
+              <FiRefreshCw size={14} /> Try Again
+            </button>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  const headline =
+    hero.headline || (profile?.name ? `Hi, I'm ${profile.name}.` : "Hi, I'm Preethika.");
+  const intro =
+    profile?.title ||
+    'Information Science & Engineering Student | Aspiring Software Engineer | AI/ML & Full-Stack Enthusiast';
+
+  return (
+    <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center px-6 py-12 sm:px-8">
+      <div className="grid w-full items-center gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="lg:col-span-7">
+          <h1 className="font-display text-5xl font-medium leading-[1.06] tracking-tight text-[#22221F] sm:text-6xl lg:text-[4.25rem]">
+            {headline}
+          </h1>
+
+          <p className="mt-7 max-w-2xl text-lg leading-relaxed text-[#89877F] sm:text-xl">
+            {intro}
+          </p>
+
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <Link
+              href={hero.ctaLink && hero.ctaLink.startsWith('/') ? hero.ctaLink : '/projects'}
+              className="inline-flex items-center gap-2.5 border border-[#22221F] bg-[#22221F] px-7 py-3.5 text-xs font-medium uppercase tracking-[0.14em] text-[#F6F4EF] transition-colors hover:border-[#85806D] hover:bg-[#85806D]"
+            >
+              {hero.ctaText || 'View Projects'}
+              <FiArrowRight size={15} />
+            </Link>
+
+            <a
+              href={api.downloadResumeUrl()}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2.5 border border-[#DCD9D1] bg-transparent px-7 py-3.5 text-xs font-medium uppercase tracking-[0.14em] text-[#22221F] transition-colors hover:border-[#22221F] hover:bg-[#E9E5DC]/50"
+            >
+              <FiDownload size={15} />
+              Download Resume
+            </a>
           </div>
-        ) : (
-          <>
-            {profile?.title && (
-              <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mb-4 font-mono text-sm uppercase tracking-[0.3em] text-primary"
-              >
-                {profile.title}
-              </motion.p>
-            )}
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-display text-5xl font-semibold leading-tight sm:text-7xl"
-            >
-              {hero.headline || (profile?.name ? `Hi, I'm ${profile.name}.` : '')}
-            </motion.h1>
-
-            {(hero.subheadline || profile?.careerObjective) && (
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="mx-auto mt-6 max-w-xl text-lg text-slate-400"
-              >
-                {hero.subheadline || profile?.careerObjective}
-              </motion.p>
-            )}
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-10 flex items-center justify-center gap-4"
-            >
-              <a
-                href={hero.ctaLink || '#projects'}
-                className="rounded-full px-6 py-3 font-medium text-surface transition duration-300 hover:-translate-y-0.5 hover:scale-[1.04] hover:shadow-glow hover:opacity-95"
-                style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))' }}
-              >
-                {hero.ctaText || 'View my work'}
-              </a>
-              <a href="#contact" className="glass-card rounded-full px-6 py-3 font-medium transition duration-300 hover:-translate-y-0.5 hover:scale-[1.04] hover:shadow-glow">
-                Get in touch
-              </a>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-8 flex flex-wrap items-center justify-center gap-4"
-            >
-              {socialLinks.map(({ platform, href, Icon }) => (
+          {socialLinks.length > 0 && (
+            <div className="mt-10 flex flex-wrap items-center gap-7 border-t border-[#DCD9D1] pt-6">
+              {socialLinks.map((link) => (
                 <a
-                  key={platform + href}
-                  href={href}
-                  target={href.startsWith('mailto:') ? undefined : '_blank'}
+                  key={link.url}
+                  href={link.url}
+                  target={link.url.startsWith('mailto:') ? undefined : '_blank'}
                   rel="noreferrer"
-                  aria-label={platform}
-                  title={platform}
-                  className="flex h-11 w-11 items-center justify-center rounded-full glass-card text-lg text-slate-300 transition duration-300 hover:-translate-y-0.5 hover:scale-110 hover:text-primary hover:shadow-glow"
+                  className="editorial-link text-xs uppercase tracking-[0.14em]"
                 >
-                  <SocialIcon icon={Icon} className="text-lg" />
+                  {link.platform === 'Linkedln' ? 'LinkedIn' : link.platform}
                 </a>
               ))}
-              <a
-                href={api.downloadResumeUrl()}
-                download
-                className="flex items-center gap-2 rounded-full glass-card px-4 py-2.5 text-sm font-medium text-slate-300 transition duration-300 hover:-translate-y-0.5 hover:scale-[1.04] hover:text-primary hover:shadow-glow"
-              >
-                <FiDownload /> Resume
-              </a>
-            </motion.div>
-          </>
+            </div>
+          )}
+        </div>
+
+        {profile?.profilePhoto?.url && (
+          <div className="lg:col-span-5">
+            <div className="mx-auto max-w-md border border-[#DCD9D1] bg-[#E9E5DC]/40 p-3 lg:ml-auto lg:mr-0">
+              <img
+                src={profile.profilePhoto.url}
+                alt={profile.name || 'Preethika Poojary'}
+                className="aspect-[4/5] w-full object-cover object-top"
+              />
+            </div>
+          </div>
         )}
       </div>
-
-      <SectionNavArrow currentId="home" />
     </section>
   );
 }

@@ -1,135 +1,158 @@
 'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { FiGithub, FiExternalLink, FiArrowLeft, FiPlayCircle, FiFileText, FiDownload } from 'react-icons/fi';
-import useFetch from '@/hooks/useFetch';
+import { FiArrowLeft, FiExternalLink, FiFileText, FiGithub } from 'react-icons/fi';
+import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
-import LoadingScreen from '@/components/public/layout/LoadingScreen';
-
-function toEmbedUrl(url) {
-  if (!url) return null;
-  const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]+)/);
-  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
-  return null; // non-YouTube links fall back to a plain "Watch video" link
-}
+import Lightbox from '@/components/public/common/Lightbox';
 
 export default function ProjectDetail() {
   const { slug } = useParams();
-  const { data: project, loading, error } = useFetch(() => api.getProjectBySlug(slug), [slug]);
+  const { data: project, loading } = useFetch(() => api.getProjectBySlug(slug), [slug]);
+  const [previewImg, setPreviewImg] = useState(null);
 
-  if (loading) return <LoadingScreen />;
-
-  if (error || !project) {
+  if (loading) {
     return (
-      <div className="mx-auto max-w-2xl px-6 pt-40 text-center">
-        <h1 className="font-display text-2xl">Project not found</h1>
-        <Link href="/#projects" className="mt-4 inline-block text-primary hover:underline">
-          ← Back to projects
+      <div className="mx-auto max-w-4xl px-6 py-20 sm:px-8">
+        <p className="text-sm text-[#89877F]">Loading project…</p>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="mx-auto max-w-4xl px-6 py-20 sm:px-8">
+        <p className="font-display text-2xl text-[#22221F]">Project not found</p>
+        <Link href="/projects" className="editorial-link mt-4">
+          <FiArrowLeft size={14} /> Back to Projects
         </Link>
       </div>
     );
   }
 
   return (
-    <article className="mx-auto max-w-4xl px-6 pb-24 pt-32">
-      <Link href="/#projects" className="mb-8 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white">
-        <FiArrowLeft /> Back to projects
+    <article className="mx-auto max-w-4xl px-6 pb-20 pt-12 sm:px-8 sm:pt-16">
+      <Link href="/projects" className="editorial-link mb-8">
+        <FiArrowLeft size={14} /> All Projects
       </Link>
 
-      {project.coverImage?.url && (
-        <div className="glass-card mb-8 aspect-video overflow-hidden">
-          <img src={project.coverImage.url} alt={project.title} className="h-full w-full object-cover" />
-        </div>
-      )}
-
-      <h1 className="font-display text-4xl font-semibold">{project.title}</h1>
-      {project.shortDescription && (
-        <p className="mt-2 text-lg text-slate-400">{project.shortDescription}</p>
-      )}
-      <div className="mt-3 flex flex-wrap gap-2">
-        {(project.technologies || []).map((t) => (
-          <span key={t} className="rounded-full bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300">
-            {t}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-4 flex gap-5 text-sm">
-        {project.githubUrl && (
-          <a href={project.githubUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-primary hover:underline">
-            <FiGithub /> Source
-          </a>
+      <header className="border-b border-[#DCD9D1] pb-8">
+        {project.category && (
+          <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
+            {project.category}
+          </p>
         )}
-        {project.liveDemoUrl && (
-          <a href={project.liveDemoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-primary hover:underline">
-            <FiExternalLink /> Live demo
-          </a>
-        )}
-        {project.videoUrl && (
-          <a href={project.videoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-primary hover:underline">
-            <FiPlayCircle /> Watch video
-          </a>
-        )}
-      </div>
 
-      {project.videoUrl && toEmbedUrl(project.videoUrl) && (
-        <div className="glass-card mt-8 aspect-video overflow-hidden">
-          <iframe
-            src={toEmbedUrl(project.videoUrl)}
-            title={`${project.title} video`}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="h-full w-full"
-          />
-        </div>
-      )}
+        <h1 className="font-display text-4xl font-medium leading-[1.12] tracking-tight text-[#22221F] sm:text-5xl">
+          {project.title}
+        </h1>
 
-      {project.reportPdf?.url && (
-        <div className="glass-card mt-8 flex flex-wrap items-center justify-between gap-4 p-5">
-          <div className="flex items-center gap-3">
-            <FiFileText className="text-2xl text-primary" />
-            <div>
-              <p className="font-medium">Project Report</p>
-              <p className="text-xs text-slate-500">Detailed write-up / case study PDF</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
+        {project.shortDescription && (
+          <p className="mt-4 text-base leading-relaxed text-[#89877F] sm:text-lg">
+            {project.shortDescription}
+          </p>
+        )}
+
+        <div className="mt-6 flex flex-wrap items-center gap-6">
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="editorial-link"
+            >
+              <FiGithub size={14} /> GitHub Repository
+            </a>
+          )}
+          {project.liveDemoUrl && (
+            <a
+              href={project.liveDemoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="editorial-link"
+            >
+              <FiExternalLink size={14} /> Live Demo
+            </a>
+          )}
+          {project.reportPdf?.url && (
             <a
               href={project.reportPdf.url}
               target="_blank"
               rel="noreferrer"
-              className="glass-card flex items-center gap-2 px-4 py-2 text-sm font-medium"
+              className="editorial-link"
             >
-              <FiFileText size={14} /> View Report
+              <FiFileText size={14} /> Project Report (PDF)
             </a>
-            <a
-              href={project.reportPdf.url}
-              download
-              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-surface"
-              style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))' }}
-            >
-              <FiDownload size={14} /> Download Report
-            </a>
-          </div>
+          )}
+        </div>
+      </header>
+
+      {project.coverImage?.url && (
+        <div className="my-10 border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2">
+          <img
+            src={project.coverImage.url}
+            alt={project.title}
+            className="w-full cursor-pointer object-cover"
+            onClick={() => setPreviewImg(project.coverImage.url)}
+          />
         </div>
       )}
 
-      {project.screenshots?.length > 0 && (
-        <div className="mt-10">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Screenshots</p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {project.screenshots.map((s) => (
-              <img key={s.url} src={s.url} alt={s.alt || project.title} className="glass-card w-full object-cover transition hover:scale-[1.02]" />
+      {project.technologies?.length > 0 && (
+        <div className="mb-10 border-b border-[#DCD9D1] pb-8">
+          <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
+            Technologies Used
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {project.technologies.map((tech) => (
+              <span
+                key={tech}
+                className="border border-[#DCD9D1] bg-[#E9E5DC]/45 px-3 py-1 text-xs font-medium text-[#22221F]"
+              >
+                {tech}
+              </span>
             ))}
           </div>
         </div>
       )}
 
-      <div
-        className="prose prose-invert mt-10 max-w-none"
-        // Content is authored via TipTap in the admin dashboard and stored
-        // as sanitized HTML on the backend — safe to render directly here.
-        dangerouslySetInnerHTML={{ __html: project.longDescription || '' }}
+      {project.longDescription && (
+        <div
+          className="editorial-prose text-base"
+          dangerouslySetInnerHTML={{ __html: project.longDescription }}
+        />
+      )}
+
+      {project.screenshots?.length > 0 && (
+        <section className="mt-14 border-t border-[#DCD9D1] pt-10">
+          <p className="mb-6 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
+            Screenshots
+          </p>
+          <div className="grid gap-6 sm:grid-cols-2">
+            {project.screenshots.map((shot, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setPreviewImg(shot.url)}
+                className="overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2 text-left"
+              >
+                <img
+                  src={shot.url}
+                  alt={shot.alt || `${project.title} screenshot ${idx + 1}`}
+                  className="aspect-video w-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <Lightbox
+        image={previewImg}
+        title={project.title}
+        onClose={() => setPreviewImg(null)}
       />
     </article>
   );

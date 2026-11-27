@@ -6,23 +6,17 @@ import { SettingsProvider, useSettings } from '@/context/SettingsContext';
 import Navbar from '@/components/public/layout/Navbar';
 import Footer from '@/components/public/layout/Footer';
 import LoadingScreen from '@/components/public/layout/LoadingScreen';
-import ScrollProgressBar from '@/components/public/common/ScrollProgressBar';
-import BackToTop from '@/components/public/common/BackToTop';
-import StarfieldBackground from '@/components/public/common/StarfieldBackground';
 
 function PublicContent({ children }) {
   const { ready } = useSettings();
   if (!ready) return <LoadingScreen />;
 
   return (
-    <>
-      <StarfieldBackground />
-      <ScrollProgressBar />
+    <div className="flex min-h-screen flex-col bg-[#F6F4EF] text-[#22221F] transition-colors duration-200">
       <Navbar />
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
-      <BackToTop />
-    </>
+    </div>
   );
 }
 

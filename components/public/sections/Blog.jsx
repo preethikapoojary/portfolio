@@ -1,77 +1,65 @@
 'use client';
-import { motion } from 'framer-motion';
+
 import Link from 'next/link';
-import SectionHeading from '../common/SectionHeading';
-import SectionNavArrow from '../common/SectionNavArrow';
-import EmptyState from '../common/EmptyState';
-import useFetch from '@/hooks/useFetch';
+import { FiArrowRight } from 'react-icons/fi';
+import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
+import SectionHeading from '@/components/public/common/SectionHeading';
 
 export default function Blog() {
-  const { data, loading } = useFetch(() => api.getBlogPosts({ limit: 3 }), []);
-  const posts = data?.items || data || [];
-  const featuredPosts = posts.slice(0, 3);
+  const { data: posts, loading } = useFetch(() => api.getBlogPosts(), []);
+  if (loading || !posts?.length) return null;
 
   return (
-    <section id="blog" className="relative w-full px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading eyebrow="Blog" title="Writing" subtitle="Notes on things I'm building and learning." />
-      {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="glass-card h-56 animate-pulse" />
+    <section
+      id="blog"
+      className="flex flex-col justify-center border-t border-[#DCD9D1] py-16 lg:min-h-[calc(100vh-4rem)] lg:py-20"
+    >
+      <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
+        <SectionHeading
+          number="06"
+          eyebrow="Writing"
+          title="Articles & Notes"
+          actionLabel="Read All Articles"
+          actionHref="/blog"
+        />
+
+        <div className="divide-y divide-[#DCD9D1]">
+          {posts.slice(0, 3).map((post) => (
+            <Link
+              key={post._id}
+              href={`/blog/${post.slug}`}
+              className="group grid gap-4 py-7 first:pt-2 last:pb-2 md:grid-cols-12 md:items-baseline md:gap-8"
+            >
+              <div className="text-sm text-[#89877F] md:col-span-3">
+                {post.publishedAt &&
+                  new Date(post.publishedAt).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+              </div>
+
+              <div className="md:col-span-7">
+                <h3 className="font-display text-3xl font-medium text-[#22221F] transition-colors group-hover:text-[#85806D]">
+                  {post.title}
+                </h3>
+                {post.excerpt && (
+                  <p className="mt-2 line-clamp-2 text-base text-[#89877F]">
+                    {post.excerpt}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center md:col-span-2 md:justify-end">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-[#22221F] group-hover:text-[#85806D]">
+                  Read <FiArrowRight size={14} />
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
-      ) : !posts.length ? (
-        <EmptyState message="Blog posts will appear here once published from the Admin Dashboard." />
-      ) : (
-        <>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredPosts.map((post, i) => (
-              <motion.div
-                key={post._id || post.slug}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="glass-card overflow-hidden transition hover:-translate-y-1 hover:shadow-glow flex flex-col justify-between"
-              >
-                <div>
-                  {post.coverImage?.url && (
-                    <div className="aspect-video overflow-hidden">
-                      <img src={post.coverImage.url} alt={post.title} className="h-full w-full object-cover" />
-                    </div>
-                  )}
-                  <div className="p-5">
-                    <p className="font-mono text-xs text-slate-500">
-                      {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : ''}
-                    </p>
-                    <h3 className="mt-1 font-display text-lg font-semibold">{post.title}</h3>
-                    <p className="mt-2 line-clamp-2 text-sm text-slate-400">{post.excerpt}</p>
-                  </div>
-                </div>
-                <div className="p-5 pt-0">
-                  <Link href={`/blog/${post.slug}`} className="inline-block text-sm text-primary hover:underline">
-                    Read more →
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
-            <Link
-              href="/blog"
-              className="glass-card inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-slate-200 transition duration-300 hover:scale-[1.04] hover:text-primary hover:shadow-glow"
-            >
-              View More Blog Posts →
-            </Link>
-          </div>
-        </>
-      )}
       </div>
-
-      <SectionNavArrow currentId="blog" />
     </section>
   );
 }

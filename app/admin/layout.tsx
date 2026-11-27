@@ -7,9 +7,15 @@ import { AdminAuthProvider } from "@/context/AdminAuthContext";
 import ProtectedRoute from "@/components/admin/layout/ProtectedRoute";
 import DashboardLayout from "@/components/admin/layout/DashboardLayout";
 
+const AUTH_ROUTES = [
+  "/admin/login",
+  "/admin/forgot-password",
+  "/admin/update-password",
+];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isLoginPage = pathname === "/admin/login";
+  const isAuthPage = AUTH_ROUTES.includes(pathname || "");
 
   useEffect(() => {
     document.body.classList.add("admin-body");
@@ -20,7 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <AdminAuthProvider>
-      {isLoginPage ? (
+      {isAuthPage ? (
         children
       ) : (
         <ProtectedRoute>

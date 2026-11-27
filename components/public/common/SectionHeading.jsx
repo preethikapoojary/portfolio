@@ -1,20 +1,33 @@
 'use client';
-import { motion } from 'framer-motion';
 
-export default function SectionHeading({ eyebrow, title, subtitle }) {
+import Link from 'next/link';
+import { FiArrowRight } from 'react-icons/fi';
+
+export default function SectionHeading({
+  number,
+  eyebrow,
+  title,
+  actionLabel,
+  actionHref,
+}) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.5 }}
-      className="mb-12 max-w-2xl"
-    >
-      {eyebrow && (
-        <p className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-primary">{eyebrow}</p>
+    <div className="mb-10 flex flex-col justify-between gap-4 border-b border-[#DCD9D1] pb-6 sm:flex-row sm:items-end">
+      <div>
+        {(number || eyebrow) && (
+          <p className="mb-2.5 text-xs font-medium uppercase tracking-[0.2em] text-[#89877F]">
+            {[number, eyebrow].filter(Boolean).join(' — ')}
+          </p>
+        )}
+        <h2 className="font-display text-4xl font-medium tracking-tight text-[#22221F] sm:text-5xl">
+          {title}
+        </h2>
+      </div>
+
+      {actionLabel && actionHref && (
+        <Link href={actionHref} className="editorial-link shrink-0 text-[15px]">
+          {actionLabel} <FiArrowRight size={15} />
+        </Link>
       )}
-      <h2 className="font-display text-3xl font-semibold sm:text-4xl">{title}</h2>
-      {subtitle && <p className="mt-3 text-slate-400">{subtitle}</p>}
-    </motion.div>
+    </div>
   );
 }

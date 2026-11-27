@@ -1,50 +1,84 @@
 'use client';
-import { motion } from 'framer-motion';
-import SectionHeading from '../common/SectionHeading';
-import SectionNavArrow from '../common/SectionNavArrow';
+
+import Link from 'next/link';
+import { FiArrowRight } from 'react-icons/fi';
 import { useSettings } from '@/context/SettingsContext';
+import { useFetch } from '@/hooks/useFetch';
+import api from '@/api/endpoints';
 
 export default function About() {
   const { profile } = useSettings();
+  const { data: education } = useFetch(api.getEducation, []);
+
+  if (!profile) return null;
+
+  const currentEdu = (education || [])[0];
 
   return (
-    <section id="about" className="relative w-full px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading eyebrow="About" title="A little about me" />
-        <div className="grid items-center gap-12 md:grid-cols-[1fr_1.4fr]">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="glass-card mx-auto aspect-square w-56 overflow-hidden sm:w-72"
-          >
-            {profile?.profilePhoto?.url ? (
-              <img
-                src={profile.profilePhoto.url}
-                alt={profile?.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center font-display text-4xl text-slate-600">
-                {profile?.name?.[0] || '?'}
-              </div>
-            )}
-          </motion.div>
+    <section
+      id="about"
+      className="flex flex-col justify-center border-t border-[#DCD9D1] bg-[#E9E5DC]/35 py-16 lg:min-h-[calc(100vh-4rem)] lg:py-20"
+    >
+      <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
+        <div className="mb-10 border-b border-[#DCD9D1] pb-6 text-center">
+          <h2 className="font-display text-4xl font-medium tracking-tight text-[#22221F] sm:text-5xl">
+            About
+          </h2>
+        </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="whitespace-pre-line text-lg leading-relaxed text-slate-300"
-          >
-            {profile?.aboutMe || 'This is where your about-me content will appear once added from the Admin Dashboard.'}
-          </motion.p>
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-7">
+            <p className="text-lg leading-relaxed text-[#22221F] sm:text-xl sm:leading-relaxed">
+              {profile.aboutMe}
+            </p>
+
+            <div className="mt-9">
+              <Link href="/about" className="editorial-link text-base">
+                Explore About <FiArrowRight size={15} />
+              </Link>
+            </div>
+          </div>
+
+          <div className="border-t border-[#DCD9D1] pt-6 lg:col-span-5 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#89877F]">
+              Academic Highlight
+            </p>
+            <div className="mt-5 space-y-5">
+              <div>
+                <h3 className="font-display text-3xl font-medium text-[#22221F]">
+                  {currentEdu?.institution || 'NMAM Institute of Technology, Nitte'}
+                </h3>
+                <p className="mt-1.5 text-base text-[#89877F]">
+                  {currentEdu
+                    ? [currentEdu.degree, currentEdu.fieldOfStudy].filter(Boolean).join(' — ')
+                    : 'B.Tech — Information Science & Engineering'}
+                </p>
+              </div>
+
+              <div className="flex items-baseline gap-8 border-t border-[#DCD9D1] pt-5">
+                {currentEdu?.grade && (
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.16em] text-[#89877F]">
+                      Grade
+                    </p>
+                    <p className="mt-1 font-display text-3xl font-semibold text-[#22221F]">
+                      {currentEdu.grade}
+                    </p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-[#89877F]">
+                    Focus
+                  </p>
+                  <p className="mt-1 text-base font-medium text-[#22221F]">
+                    Software Engineering &amp; AI/ML
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <SectionNavArrow currentId="about" />
     </section>
   );
 }

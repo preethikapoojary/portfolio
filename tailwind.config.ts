@@ -7,18 +7,17 @@ const config: Config = {
     "./context/**/*.{js,ts,jsx,tsx,mdx}",
     "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        // Public theme tokens (driven by CSS variables from SiteSettings.theme)
-        primary: "var(--color-primary, #6366F1)",
-        secondary: "var(--color-secondary, #8B5CF6)",
-        accent: "var(--color-accent, #F59E0B)",
-        surface: "#0B0F19",
-        "surface-soft": "#11162326",
-        glass: "rgba(255,255,255,0.11)",
-        // Admin panel tokens
+        // Editorial warm-neutral palette
+        ivory: "#F6F4EF",
+        sand: "#E9E5DC",
+        charcoal: "#22221F",
+        stone: "#89877F",
+        olive: "#85806D",
+        hairline: "#DCD9D1",
+        // Admin panel tokens (kept intact for /admin)
         "admin-primary": "#6366F1",
         "admin-primary-dark": "#4F46E5",
         "admin-surface": "#F8FAFC",
@@ -27,17 +26,13 @@ const config: Config = {
         "admin-muted": "#64748B",
       },
       fontFamily: {
-        display: ["var(--font-display)", "sans-serif"],
-        body: ["var(--font-body)", "sans-serif"],
-        mono: ['"JetBrains Mono"', "monospace"],
+        display: ['"Cormorant Garamond"', "Georgia", "serif"],
+        body: ['"Inter"', "system-ui", "-apple-system", "sans-serif"],
+        sans: ['"Inter"', "system-ui", "-apple-system", "sans-serif"],
       },
-      backdropBlur: { xs: "2px" },
       boxShadow: {
-        glass: "0 10px 36px 0 rgba(0,0,0,0.42)",
-        glow: "0 0 40px -10px var(--color-primary)",
         card: "0 1px 2px rgba(15,23,42,0.06), 0 1px 3px rgba(15,23,42,0.08)",
       },
-      borderRadius: { xl2: "1.25rem" },
     },
   },
   plugins: [],

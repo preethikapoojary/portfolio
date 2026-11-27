@@ -1,271 +1,258 @@
 'use client';
-import { useEffect, useState } from 'react';
+
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { AnimatePresence, motion } from 'framer-motion';
-import { FiMoon, FiSun, FiMenu, FiX } from 'react-icons/fi';
-import { useTheme } from '@/context/ThemeContext';
+import { FiMoon, FiSun } from 'react-icons/fi';
 import { useSettings } from '@/context/SettingsContext';
-
-const NAV_ORDER = ['about', 'projects', 'experience', 'certificates', 'blog', 'contact'];
-
-const DEFAULT_LABELS = {
-  about: 'About',
-  projects: 'Projects',
-  experience: 'Experience',
-  certificates: 'Certificates',
-  blog: 'Blog',
-  contact: 'Contact',
-};
+import { useTheme } from '@/context/ThemeContext';
+import api from '@/api/endpoints';
 
 export default function Navbar() {
-  const { mode, toggle } = useTheme();
-  const { settings, sections } = useSettings();
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [activeKey, setActiveKey] = useState('home');
   const pathname = usePathname();
+  const { profile } = useSettings();
+  const { mode, toggle } = useTheme();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [hasBlogs, setHasBlogs] = useState(false);
+  const [activeKey, setActiveKey] = useState('home');
+  const headerRef = useRef(null);
+  const mobileNavRef = useRef(null);
+  const menuBtnRef = useRef(null);
 
   const isHome = pathname === '/';
 
-  // Navigation items matching user requirements:
-  // About, Projects, Experience, Certificates, Blog, Contact
-  const navSections = NAV_ORDER.map((key) => {
-    const found = (sections || []).find((s) => s.key === key);
-    return {
-      key,
-      label: found?.label || DEFAULT_LABELS[key],
-      isVisible: found ? found.isVisible : true,
-    };
-  }).filter((s) => s.isVisible);
-
-  // Monitor scroll distance to apply elevated glass styling
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    api
+      .getBlogPosts()
+      .then((posts) => setHasBlogs(Array.isArray(posts) && posts.length > 0))
+      .catch(() => setHasBlogs(false));
   }, []);
 
-  // Close mobile drawer on route change or Escape key
   useEffect(() => {
-    setOpen(false);
+    setMobileOpen(false);
   }, [pathname]);
 
-  useEffect(() => {
-    const onKeyDown = (e) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
-
-  // Scroll-spy: highlights whichever section is currently active
+  // Scroll-spy for homepage sections
   useEffect(() => {
     if (!isHome) return undefined;
 
-    const keys = ['home', ...navSections.map((s) => s.key)];
-    const elements = keys.map((key) => document.getElementById(key)).filter(Boolean);
-    if (!elements.length) return undefined;
+    const sectionIds = [
+      'about',
+      'projects',
+      'experience',
+      'certificates',
+      ...(hasBlogs ? ['blog'] : []),
+      'contact',
+    ];
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting);
-        if (visible.length > 0) {
-          const topMost = visible.reduce((a, b) =>
-            a.boundingClientRect.top < b.boundingClientRect.top ? a : b
-          );
-          setActiveKey(topMost.target.id);
-        }
-      },
-      { rootMargin: '-15% 0px -50% 0px', threshold: 0 }
-    );
-
-    elements.forEach((el) => observer.observe(el));
-
-    const onScroll = () => {
-      if (window.scrollY < 120) {
+    const onScrollSpy = () => {
+      if (window.scrollY < 160) {
         setActiveKey('home');
+        return;
+      }
+      const offset = 140;
+      let current = 'home';
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.getBoundingClientRect().top;
+          if (top <= offset) {
+            current = id;
+          }
+        }
+      }
+      setActiveKey(current);
+    };
+
+    onScrollSpy();
+    window.addEventListener('scroll', onScrollSpy, { passive: true });
+    return () => window.removeEventListener('scroll', onScrollSpy);
+  }, [isHome, hasBlogs]);
+
+  useEffect(() => {
+    const onPointerOutside = (e) => {
+      if (!mobileOpen) return;
+      const inHeader = headerRef.current?.contains(e.target);
+      const inMenu = mobileNavRef.current?.contains(e.target);
+      if (!inHeader && !inMenu) {
+        setMobileOpen(false);
       }
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
 
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', onScroll);
+    const onScroll = () => {
+      if (mobileOpen) {
+        setMobileOpen(false);
+      }
     };
-  }, [isHome, navSections.map((s) => s.key).join(',')]);
 
-  const handleLogoClick = (e) => {
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape' && mobileOpen) {
+        setMobileOpen(false);
+        menuBtnRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('mousedown', onPointerOutside);
+    document.addEventListener('touchstart', onPointerOutside, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerOutside);
+      document.removeEventListener('touchstart', onPointerOutside);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [mobileOpen]);
+
+  const navLinks = [
+    { key: 'home', label: 'Home', href: '/' },
+    { key: 'about', label: 'About', href: isHome ? '#about' : '/#about' },
+    { key: 'projects', label: 'Projects', href: isHome ? '#projects' : '/#projects' },
+    { key: 'experience', label: 'Experience', href: isHome ? '#experience' : '/#experience' },
+    { key: 'certificates', label: 'Certificates', href: isHome ? '#certificates' : '/#certificates' },
+    ...(hasBlogs
+      ? [{ key: 'blog', label: 'Blog', href: isHome ? '#blog' : '/#blog' }]
+      : []),
+    { key: 'contact', label: 'Contact', href: isHome ? '#contact' : '/#contact' },
+  ];
+
+  const isLinkActive = (key) => {
+    if (isHome) return activeKey === key;
+    if (key === 'home') return false;
+    return pathname === `/${key}` || pathname?.startsWith(`/${key}/`);
+  };
+
+  const handleHomeClick = (e) => {
+    setMobileOpen(false);
     if (isHome) {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setActiveKey('home');
-      window.history.pushState(null, '', '/');
     }
-    setOpen(false);
   };
 
-  const handleNavClick = (e, key) => {
-    if (isHome) {
-      e.preventDefault();
-      const el = document.getElementById(key);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-        window.history.pushState(null, '', `#${key}`);
-        setActiveKey(key);
-      }
-    }
-    setOpen(false);
-  };
+  const displayName = profile?.name ? `${profile.name} Poojary` : 'Preethika Poojary';
 
   return (
-    <header className="fixed top-0 z-50 w-full px-4 sm:px-6 transition-all duration-300">
-      <nav
-        className={`glass-card mx-auto flex max-w-6xl items-center justify-between rounded-full px-5 py-2.5 sm:py-3 transition-all duration-300 ${
-          scrolled
-            ? 'mt-2.5 sm:mt-3 shadow-xl bg-surface/85 backdrop-blur-xl border border-white/10'
-            : 'mt-3.5 sm:mt-4 shadow-glass'
-        }`}
-      >
-        {/* Brand / Logo */}
+    <header
+      ref={headerRef}
+      className="sticky top-0 z-40 border-b border-[#DCD9D1] bg-[#F6F4EF]/95 backdrop-blur-sm transition-colors duration-200"
+    >
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 sm:px-8">
         <Link
           href="/"
-          onClick={handleLogoClick}
-          className="flex items-center gap-2.5 font-display text-base sm:text-lg font-semibold tracking-tight transition hover:opacity-90"
+          onClick={handleHomeClick}
+          className="font-display text-xl font-semibold tracking-tight text-[#22221F] transition-colors hover:text-[#85806D]"
         >
-          {settings?.logo?.url ? (
-            <img
-              src={settings.logo.url}
-              alt="Logo"
-              className="h-7 w-7 rounded-full object-cover border border-white/10"
-            />
-          ) : (
-            <span
-              className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-surface shadow-glow"
-              style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))' }}
-            >
-              {settings?.hero?.headline?.slice(0, 1) || 'P'}
-            </span>
-          )}
-          <span className="text-slate-100">{settings?.seo?.metaTitle || 'Portfolio'}</span>
+          {displayName}
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <ul className="hidden items-center gap-1 text-sm text-slate-300 md:flex">
-          {navSections.map((s) => {
-            const isActive = isHome && activeKey === s.key;
+        {/* Desktop Navigation */}
+        <nav className="hidden items-center gap-7 md:flex" aria-label="Primary">
+          {navLinks.map((item) => {
+            const active = isLinkActive(item.key);
             return (
-              <li key={s.key}>
-                {isHome ? (
-                  <a
-                    href={`#${s.key}`}
-                    onClick={(e) => handleNavClick(e, s.key)}
-                    className={`relative rounded-full px-3.5 py-1.5 transition-colors duration-200 ${
-                      isActive ? 'text-white font-medium' : 'text-slate-300 hover:text-white'
-                    }`}
-                  >
-                    {isActive && (
-                      <span
-                        aria-hidden
-                        className="absolute inset-0 -z-10 rounded-full"
-                        style={{
-                          background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))',
-                          opacity: 0.22,
-                          boxShadow: '0 0 16px -1px var(--color-primary)',
-                        }}
-                      />
-                    )}
-                    {s.label}
-                  </a>
-                ) : (
-                  <Link
-                    href={`/#${s.key}`}
-                    onClick={() => setOpen(false)}
-                    className="rounded-full px-3.5 py-1.5 text-slate-300 transition-colors hover:text-white"
-                  >
-                    {s.label}
-                  </Link>
+              <Link
+                key={item.key}
+                href={item.href}
+                onClick={item.key === 'home' ? handleHomeClick : undefined}
+                className={`relative py-1 text-[13px] font-medium tracking-wide transition-colors ${
+                  active ? 'text-[#22221F]' : 'text-[#89877F] hover:text-[#22221F]'
+                }`}
+              >
+                {item.label}
+                {active && (
+                  <span className="absolute inset-x-0 -bottom-[1px] h-[1.5px] bg-[#85806D]" />
                 )}
-              </li>
+              </Link>
             );
           })}
-        </ul>
 
-        {/* Actions (Theme toggle & Mobile menu button) */}
-        <div className="flex items-center gap-2 sm:gap-3">
           <button
+            type="button"
             onClick={toggle}
-            aria-label="Toggle dark/light mode"
-            className="rounded-full p-2 text-slate-300 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+            aria-label={mode === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            className="p-1.5 text-[#89877F] transition-colors hover:text-[#22221F]"
           >
-            {mode === 'dark' ? <FiSun className="text-lg" /> : <FiMoon className="text-lg" />}
+            {mode === 'dark' ? <FiSun size={15} /> : <FiMoon size={15} />}
           </button>
+        </nav>
+
+        {/* Smooth 3-Line to X Animated Hamburger Button */}
+        <button
+          ref={menuBtnRef}
+          type="button"
+          onClick={() => setMobileOpen((o) => !o)}
+          aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-floating-nav"
+          className="relative z-50 flex h-9 w-9 flex-col items-center justify-center focus:outline-none focus-visible:ring-1 focus-visible:ring-[#85806D] md:hidden"
+        >
+          <span
+            className={`block h-[1.5px] w-5 bg-current text-[#22221F] transition-all duration-300 ease-in-out ${
+              mobileOpen ? 'translate-y-[1.5px] rotate-45' : '-translate-y-1.5'
+            }`}
+          />
+          <span
+            className={`block h-[1.5px] w-5 bg-current text-[#22221F] transition-all duration-300 ease-in-out ${
+              mobileOpen ? 'opacity-0' : 'opacity-100'
+            }`}
+          />
+          <span
+            className={`block h-[1.5px] w-5 bg-current text-[#22221F] transition-all duration-300 ease-in-out ${
+              mobileOpen ? '-translate-y-[1.5px] -rotate-45' : 'translate-y-1.5'
+            }`}
+          />
+        </button>
+      </div>
+
+      {/* Compact Floating Dropdown Menu */}
+      <nav
+        ref={mobileNavRef}
+        id="mobile-floating-nav"
+        aria-label="Mobile"
+        aria-hidden={!mobileOpen}
+        className={`fixed right-4 top-[4.5rem] z-50 w-56 max-w-[calc(100vw-2rem)] rounded-[22px] border border-[#DCD9D1] bg-[#F6F4EF] px-5 py-6 shadow-[0_14px_40px_rgba(34,34,31,0.12)] transition-all duration-200 ease-out md:hidden ${
+          mobileOpen
+            ? 'pointer-events-auto translate-y-0 opacity-100'
+            : 'pointer-events-none -translate-y-2 opacity-0'
+        }`}
+      >
+        <div className="flex flex-col items-center space-y-4">
+          {navLinks.map((item) => {
+            const active = isLinkActive(item.key);
+            return (
+              <Link
+                key={item.key}
+                href={item.href}
+                tabIndex={mobileOpen ? 0 : -1}
+                onClick={
+                  item.key === 'home'
+                    ? handleHomeClick
+                    : () => setMobileOpen(false)
+                }
+                className={`py-0.5 text-[15px] font-medium tracking-wide transition-colors ${
+                  active
+                    ? 'font-semibold text-[#22221F] underline decoration-[#85806D] decoration-1 underline-offset-4'
+                    : 'text-[#89877F] hover:text-[#22221F]'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+
           <button
-            onClick={() => setOpen((o) => !o)}
-            className="rounded-full p-2 text-slate-300 transition hover:bg-white/10 hover:text-white md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
-            aria-label="Toggle menu"
+            type="button"
+            tabIndex={mobileOpen ? 0 : -1}
+            onClick={toggle}
+            aria-label={mode === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            className="mt-1 p-2 text-[#22221F] transition-colors hover:text-[#85806D]"
           >
-            {open ? <FiX className="text-xl" /> : <FiMenu className="text-xl" />}
+            {mode === 'dark' ? <FiSun size={16} /> : <FiMoon size={16} />}
           </button>
         </div>
       </nav>
-
-      {/* Mobile Navigation Drawer */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="glass-card mx-auto mt-2 max-w-6xl rounded-2xl p-4 text-sm md:hidden border border-white/10 shadow-2xl bg-surface/95 backdrop-blur-2xl"
-          >
-            <div className="flex flex-col gap-1">
-              <Link
-                href="/"
-                onClick={handleLogoClick}
-                className={`rounded-xl px-4 py-2.5 transition-colors ${
-                  isHome && activeKey === 'home'
-                    ? 'bg-white/10 font-medium text-white'
-                    : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                Home
-              </Link>
-
-              {navSections.map((s) => {
-                const isActive = isHome && activeKey === s.key;
-                return isHome ? (
-                  <a
-                    key={s.key}
-                    href={`#${s.key}`}
-                    onClick={(e) => handleNavClick(e, s.key)}
-                    className={`rounded-xl px-4 py-2.5 transition-colors ${
-                      isActive
-                        ? 'bg-white/10 font-medium text-white'
-                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    {s.label}
-                  </a>
-                ) : (
-                  <Link
-                    key={s.key}
-                    href={`/#${s.key}`}
-                    onClick={() => setOpen(false)}
-                    className="rounded-xl px-4 py-2.5 text-slate-300 transition-colors hover:bg-white/5 hover:text-white"
-                  >
-                    {s.label}
-                  </Link>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   );
 }

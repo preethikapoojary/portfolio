@@ -1,97 +1,117 @@
 'use client';
+
 import Link from 'next/link';
-import { FiGithub, FiExternalLink } from 'react-icons/fi';
-import SectionHeading from '../common/SectionHeading';
-import SectionNavArrow from '../common/SectionNavArrow';
-import EmptyState from '../common/EmptyState';
-import TiltCard from '../common/TiltCard';
-import useFetch from '@/hooks/useFetch';
+import { FiArrowRight } from 'react-icons/fi';
+import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
+import SectionHeading from '@/components/public/common/SectionHeading';
 
 export default function Projects() {
-  const { data, loading } = useFetch(() => api.getProjects(), []);
-  const projects = data?.items || data || [];
-  const featuredProjects = projects.slice(0, 3);
+  const { data: projects, loading } = useFetch(() => api.getProjects(), []);
+  if (loading || !projects?.length) return null;
+
+  const featured = projects.slice(0, 3);
 
   return (
-    <section id="projects" className="relative w-full px-6 py-24">
-      <div className="mx-auto max-w-6xl">
+    <section
+      id="projects"
+      className="flex flex-col justify-center border-t border-[#DCD9D1] py-16 lg:min-h-[calc(100vh-4rem)] lg:py-20"
+    >
+      <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
         <SectionHeading
-          eyebrow="Projects"
-          title="Selected work"
-          subtitle="A mix of things I've built, shipped, and broken along the way."
+          number="02"
+          eyebrow="Selected Work"
+          title="Projects"
+          actionLabel="View All Projects"
+          actionHref="/projects"
         />
-      {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="glass-card h-64 animate-pulse" />
-          ))}
-        </div>
-      ) : !projects.length ? (
-        <EmptyState message="Projects will appear here once added from the Admin Dashboard." />
-      ) : (
-        <>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredProjects.map((project, i) => (
-              <TiltCard
-                key={project._id || project.slug}
-                delay={i * 0.05}
-                className="glass-card group overflow-hidden transition-shadow hover:shadow-glow flex flex-col justify-between"
+
+        <div className="divide-y divide-[#DCD9D1]">
+          {featured.map((project, index) => {
+            const num = String(index + 1).padStart(2, '0');
+            const imageFirst = index % 2 === 1;
+
+            return (
+              <article
+                key={project._id}
+                className="grid items-center gap-8 py-12 first:pt-2 last:pb-2 lg:grid-cols-12 lg:gap-12"
               >
-                <div>
-                  {(project.coverImage?.url || project.screenshots?.[0]?.url) && (
-                    <div className="aspect-video overflow-hidden">
-                      <img
-                        src={project.coverImage?.url || project.screenshots[0].url}
-                        alt={project.title}
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                      />
-                    </div>
+                <div
+                  className={`lg:col-span-6 ${
+                    imageFirst ? 'lg:order-2' : 'lg:order-1'
+                  }`}
+                >
+                  <div className="mb-3 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.18em] text-[#89877F]">
+                    <span>{num}</span>
+                    {project.category && (
+                      <>
+                        <span>/</span>
+                        <span>{project.category}</span>
+                      </>
+                    )}
+                  </div>
+
+                  <Link href={`/projects/${project.slug}`} className="group block">
+                    <h3 className="font-display text-3xl font-medium tracking-tight text-[#22221F] transition-colors group-hover:text-[#85806D] sm:text-4xl">
+                      {project.title}
+                    </h3>
+                  </Link>
+
+                  {project.shortDescription && (
+                    <p className="mt-4 text-base leading-relaxed text-[#89877F] sm:text-lg">
+                      {project.shortDescription}
+                    </p>
                   )}
-                  <div className="p-6">
-                    <div className="mb-2 flex flex-wrap gap-2">
-                      {(project.technologies || []).slice(0, 4).map((tech) => (
-                        <span key={tech} className="rounded-full bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300">
+
+                  {project.technologies?.length > 0 && (
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {project.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="border border-[#DCD9D1] bg-[#E9E5DC]/45 px-3 py-1 text-xs font-medium text-[#22221F]"
+                        >
                           {tech}
                         </span>
                       ))}
                     </div>
-                    <h3 className="font-display text-xl font-semibold">{project.title}</h3>
-                    <p className="mt-2 line-clamp-2 text-sm text-slate-400">{project.shortDescription}</p>
+                  )}
+
+                  <div className="mt-6">
+                    <Link href={`/projects/${project.slug}`} className="editorial-link text-[15px]">
+                      View Project <FiArrowRight size={15} />
+                    </Link>
                   </div>
                 </div>
-                <div className="p-6 pt-0 flex items-center gap-4 text-sm">
-                  <Link href={`/projects/${project.slug}`} className="text-primary hover:underline">
-                    View details
+
+                <div
+                  className={`lg:col-span-6 ${
+                    imageFirst ? 'lg:order-1' : 'lg:order-2'
+                  }`}
+                >
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    className="group block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40"
+                  >
+                    {project.coverImage?.url ? (
+                      <img
+                        src={project.coverImage.url}
+                        alt={project.title}
+                        className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="flex aspect-[16/10] w-full items-center justify-center bg-[#E9E5DC] px-6 text-center">
+                        <span className="font-display text-3xl text-[#85806D]">
+                          {project.title}
+                        </span>
+                      </div>
+                    )}
                   </Link>
-                  {project.githubUrl && (
-                    <a href={project.githubUrl} target="_blank" rel="noreferrer" aria-label="GitHub repository" className="transition hover:scale-110 hover:text-primary">
-                      <FiGithub />
-                    </a>
-                  )}
-                  {project.liveDemoUrl && (
-                    <a href={project.liveDemoUrl} target="_blank" rel="noreferrer" aria-label="Live demo" className="transition hover:scale-110 hover:text-primary">
-                      <FiExternalLink />
-                    </a>
-                  )}
                 </div>
-              </TiltCard>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
-            <Link
-              href="/projects"
-              className="glass-card inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-slate-200 transition duration-300 hover:scale-[1.04] hover:text-primary hover:shadow-glow"
-            >
-              View More Projects →
-            </Link>
-          </div>
-        </>
-      )}
+              </article>
+            );
+          })}
+        </div>
       </div>
-
-      <SectionNavArrow currentId="projects" />
     </section>
   );
 }

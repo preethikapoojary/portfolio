@@ -1,139 +1,82 @@
 'use client';
-import { useRef, useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { FiArrowLeft, FiSend } from 'react-icons/fi';
+
+import { useState } from 'react';
 import { Turnstile } from '@marsidev/react-turnstile';
-import SectionHeading from '@/components/public/common/SectionHeading';
-import SocialIcon from '@/components/public/common/SocialIcon';
+import { FiCheck, FiSend } from 'react-icons/fi';
+import api from '@/api/endpoints';
 import { useSettings } from '@/context/SettingsContext';
 import { getSocialLinks } from '@/utils/socialLinks';
-import api from '@/api/endpoints';
+import PageHeader from '@/components/public/common/PageHeader';
 
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export default function ContactPage() {
   const { profile } = useSettings();
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    purpose: '',
-    message: '',
-    company: '',
-    linkedinUrl: '',
-    githubUrl: '',
-  });
-  const [turnstileToken, setTurnstileToken] = useState('');
-  const [status, setStatus] = useState('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-  const turnstileRef = useRef(null);
-
   const socialLinks = getSocialLinks(profile);
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
 
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
-
-    if (!form.purpose) {
-      setErrorMessage('Please select a purpose for your message.');
-      return;
-    }
-
+    setError('');
     if (turnstileSiteKey && !turnstileToken) {
-      setErrorMessage('Please complete the security check.');
+      setError('Please complete the verification check.');
       return;
     }
-
-    setStatus('sending');
-
-    let fullMessage = form.message;
-    const optionalDetails = [];
-    if (form.company?.trim()) optionalDetails.push(`Company / Organization: ${form.company.trim()}`);
-    if (form.linkedinUrl?.trim()) optionalDetails.push(`LinkedIn Profile: ${form.linkedinUrl.trim()}`);
-    if (form.githubUrl?.trim()) optionalDetails.push(`GitHub Profile: ${form.githubUrl.trim()}`);
-
-    if (optionalDetails.length > 0) {
-      fullMessage += `\n\n---\nAdditional Details:\n` + optionalDetails.join('\n');
-    }
-
+    setSubmitting(true);
     try {
-      await api.submitContactMessage({
-        name: form.name.trim(),
-        email: form.email.trim(),
-        subject: form.purpose,
-        message: fullMessage,
-        ...(turnstileToken ? { turnstileToken } : {}),
-      });
-      setStatus('sent');
-      setForm({
-        name: '',
-        email: '',
-        purpose: '',
-        message: '',
-        company: '',
-        linkedinUrl: '',
-        githubUrl: '',
-      });
-      setTurnstileToken('');
-      turnstileRef.current?.reset();
+      await api.submitContactMessage({ ...form, turnstileToken });
+      setSent(true);
+      setForm({ name: '', email: '', subject: '', message: '' });
     } catch (err) {
-      setStatus('error');
-      setErrorMessage(err.response?.data?.message || 'Something went wrong. Please try again.');
-      setTurnstileToken('');
-      turnstileRef.current?.reset();
+      setError(err?.response?.data?.message || 'Unable to send message. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-6 pb-24 pt-32">
-      <Link
-        href="/"
-        className="glass-card mb-8 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-slate-300 transition duration-300 hover:scale-[1.04] hover:text-primary hover:shadow-glow"
-      >
-        <FiArrowLeft /> Back to Portfolio
-      </Link>
-
-      <SectionHeading
+    <div className="mx-auto max-w-6xl px-6 pb-20 sm:px-8">
+      <PageHeader
         eyebrow="Contact"
-        title="Get in Touch"
-        subtitle="Have a project in mind, a question, or just want to connect? Send a message below."
+        title="Let's Connect"
+        description="Open to software engineering internships, collaborative projects, and technical conversations."
       />
 
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="grid gap-10 md:grid-cols-2 items-start"
-      >
-        <div className="space-y-6">
-          <div className="glass-card p-6 md:p-8 space-y-4">
-            <h3 className="font-display text-xl font-semibold text-slate-100">Let&apos;s Connect</h3>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              Open to internships, collaborations, and interesting conversations in tech. Feel free to reach out!
+      <div className="grid gap-14 py-14 lg:grid-cols-12 lg:gap-16">
+        <div className="space-y-8 lg:col-span-5">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
+              Direct Email
             </p>
-
-            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3.5 py-1.5 text-xs font-medium text-emerald-400 border border-emerald-500/20">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              Available for new opportunities
-            </div>
+            {profile?.email && (
+              <a
+                href={`mailto:${profile.email}`}
+                className="mt-2 inline-block border-b border-[#DCD9D1] pb-1 text-base font-medium text-[#22221F] transition-colors hover:border-[#22221F]"
+              >
+                {profile.email}
+              </a>
+            )}
           </div>
 
           {socialLinks.length > 0 && (
-            <div className="glass-card p-6 md:p-8 space-y-4">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Connect with me</h4>
-              <div className="flex flex-wrap gap-2.5">
-                {socialLinks.map(({ platform, href, Icon }) => (
+            <div className="border-t border-[#DCD9D1] pt-6">
+              <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
+                Profiles
+              </p>
+              <div className="flex flex-col items-start gap-3">
+                {socialLinks.map((link) => (
                   <a
-                    key={platform + href}
-                    href={href}
-                    target={href.startsWith('mailto:') ? undefined : '_blank'}
+                    key={link.url}
+                    href={link.url}
+                    target={link.url.startsWith('mailto:') ? undefined : '_blank'}
                     rel="noreferrer"
-                    className="glass-card flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 transition duration-300 hover:-translate-y-0.5 hover:scale-[1.04] hover:text-primary hover:shadow-glow"
+                    className="editorial-link"
                   >
-                    <SocialIcon icon={Icon} className="text-base" /> {platform}
+                    {link.platform === 'Linkedln' ? 'LinkedIn' : link.platform}
                   </a>
                 ))}
               </div>
@@ -141,120 +84,104 @@ export default function ContactPage() {
           )}
         </div>
 
-        <form onSubmit={submit} className="glass-card grid grid-cols-1 sm:grid-cols-2 gap-4 p-6 md:p-8">
-          <input
-            required
-            type="text"
-            placeholder="Your Name *"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="rounded-lg bg-white/5 px-4 py-2.5 text-sm text-slate-200 outline-none transition focus-visible:ring-2 focus-visible:ring-primary placeholder:text-slate-500"
-          />
-          <input
-            required
-            type="email"
-            placeholder="Your Email *"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="rounded-lg bg-white/5 px-4 py-2.5 text-sm text-slate-200 outline-none transition focus-visible:ring-2 focus-visible:ring-primary placeholder:text-slate-500"
-          />
-
-          <select
-            required
-            value={form.purpose}
-            onChange={(e) => setForm({ ...form, purpose: e.target.value })}
-            className="sm:col-span-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-slate-200 outline-none transition focus-visible:ring-2 focus-visible:ring-primary cursor-pointer border-r-[16px] border-transparent"
-          >
-            <option value="" disabled className="bg-slate-900 text-slate-400">
-              Select Purpose *
-            </option>
-            <option value="Internship Opportunity" className="bg-slate-900 text-slate-200">
-              Internship Opportunity
-            </option>
-            <option value="Collaboration" className="bg-slate-900 text-slate-200">
-              Collaboration
-            </option>
-            <option value="Project Discussion" className="bg-slate-900 text-slate-200">
-              Project Discussion
-            </option>
-            <option value="Networking" className="bg-slate-900 text-slate-200">
-              Networking
-            </option>
-            <option value="Feedback" className="bg-slate-900 text-slate-200">
-              Feedback
-            </option>
-            <option value="Other" className="bg-slate-900 text-slate-200">
-              Other
-            </option>
-          </select>
-
-          <textarea
-            required
-            placeholder="Your Message *"
-            rows={4}
-            value={form.message}
-            onChange={(e) => setForm({ ...form, message: e.target.value })}
-            className="sm:col-span-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-slate-200 outline-none transition focus-visible:ring-2 focus-visible:ring-primary placeholder:text-slate-500"
-          />
-
-          <input
-            type="text"
-            placeholder="Company / Organization (optional)"
-            value={form.company}
-            onChange={(e) => setForm({ ...form, company: e.target.value })}
-            className="sm:col-span-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-slate-200 outline-none transition focus-visible:ring-2 focus-visible:ring-primary placeholder:text-slate-500"
-          />
-
-          <input
-            type="url"
-            placeholder="LinkedIn Profile URL (optional)"
-            value={form.linkedinUrl}
-            onChange={(e) => setForm({ ...form, linkedinUrl: e.target.value })}
-            className="rounded-lg bg-white/5 px-4 py-2.5 text-sm text-slate-200 outline-none transition focus-visible:ring-2 focus-visible:ring-primary placeholder:text-slate-500"
-          />
-          <input
-            type="url"
-            placeholder="GitHub Profile URL (optional)"
-            value={form.githubUrl}
-            onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
-            className="rounded-lg bg-white/5 px-4 py-2.5 text-sm text-slate-200 outline-none transition focus-visible:ring-2 focus-visible:ring-primary placeholder:text-slate-500"
-          />
-
-          {turnstileSiteKey && (
-            <div className="sm:col-span-2 my-1 flex justify-center">
-              <Turnstile
-                ref={turnstileRef}
-                siteKey={turnstileSiteKey}
-                onSuccess={(token) => {
-                  setTurnstileToken(token);
-                  setErrorMessage('');
-                }}
-                onExpire={() => setTurnstileToken('')}
-                onError={() => setTurnstileToken('')}
-                options={{
-                  theme: 'dark',
-                }}
-              />
+        <div className="lg:col-span-7">
+          {sent ? (
+            <div className="border border-[#DCD9D1] bg-[#E9E5DC]/45 p-8">
+              <div className="flex items-center gap-2.5 text-[#22221F]">
+                <FiCheck size={18} />
+                <h2 className="font-display text-2xl font-medium">Message Received</h2>
+              </div>
+              <p className="mt-2 text-sm text-[#89877F]">
+                Thank you for reaching out. I&apos;ll get back to you soon.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSent(false)}
+                className="editorial-link mt-6"
+              >
+                Send another message
+              </button>
             </div>
-          )}
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6 border border-[#DCD9D1] bg-[#E9E5DC]/25 p-6 sm:p-8">
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="name" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                    Name *
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                  />
+                </div>
 
-          <button
-            type="submit"
-            disabled={status === 'sending' || (Boolean(turnstileSiteKey) && !turnstileToken)}
-            className="sm:col-span-2 justify-self-start inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium text-surface transition duration-300 hover:-translate-y-0.5 hover:scale-[1.04] hover:shadow-glow disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))' }}
-          >
-            <FiSend /> {status === 'sending' ? 'Sending…' : 'Start a Conversation'}
-          </button>
-          {status === 'sent' && (
-            <p className="sm:col-span-2 text-sm text-emerald-400">Message sent — thank you! I&apos;ll get back to you soon.</p>
+                <div>
+                  <label htmlFor="email" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                    Email *
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="subject" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                  Subject
+                </label>
+                <input
+                  id="subject"
+                  type="text"
+                  value={form.subject}
+                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                  className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="message" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                  Message *
+                </label>
+                <textarea
+                  id="message"
+                  rows={5}
+                  required
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                />
+              </div>
+
+              {turnstileSiteKey && (
+                <Turnstile
+                  siteKey={turnstileSiteKey}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                />
+              )}
+
+              {error && <p className="text-xs text-red-700">{error}</p>}
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="inline-flex items-center gap-2 border border-[#22221F] bg-[#22221F] px-6 py-3 text-xs font-medium uppercase tracking-[0.12em] text-[#F6F4EF] transition-colors hover:border-[#85806D] hover:bg-[#85806D] disabled:opacity-60"
+              >
+                <FiSend size={13} />
+                {submitting ? 'Sending…' : 'Send Message'}
+              </button>
+            </form>
           )}
-          {(status === 'error' || errorMessage) && (
-            <p className="sm:col-span-2 text-sm text-red-400">{errorMessage || 'Something went wrong. Please try again.'}</p>
-          )}
-        </form>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }
-

@@ -7,12 +7,15 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-admin-panel p-4 md:block">
-      <div className="mb-6 flex items-center justify-between px-2 py-2">
-        <Link href="/admin" className="font-mono text-sm font-semibold text-admin-primary">
-          Portfolio Admin
+    <aside className="hidden w-64 shrink-0 border-r border-[#DCD9D1] bg-[#E9E5DC]/35 p-5 md:block">
+      <div className="mb-6 flex items-center justify-between border-b border-[#DCD9D1] pb-4">
+        <Link href="/admin" className="font-display text-lg font-semibold text-[#22221F]">
+          Portfolio CMS
         </Link>
-        <Link href="/" className="text-xs text-admin-muted hover:text-admin-ink">
+        <Link
+          href="/"
+          className="text-xs font-medium text-[#89877F] transition-colors hover:text-[#22221F]"
+        >
           View Site ↗
         </Link>
       </div>
@@ -23,18 +26,18 @@ export default function Sidebar() {
             <Link
               key={key}
               href={path}
-              className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition ${
+              className={`flex items-center justify-between border-l-2 px-3 py-2 text-[13px] transition-colors ${
                 isActive
-                  ? 'bg-admin-primary/10 font-medium text-admin-primary'
-                  : 'text-admin-muted hover:bg-slate-100'
+                  ? 'border-[#22221F] bg-[#E9E5DC]/60 font-medium text-[#22221F]'
+                  : 'border-transparent text-[#89877F] hover:bg-[#E9E5DC]/40 hover:text-[#22221F]'
               }`}
             >
               <span className="flex items-center gap-3">
-                <Icon size={16} />
+                <Icon size={15} />
                 {label}
               </span>
               {status === 'phase2' && (
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-admin-muted">
+                <span className="border border-[#DCD9D1] px-1.5 py-0.5 text-[10px] text-[#89877F]">
                   Soon
                 </span>
               )}

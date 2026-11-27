@@ -15,7 +15,7 @@ export default function ProtectedRoute({ children }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-admin-surface text-admin-muted">
+      <div className="admin-shell flex min-h-screen items-center justify-center bg-[#F6F4EF] text-sm text-[#89877F]">
         Loading…
       </div>
     );

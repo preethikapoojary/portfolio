@@ -31,40 +31,42 @@ export default function Topbar() {
     (summary.unreadSystem || 0);
 
   return (
-    <header className="flex items-center justify-between border-b border-slate-200 bg-admin-panel px-6 py-3">
-      <div />
+    <header className="flex h-16 items-center justify-between border-b border-[#DCD9D1] bg-[#F6F4EF] px-6">
+      <div className="text-xs font-medium uppercase tracking-[0.16em] text-[#89877F]">
+        Administration
+      </div>
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.push('/admin/messages')}
-          className="relative rounded-lg p-2 text-admin-muted hover:bg-slate-100"
+          className="relative p-2 text-[#89877F] transition-colors hover:text-[#22221F]"
           aria-label="Messages"
         >
-          <FiMessageSquare />
+          <FiMessageSquare size={16} />
           {summary.unreadMessages > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+            <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#22221F] text-[10px] text-[#F6F4EF]">
               {summary.unreadMessages}
             </span>
           )}
         </button>
         <button
-          className="relative rounded-lg p-2 text-admin-muted hover:bg-slate-100"
+          className="relative p-2 text-[#89877F] transition-colors hover:text-[#22221F]"
           aria-label="Notifications"
         >
-          <FiBell />
+          <FiBell size={16} />
           {totalBadge > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-admin-primary text-[10px] text-white">
+            <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#85806D] text-[10px] text-[#F6F4EF]">
               {totalBadge}
             </span>
           )}
         </button>
-        <div className="h-6 w-px bg-slate-200" />
-        <span className="text-sm text-admin-muted">{admin?.name || admin?.email}</span>
+        <div className="h-5 w-px bg-[#DCD9D1]" />
+        <span className="text-xs font-medium text-[#22221F]">{admin?.name || admin?.email}</span>
         <button
           onClick={logout}
-          className="rounded-lg p-2 text-admin-muted hover:bg-slate-100"
+          className="p-2 text-[#89877F] transition-colors hover:text-[#22221F]"
           aria-label="Log out"
         >
-          <FiLogOut />
+          <FiLogOut size={16} />
         </button>
       </div>
     </header>

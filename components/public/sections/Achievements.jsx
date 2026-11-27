@@ -1,49 +1,69 @@
 'use client';
-import { motion } from 'framer-motion';
-import { FiAward } from 'react-icons/fi';
-import SectionHeading from '../common/SectionHeading';
-import SectionNavArrow from '../common/SectionNavArrow';
-import EmptyState from '../common/EmptyState';
-import DynamicIcon from '../common/DynamicIcon';
-import useFetch from '@/hooks/useFetch';
+
+import Link from 'next/link';
+import { FiArrowRight } from 'react-icons/fi';
+import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
+import SectionHeading from '@/components/public/common/SectionHeading';
 
 export default function Achievements() {
-  const { data: achievements, loading } = useFetch(api.getAchievements, []);
+  const { data: items, loading } = useFetch(api.getAchievements, []);
+  if (loading || !items?.length) return null;
 
   return (
-    <section id="achievements" className="relative w-full px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading eyebrow="Achievements" title="Milestones worth mentioning" />
-        {loading ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="glass-card h-32 animate-pulse" />
-            ))}
-          </div>
-        ) : !achievements?.length ? (
-          <EmptyState message="Achievements will appear here once added from the Admin Dashboard." />
-        ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {achievements.map((item, i) => (
-              <motion.div
-                key={item._id}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-                className="glass-card p-6 transition hover:-translate-y-1 hover:shadow-glow"
-              >
-                <DynamicIcon icon={item.icon} fallback={FiAward} className="mb-3 text-2xl text-accent" />
-                <h3 className="font-medium">{item.title}</h3>
-                <p className="mt-1 text-sm text-slate-400">{item.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </div>
+    <section
+      id="achievements"
+      className="flex flex-col justify-center border-t border-[#DCD9D1] py-16 lg:min-h-[calc(100vh-4rem)] lg:py-20"
+    >
+      <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
+        <SectionHeading
+          number="04"
+          eyebrow="Milestones"
+          title="Achievements"
+          actionLabel="View Experience & Honors"
+          actionHref="/experience"
+        />
 
-      <SectionNavArrow currentId="achievements" />
+        <div className="divide-y divide-[#DCD9D1]">
+          {items.map((item, index) => (
+            <div
+              key={item._id}
+              className="grid gap-4 py-7 first:pt-2 last:pb-2 md:grid-cols-12 md:items-baseline md:gap-8"
+            >
+              <div className="flex items-baseline gap-4 md:col-span-3">
+                <span className="text-xs font-medium tracking-[0.16em] text-[#85806D]">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="text-sm text-[#89877F]">
+                  {item.date
+                    ? new Date(item.date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        year: 'numeric',
+                      })
+                    : 'Milestone'}
+                </span>
+              </div>
+
+              <div className="md:col-span-9">
+                <h3 className="font-display text-2xl font-medium text-[#22221F] sm:text-3xl">
+                  {item.title}
+                </h3>
+                {item.description && (
+                  <p className="mt-2 text-base leading-relaxed text-[#89877F]">
+                    {item.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10">
+          <Link href="/experience" className="editorial-link text-[15px]">
+            Explore full timeline <FiArrowRight size={15} />
+          </Link>
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,95 +1,56 @@
 'use client';
-import { useEffect, useCallback } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
-/**
- * Full-screen image viewer. Pass `onClose` to control open/close from the
- * parent, and optionally `onPrev`/`onNext` to enable arrow navigation
- * (used by Gallery; omitted by Certificates, which shows one image at a
- * time with no set to navigate through).
- */
-export default function Lightbox({ image, caption, subcaption, onClose, onPrev, onNext }) {
-  const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowLeft' && onPrev) onPrev();
-      if (e.key === 'ArrowRight' && onNext) onNext();
-    },
-    [onClose, onPrev, onNext]
-  );
+import { useEffect } from 'react';
+import { FiX } from 'react-icons/fi';
 
+export default function Lightbox({ image, title, subtitle, onClose }) {
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
+    if (!image) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
     };
-  }, [handleKeyDown]);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [image, onClose]);
 
   if (!image) return null;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 z-[90] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm sm:p-8"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#22221F]/80 p-4 sm:p-8"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="relative max-h-[90vh] w-full max-w-4xl overflow-hidden border border-[#DCD9D1] bg-[#F6F4EF] p-4 sm:p-6"
+        onClick={(e) => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 sm:right-6 sm:top-6"
-        >
-          <FiX size={20} />
-        </button>
-
-        {onPrev && (
+        <div className="mb-4 flex items-start justify-between gap-4 border-b border-[#DCD9D1] pb-3">
+          <div>
+            {title && (
+              <h3 className="font-display text-xl font-medium text-[#22221F]">{title}</h3>
+            )}
+            {subtitle && <p className="text-xs text-[#89877F]">{subtitle}</p>}
+          </div>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onPrev();
-            }}
-            aria-label="Previous image"
-            className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 sm:left-6"
+            type="button"
+            onClick={onClose}
+            aria-label="Close preview"
+            className="p-1.5 text-[#89877F] transition-colors hover:text-[#22221F]"
           >
-            <FiChevronLeft size={22} />
+            <FiX size={18} />
           </button>
-        )}
-        {onNext && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onNext();
-            }}
-            aria-label="Next image"
-            className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 sm:right-6"
-          >
-            <FiChevronRight size={22} />
-          </button>
-        )}
+        </div>
 
-        <motion.div
-          key={image}
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.96 }}
-          transition={{ duration: 0.2 }}
-          onClick={(e) => e.stopPropagation()}
-          className="flex max-h-[85vh] max-w-4xl flex-col items-center"
-        >
-          <img src={image} alt={caption || ''} className="max-h-[75vh] w-auto rounded-lg object-contain shadow-2xl" />
-          {(caption || subcaption) && (
-            <div className="mt-4 text-center">
-              {caption && <p className="text-sm font-medium text-white">{caption}</p>}
-              {subcaption && <p className="mt-1 font-mono text-xs uppercase tracking-wide text-white/60">{subcaption}</p>}
-            </div>
-          )}
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        <div className="flex max-h-[72vh] items-center justify-center overflow-auto bg-[#E9E5DC]/40 p-2">
+          <img
+            src={image}
+            alt={title || 'Preview'}
+            className="max-h-[68vh] w-auto object-contain"
+          />
+        </div>
+      </div>
+    </div>
   );
 }
