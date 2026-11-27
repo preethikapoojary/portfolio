@@ -86,6 +86,11 @@ export default function Navbar() {
     };
 
     const onKeyDown = (e) => {
+      if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        toggle();
+        return;
+      }
       if (e.key === 'Escape' && mobileOpen) {
         setMobileOpen(false);
         menuBtnRef.current?.focus();
@@ -102,7 +107,7 @@ export default function Navbar() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [mobileOpen]);
+  }, [mobileOpen, toggle]);
 
   const navLinks = [
     { key: 'home', label: 'Home', href: '/' },
@@ -168,14 +173,22 @@ export default function Navbar() {
             );
           })}
 
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label={mode === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-            className="p-1.5 text-[#89877F] transition-colors hover:text-[#22221F]"
-          >
-            {mode === 'dark' ? <FiSun size={15} /> : <FiMoon size={15} />}
-          </button>
+          <div className="group relative">
+            <button
+              type="button"
+              onClick={toggle}
+              aria-label={mode === 'dark' ? 'Switch to light theme (Ctrl+Alt+L)' : 'Switch to dark theme (Ctrl+Alt+L)'}
+              className="p-1.5 text-[#89877F] transition-colors hover:text-[#22221F]"
+            >
+              {mode === 'dark' ? <FiSun size={15} /> : <FiMoon size={15} />}
+            </button>
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute right-0 top-full mt-2 whitespace-nowrap border border-[#DCD9D1] bg-[#F6F4EF] px-2.5 py-1 text-[11px] font-medium text-[#22221F] opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+            >
+              {mode === 'dark' ? 'Light mode' : 'Dark mode'} · Ctrl+Alt+L
+            </span>
+          </div>
         </nav>
 
         {/* Smooth 3-Line to X Animated Hamburger Button */}
