@@ -7,7 +7,12 @@ import { getSocialLinks } from '@/utils/socialLinks';
 
 export default function Contact() {
   const { profile } = useSettings();
-  const socialLinks = getSocialLinks(profile);
+  const socialLinks = getSocialLinks(profile).filter(
+    (link) =>
+      !link.url?.startsWith('mailto:') &&
+      !['gmail', 'email'].includes((link.platform || '').toLowerCase()) &&
+      !['gmail', 'email'].includes((link.icon || '').toLowerCase())
+  );
 
   return (
     <section

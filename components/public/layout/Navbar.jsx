@@ -201,7 +201,7 @@ export default function Navbar() {
             </button>
             <span
               role="tooltip"
-              className="pointer-events-none absolute right-0 top-full mt-2 whitespace-nowrap border border-[#DCD9D1] bg-[#F6F4EF] px-2.5 py-1 text-[11px] font-medium text-[#22221F] opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+              className="pointer-events-none absolute right-0 top-full mt-2 whitespace-nowrap border border-[#DCD9D1] bg-[#F6F4EF] px-2.5 py-1 text-[11px] font-medium text-[#22221F] opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100"
             >
               {mode === 'dark' ? 'Light mode' : 'Dark mode'} · Ctrl+Alt+L
             </span>

@@ -12,7 +12,12 @@ const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export default function ContactPage() {
   const { profile } = useSettings();
-  const socialLinks = getSocialLinks(profile);
+  const socialLinks = getSocialLinks(profile).filter(
+    (link) =>
+      !link.url?.startsWith('mailto:') &&
+      !['gmail', 'email'].includes((link.platform || '').toLowerCase()) &&
+      !['gmail', 'email'].includes((link.icon || '').toLowerCase())
+  );
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [turnstileToken, setTurnstileToken] = useState('');
   const [submitting, setSubmitting] = useState(false);
