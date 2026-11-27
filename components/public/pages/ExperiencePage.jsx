@@ -28,9 +28,11 @@ export default function ExperiencePage() {
 
       {/* Internships / Work Experience */}
       <section className="border-b border-[#DCD9D1] py-14">
-        <p className="mb-8 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
-          Internships &amp; Roles
-        </p>
+        <div className="mb-10 border-b border-[#DCD9D1] pb-5 text-center">
+          <h2 className="font-display text-3xl font-medium tracking-tight text-[#22221F] sm:text-4xl">
+            Internships &amp; Roles
+          </h2>
+        </div>
 
         {expLoading ? (
           <p className="text-sm text-[#89877F]">Loading experience…</p>
@@ -99,9 +101,11 @@ export default function ExperiencePage() {
 
       {/* Achievements & Hackathons */}
       <section className="py-14">
-        <p className="mb-8 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
-          Honors, Hackathons &amp; Research
-        </p>
+        <div className="mb-10 border-b border-[#DCD9D1] pb-5 text-center">
+          <h2 className="font-display text-3xl font-medium tracking-tight text-[#22221F] sm:text-4xl">
+            Honors, Hackathons &amp; Research
+          </h2>
+        </div>
 
         {achLoading ? (
           <p className="text-sm text-[#89877F]">Loading achievements…</p>
