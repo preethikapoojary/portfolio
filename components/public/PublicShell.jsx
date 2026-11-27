@@ -33,15 +33,15 @@ export default function PublicShell({ children }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith('/admin');
 
-  if (isAdmin) {
-    return <>{children}</>;
-  }
-
   return (
     <ThemeProvider>
-      <SettingsProvider>
-        <PublicContent>{children}</PublicContent>
-      </SettingsProvider>
+      {isAdmin ? (
+        children
+      ) : (
+        <SettingsProvider>
+          <PublicContent>{children}</PublicContent>
+        </SettingsProvider>
+      )}
     </ThemeProvider>
   );
 }

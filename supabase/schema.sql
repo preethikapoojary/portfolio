@@ -76,20 +76,15 @@ insert into public.sections (key, label, "order", is_visible)
 values
   ('home', 'Home', 0, true),
   ('about', 'About', 1, true),
-  ('education', 'Education', 2, true),
-  ('skills', 'Skills', 3, true),
-  ('projects', 'Projects', 4, true),
-  ('experience', 'Experience', 5, true),
-  ('certificates', 'Certificates', 6, true),
-  ('achievements', 'Achievements', 7, true),
-  ('gallery', 'Gallery', 8, true),
-  ('blog', 'Blog', 9, true),
-  ('testimonials', 'Testimonials', 10, true),
-  ('resume', 'Resume', 11, true),
-  ('github', 'Github', 12, true),
-  ('coding_profiles', 'Coding Profiles', 13, true),
-  ('contact', 'Contact', 14, true)
-on conflict (key) do nothing;
+  ('projects', 'Projects', 2, true),
+  ('experience', 'Experience', 3, true),
+  ('certificates', 'Certificates', 4, true),
+  ('testimonials', 'Testimonials', 5, true),
+  ('blog', 'Blog', 6, true),
+  ('contact', 'Contact', 7, true)
+on conflict (key) do update set
+  label = excluded.label,
+  "order" = excluded."order";
 
 -- ------------------------------------------------------------------------------
 -- 4. Content Modules

@@ -14,8 +14,11 @@ export default function Sidebar() {
         </Link>
       </div>
       <nav className="space-y-1">
-        {moduleRegistry.map(({ key, label, icon: Icon, path, status }) => {
-          const isActive = path === '/admin' ? pathname === '/admin' : pathname?.startsWith(path);
+        {moduleRegistry.map(({ key, label, icon: Icon, path, matchPaths, status }) => {
+          const paths = matchPaths || [path];
+          const isActive = paths.some((p) =>
+            p === '/admin' ? pathname === '/admin' : pathname?.startsWith(p)
+          );
           return (
             <Link
               key={key}
