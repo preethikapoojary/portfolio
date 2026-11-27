@@ -5,6 +5,7 @@ import {
   ok,
   fail,
 } from "@/lib/adminAuth";
+import { getSingletonRow } from "@/lib/jsonListHandler";
 
 export async function GET(req: Request) {
   const admin = await verifyAdminRequest(req);
@@ -13,32 +14,32 @@ export async function GET(req: Request) {
   try {
     const supabase = getServiceSupabase();
     const [
+      aboutRes,
       projects,
-      skills,
       experience,
-      education,
-      certificates,
       achievements,
+      certificates,
       blog,
       unreadMessages,
       pendingTestimonials,
       analytics,
     ] = await Promise.all([
-      supabase.from("projects").select("id", { count: "exact", head: true }),
-      supabase.from("skills").select("id", { count: "exact", head: true }),
-      supabase.from("experience").select("id", { count: "exact", head: true }),
-      supabase.from("education").select("id", { count: "exact", head: true }),
-      supabase.from("certificates").select("id", { count: "exact", head: true }),
-      supabase.from("achievements").select("id", { count: "exact", head: true }),
-      supabase.from("blog_posts").select("id", { count: "exact", head: true }),
+      getSingletonRow("about"),
+      supabase.from("projects").select("id", { count: "exact", head: true }).eq("is_archived", false),
+      supabase.from("experience").select("id", { count: "exact", head: true }).eq("entry_type", "experience").eq("is_archived", false),
+      supabase.from("experience").select("id", { count: "exact", head: true }).eq("entry_type", "achievement").eq("is_archived", false),
+      supabase.from("certificates").select("id", { count: "exact", head: true }).eq("is_archived", false),
+      supabase.from("blog_posts").select("id", { count: "exact", head: true }).eq("is_archived", false),
       supabase
         .from("contact_messages")
         .select("id", { count: "exact", head: true })
-        .eq("is_read", false),
+        .eq("is_read", false)
+        .eq("is_archived", false),
       supabase
         .from("testimonials")
         .select("id", { count: "exact", head: true })
-        .eq("status", "pending"),
+        .eq("status", "pending")
+        .eq("is_archived", false),
       supabase
         .from("analytics_events")
         .select("type, created_at")
@@ -57,12 +58,15 @@ export async function GET(req: Request) {
       else days[d].views += 1;
     }
 
+    const skillsArr = (Array.isArray(aboutRes.row?.skills) ? aboutRes.row.skills : []).filter((s: any) => !s?.isArchived);
+    const eduArr = (Array.isArray(aboutRes.row?.education) ? aboutRes.row.education : []).filter((e: any) => !e?.isArchived);
+
     return ok({
       counts: {
         projects: projects.count || 0,
-        skills: skills.count || 0,
+        skills: skillsArr.length,
         experience: experience.count || 0,
-        education: education.count || 0,
+        education: eduArr.length,
         certificates: certificates.count || 0,
         achievements: achievements.count || 0,
         blog: blog.count || 0,

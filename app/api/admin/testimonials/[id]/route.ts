@@ -41,10 +41,11 @@ export async function DELETE(
   if (!admin) return unauthorizedResponse();
 
   const { id } = await context.params;
+  const now = new Date().toISOString();
   const supabase = getServiceSupabase();
   const { data, error } = await supabase
     .from("testimonials")
-    .delete()
+    .update({ is_archived: true, archived_at: now, updated_at: now })
     .eq("id", id)
     .select()
     .maybeSingle();
@@ -52,6 +53,6 @@ export async function DELETE(
   if (error) return fail(error.message, 400);
   if (!data) return fail("Testimonial not found", 404);
 
-  await logAdminActivity(admin, "DELETE", "Testimonial", `Deleted testimonial from ${data.name}`, id);
-  return ok({ deleted: true });
+  await logAdminActivity(admin, "ARCHIVE", "Testimonial", `Moved testimonial from ${data.name} to trash`, id);
+  return ok({ archived: true });
 }

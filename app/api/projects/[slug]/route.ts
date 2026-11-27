@@ -13,6 +13,7 @@ export async function GET(
       .select("*")
       .eq("slug", slug)
       .eq("is_visible", true)
+      .eq("is_archived", false)
       .maybeSingle();
 
     if (error) return fail(error.message, 500);

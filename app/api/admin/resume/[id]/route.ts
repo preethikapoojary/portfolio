@@ -1,11 +1,11 @@
 import {
-  getServiceSupabase,
   verifyAdminRequest,
   unauthorizedResponse,
   ok,
   fail,
   logAdminActivity,
 } from "@/lib/adminAuth";
+import { getSingletonRow } from "@/lib/jsonListHandler";
 
 export async function DELETE(
   req: Request,
@@ -14,23 +14,26 @@ export async function DELETE(
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
-  const { id } = await context.params;
-  const supabase = getServiceSupabase();
-  const { data, error } = await supabase
-    .from("resume_versions")
-    .delete()
-    .eq("id", id)
-    .select()
-    .maybeSingle();
+  try {
+    const { id } = await context.params;
+    const { supabase, row } = await getSingletonRow("about");
+    const versions: any[] = Array.isArray(row.resume_versions) ? row.resume_versions : [];
+    const idx = versions.findIndex((v) => v._id === id || v.id === id);
+    if (idx === -1) return fail("Resume not found", 404);
 
-  if (error) return fail(error.message, 400);
-  if (!data) return fail("Resume not found", 404);
+    const now = new Date().toISOString();
+    const target = versions[idx];
+    versions[idx] = { ...target, isArchived: true, isActive: false, archivedAt: now, updatedAt: now };
 
-  if (data.file?.publicId) {
-    const bucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-media";
-    await supabase.storage.from(bucket).remove([data.file.publicId]);
+    const { error } = await supabase
+      .from("about")
+      .update({ resume_versions: versions, updated_at: now })
+      .eq("id", row.id);
+    if (error) return fail(error.message, 400);
+
+    await logAdminActivity(admin, "ARCHIVE", "ResumeVersion", `Moved resume to trash: ${target.label || id}`, id);
+    return ok({ archived: true });
+  } catch (err: any) {
+    return fail(err.message || "Failed to delete resume", 500);
   }
-
-  await logAdminActivity(admin, "DELETE", "ResumeVersion", `Deleted resume: ${data.label || id}`, id);
-  return ok({ deleted: true });
 }

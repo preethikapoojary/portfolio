@@ -9,6 +9,7 @@ export async function GET() {
       .select("*")
       .eq("status", "approved")
       .eq("is_visible", true)
+      .eq("is_archived", false)
       .order("created_at", { ascending: false });
 
     if (error) return fail(error.message, 500);

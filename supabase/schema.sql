@@ -1,7 +1,7 @@
 -- ==============================================================================
--- Unified Portfolio & Admin CMS — Supabase PostgreSQL Schema
+-- Unified Portfolio & Admin CMS — Consolidated Supabase PostgreSQL Schema
 -- ==============================================================================
--- Run this in Supabase Dashboard -> SQL Editor.
+-- 11 clean tables matching the public site & Admin Panel structure.
 
 create extension if not exists "pgcrypto";
 
@@ -26,9 +26,9 @@ as $$
 $$;
 
 -- ------------------------------------------------------------------------------
--- 2. Singleton Tables: profile, site_settings
+-- 2. About (Profile + Education + Skills + Coding Profiles + Resume Versions)
 -- ------------------------------------------------------------------------------
-create table if not exists public.profile (
+create table if not exists public.about (
   id uuid primary key default gen_random_uuid(),
   name text not null default '',
   title text not null default '',
@@ -40,82 +40,41 @@ create table if not exists public.profile (
   phone text not null default '',
   location text not null default '',
   social_links jsonb not null default '[]'::jsonb,
+  education jsonb not null default '[]'::jsonb,
+  skills jsonb not null default '[]'::jsonb,
+  coding_profiles jsonb not null default '[]'::jsonb,
+  resume_versions jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
+-- ------------------------------------------------------------------------------
+-- 3. Site Settings (Settings + Ordered Navigation Sections)
+-- ------------------------------------------------------------------------------
 create table if not exists public.site_settings (
   id uuid primary key default gen_random_uuid(),
-  logo jsonb not null default '{"url": null, "publicId": null, "alt": ""}'::jsonb,
-  favicon jsonb not null default '{"url": null, "publicId": null, "alt": ""}'::jsonb,
-  theme jsonb not null default '{"primaryColor": "#6366F1", "secondaryColor": "#8B5CF6", "accentColor": "#F59E0B", "fontFamily": "Inter"}'::jsonb,
-  footer_text text not null default '',
-  footer_links jsonb not null default '[]'::jsonb,
-  nav_items jsonb not null default '[]'::jsonb,
-  seo jsonb not null default '{"metaTitle": "", "metaDescription": "", "ogImage": {"url": null, "publicId": null, "alt": ""}}'::jsonb,
-  hero jsonb not null default '{"headline": "", "subheadline": "", "ctaText": "", "ctaLink": "", "backgroundImage": {"url": null, "publicId": null, "alt": ""}}'::jsonb,
+  site_name text not null default 'Portfolio',
+  theme jsonb not null default '{"primaryColor": "#6366F1", "secondaryColor": "#0F172A", "accentColor": "#22D3EE"}'::jsonb,
+  hero jsonb not null default '{"greeting": "Hi, I''m", "tagline": "", "ctaText": "View Projects"}'::jsonb,
   github_username text not null default '',
+  seo jsonb not null default '{"metaTitle": "", "metaDescription": ""}'::jsonb,
+  sections jsonb not null default '[
+    {"key": "home", "label": "Home", "order": 0, "isVisible": true},
+    {"key": "about", "label": "About", "order": 1, "isVisible": true},
+    {"key": "projects", "label": "Projects", "order": 2, "isVisible": true},
+    {"key": "experience", "label": "Experience", "order": 3, "isVisible": true},
+    {"key": "certificates", "label": "Certificates", "order": 4, "isVisible": true},
+    {"key": "testimonials", "label": "Testimonials", "order": 5, "isVisible": true},
+    {"key": "blog", "label": "Blog", "order": 6, "isVisible": true},
+    {"key": "contact", "label": "Contact", "order": 7, "isVisible": true}
+  ]'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-
--- ------------------------------------------------------------------------------
--- 3. Sections
--- ------------------------------------------------------------------------------
-create table if not exists public.sections (
-  id uuid primary key default gen_random_uuid(),
-  key text not null unique,
-  label text not null,
-  "order" integer not null default 0,
-  is_visible boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-insert into public.sections (key, label, "order", is_visible)
-values
-  ('home', 'Home', 0, true),
-  ('about', 'About', 1, true),
-  ('projects', 'Projects', 2, true),
-  ('experience', 'Experience', 3, true),
-  ('certificates', 'Certificates', 4, true),
-  ('testimonials', 'Testimonials', 5, true),
-  ('blog', 'Blog', 6, true),
-  ('contact', 'Contact', 7, true)
-on conflict (key) do update set
-  label = excluded.label,
-  "order" = excluded."order";
 
 -- ------------------------------------------------------------------------------
 -- 4. Content Modules
 -- ------------------------------------------------------------------------------
-create table if not exists public.education (
-  id uuid primary key default gen_random_uuid(),
-  institution text not null,
-  degree text not null default '',
-  field_of_study text not null default '',
-  start_date timestamptz,
-  end_date timestamptz,
-  grade text not null default '',
-  description text not null default '',
-  "order" integer not null default 0,
-  is_visible boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.skills (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  category text not null default 'General',
-  proficiency integer not null default 80,
-  icon text not null default '',
-  "order" integer not null default 0,
-  is_visible boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
 create table if not exists public.projects (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -133,20 +92,27 @@ create table if not exists public.projects (
   is_featured boolean not null default false,
   "order" integer not null default 0,
   is_visible boolean not null default true,
+  is_archived boolean not null default false,
+  archived_at timestamptz,
   seo jsonb not null default '{"metaTitle": "", "metaDescription": "", "ogImage": {"url": null, "publicId": null, "alt": ""}}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
+-- Holds both Internships/Roles (entry_type = 'experience') and Honors/Hackathons (entry_type = 'achievement')
 create table if not exists public.experience (
   id uuid primary key default gen_random_uuid(),
-  company text not null,
-  role text not null,
+  entry_type text not null default 'experience' check (entry_type in ('experience', 'achievement')),
+  company text not null default '',
+  role text not null default '',
+  title text not null default '',
   location text not null default '',
   start_date timestamptz,
   end_date timestamptz,
+  date timestamptz,
   is_current boolean not null default false,
   description text not null default '',
+  icon text not null default '',
   responsibilities text[] not null default '{}',
   technologies text[] not null default '{}',
   proof_file jsonb not null default '{"url": null, "publicId": null, "alt": ""}'::jsonb,
@@ -159,6 +125,8 @@ create table if not exists public.experience (
   attachments jsonb not null default '[]'::jsonb,
   "order" integer not null default 0,
   is_visible boolean not null default true,
+  is_archived boolean not null default false,
+  archived_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -172,29 +140,8 @@ create table if not exists public.certificates (
   issue_date timestamptz,
   "order" integer not null default 0,
   is_visible boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.achievements (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  description text not null default '',
-  date timestamptz,
-  icon text not null default '',
-  "order" integer not null default 0,
-  is_visible boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.gallery_images (
-  id uuid primary key default gen_random_uuid(),
-  image jsonb not null default '{"url": null, "publicId": null, "alt": ""}'::jsonb,
-  caption text not null default '',
-  category text not null default 'General',
-  "order" integer not null default 0,
-  is_visible boolean not null default true,
+  is_archived boolean not null default false,
+  archived_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -211,29 +158,8 @@ create table if not exists public.blog_posts (
   tags text[] not null default '{}',
   seo jsonb not null default '{"metaTitle": "", "metaDescription": "", "ogImage": {"url": null, "publicId": null, "alt": ""}}'::jsonb,
   published_at timestamptz,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.resume_versions (
-  id uuid primary key default gen_random_uuid(),
-  file jsonb not null default '{"url": null, "publicId": null, "alt": ""}'::jsonb,
-  label text not null default '',
-  is_active boolean not null default false,
-  uploaded_at timestamptz not null default now(),
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.coding_profiles (
-  id uuid primary key default gen_random_uuid(),
-  platform text not null,
-  username text not null default '',
-  profile_url text not null,
-  icon text not null default '',
-  stats jsonb not null default '{}'::jsonb,
-  "order" integer not null default 0,
-  is_visible boolean not null default true,
+  is_archived boolean not null default false,
+  archived_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -251,12 +177,14 @@ create table if not exists public.testimonials (
   rating integer not null default 5 check (rating >= 1 and rating <= 5),
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
   is_visible boolean not null default true,
+  is_archived boolean not null default false,
+  archived_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 -- ------------------------------------------------------------------------------
--- 5. Messages, Analytics, Activity Log, Notifications
+-- 5. Messages, Analytics, Activity Log
 -- ------------------------------------------------------------------------------
 create table if not exists public.contact_messages (
   id uuid primary key default gen_random_uuid(),
@@ -265,6 +193,8 @@ create table if not exists public.contact_messages (
   subject text not null default '',
   message text not null,
   is_read boolean not null default false,
+  is_archived boolean not null default false,
+  archived_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -293,80 +223,44 @@ create table if not exists public.activity_logs (
 
 create index if not exists idx_activity_created on public.activity_logs (created_at desc);
 
-create table if not exists public.system_notifications (
-  id uuid primary key default gen_random_uuid(),
-  type text not null,
-  message text not null,
-  link text,
-  is_read boolean not null default false,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
 -- ------------------------------------------------------------------------------
 -- 6. Row Level Security (RLS)
 -- ------------------------------------------------------------------------------
 alter table public.admin_users enable row level security;
-alter table public.profile enable row level security;
+alter table public.about enable row level security;
 alter table public.site_settings enable row level security;
-alter table public.sections enable row level security;
-alter table public.education enable row level security;
-alter table public.skills enable row level security;
 alter table public.projects enable row level security;
 alter table public.experience enable row level security;
 alter table public.certificates enable row level security;
-alter table public.achievements enable row level security;
-alter table public.gallery_images enable row level security;
 alter table public.blog_posts enable row level security;
-alter table public.resume_versions enable row level security;
-alter table public.coding_profiles enable row level security;
 alter table public.testimonials enable row level security;
 alter table public.contact_messages enable row level security;
 alter table public.analytics_events enable row level security;
 alter table public.activity_logs enable row level security;
-alter table public.system_notifications enable row level security;
 
--- Public read policies for visible portfolio content
-create policy "Public read profile" on public.profile for select using (true);
+create policy "Public read about" on public.about for select using (true);
 create policy "Public read settings" on public.site_settings for select using (true);
-create policy "Public read sections" on public.sections for select using (true);
-create policy "Public read education" on public.education for select using (is_visible = true);
-create policy "Public read skills" on public.skills for select using (is_visible = true);
 create policy "Public read projects" on public.projects for select using (is_visible = true);
 create policy "Public read experience" on public.experience for select using (is_visible = true);
 create policy "Public read certificates" on public.certificates for select using (is_visible = true);
-create policy "Public read achievements" on public.achievements for select using (is_visible = true);
-create policy "Public read gallery" on public.gallery_images for select using (is_visible = true);
 create policy "Public read published blog" on public.blog_posts for select using (status = 'published');
-create policy "Public read active resume" on public.resume_versions for select using (is_active = true);
-create policy "Public read coding profiles" on public.coding_profiles for select using (is_visible = true);
 create policy "Public read approved testimonials" on public.testimonials for select using (status = 'approved' and is_visible = true);
 
--- Public insert policies (contact form, testimonial submission, analytics)
 create policy "Public submit contact" on public.contact_messages for insert with check (true);
 create policy "Public submit testimonial" on public.testimonials for insert with check (status = 'pending');
 create policy "Public log analytics" on public.analytics_events for insert with check (true);
 
--- Admin full-access policies
-create policy "Admin all admin_users" on public.admin_users for all using (auth.uid() = id or public.is_admin());
-create policy "Admin all profile" on public.profile for all using (public.is_admin());
+create policy "Admin all admin_users" on public.admin_users for all using (public.is_admin());
+create policy "Admin all about" on public.about for all using (public.is_admin());
 create policy "Admin all settings" on public.site_settings for all using (public.is_admin());
-create policy "Admin all sections" on public.sections for all using (public.is_admin());
-create policy "Admin all education" on public.education for all using (public.is_admin());
-create policy "Admin all skills" on public.skills for all using (public.is_admin());
 create policy "Admin all projects" on public.projects for all using (public.is_admin());
 create policy "Admin all experience" on public.experience for all using (public.is_admin());
 create policy "Admin all certificates" on public.certificates for all using (public.is_admin());
-create policy "Admin all achievements" on public.achievements for all using (public.is_admin());
-create policy "Admin all gallery" on public.gallery_images for all using (public.is_admin());
 create policy "Admin all blog" on public.blog_posts for all using (public.is_admin());
-create policy "Admin all resume" on public.resume_versions for all using (public.is_admin());
-create policy "Admin all coding_profiles" on public.coding_profiles for all using (public.is_admin());
 create policy "Admin all testimonials" on public.testimonials for all using (public.is_admin());
 create policy "Admin all messages" on public.contact_messages for all using (public.is_admin());
 create policy "Admin all analytics" on public.analytics_events for all using (public.is_admin());
 create policy "Admin all activity_logs" on public.activity_logs for all using (public.is_admin());
-create policy "Admin all notifications" on public.system_notifications for all using (public.is_admin());
 
 -- ------------------------------------------------------------------------------
 -- 7. Supabase Storage Bucket (portfolio-media)
@@ -388,7 +282,7 @@ create policy "Admin delete portfolio media"
   using (bucket_id = 'portfolio-media' and public.is_admin());
 
 -- ------------------------------------------------------------------------------
--- 8. Schema & Table Grants (required when auto-grant is disabled on project)
+-- 8. Schema & Table Grants
 -- ------------------------------------------------------------------------------
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;

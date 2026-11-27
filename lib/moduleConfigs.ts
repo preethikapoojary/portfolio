@@ -2,19 +2,24 @@ import { CrudConfig } from "@/lib/crudHandler";
 
 export const CRUD_CONFIGS: Record<string, CrudConfig> = {
   sections: {
-    table: "sections",
+    table: "site_settings",
     resourceName: "Section",
-    defaultOrder: { column: "order", ascending: true },
+    jsonColumn: { table: "site_settings", column: "sections" },
   },
   education: {
-    table: "education",
+    table: "about",
     resourceName: "Education",
-    defaultOrder: { column: "order", ascending: true },
+    jsonColumn: { table: "about", column: "education" },
   },
   skills: {
-    table: "skills",
+    table: "about",
     resourceName: "Skill",
-    defaultOrder: { column: "order", ascending: true },
+    jsonColumn: { table: "about", column: "skills" },
+  },
+  "coding-profiles": {
+    table: "about",
+    resourceName: "CodingProfile",
+    jsonColumn: { table: "about", column: "coding_profiles" },
   },
   projects: {
     table: "projects",
@@ -26,20 +31,17 @@ export const CRUD_CONFIGS: Record<string, CrudConfig> = {
     table: "experience",
     resourceName: "Experience",
     defaultOrder: { column: "order", ascending: true },
+    fixedFilter: { entry_type: "experience" },
+  },
+  achievements: {
+    table: "experience",
+    resourceName: "Achievement",
+    defaultOrder: { column: "order", ascending: true },
+    fixedFilter: { entry_type: "achievement" },
   },
   certificates: {
     table: "certificates",
     resourceName: "Certificate",
-    defaultOrder: { column: "order", ascending: true },
-  },
-  achievements: {
-    table: "achievements",
-    resourceName: "Achievement",
-    defaultOrder: { column: "order", ascending: true },
-  },
-  gallery: {
-    table: "gallery_images",
-    resourceName: "GalleryImage",
     defaultOrder: { column: "order", ascending: true },
   },
   blog: {
@@ -47,10 +49,5 @@ export const CRUD_CONFIGS: Record<string, CrudConfig> = {
     resourceName: "BlogPost",
     defaultOrder: { column: "created_at", ascending: false },
     hasSlug: true,
-  },
-  "coding-profiles": {
-    table: "coding_profiles",
-    resourceName: "CodingProfile",
-    defaultOrder: { column: "order", ascending: true },
   },
 };

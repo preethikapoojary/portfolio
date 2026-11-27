@@ -13,12 +13,12 @@ export default function SearchBar({ onSearch, placeholder = 'Search…' }) {
 
   return (
     <div className="relative w-full max-w-xs">
-      <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+      <FiSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={15} />
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="input pl-9"
+        className="input !pl-9 placeholder:text-[#89877F]"
       />
     </div>
   );

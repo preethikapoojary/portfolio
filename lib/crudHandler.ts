@@ -8,6 +8,16 @@ import {
   logAdminActivity,
 } from "@/lib/adminAuth";
 import { rowToCamel, rowsToCamel, camelToRow, slugify } from "@/lib/mappers";
+import {
+  handleJsonPublicList,
+  handleJsonAdminList,
+  handleJsonAdminCreate,
+  handleJsonAdminGetById,
+  handleJsonAdminUpdateById,
+  handleJsonAdminDeleteById,
+  handleJsonAdminReorder,
+  handleJsonAdminToggleVisibility,
+} from "@/lib/jsonListHandler";
 
 export interface CrudConfig {
   table: string;
@@ -15,15 +25,30 @@ export interface CrudConfig {
   defaultOrder?: { column: string; ascending: boolean };
   hasSlug?: boolean;
   allowedFields?: string[];
+  fixedFilter?: Record<string, string>;
+  jsonColumn?: { table: string; column: string };
 }
 
 export async function handlePublicList(config: CrudConfig) {
+  if (config.jsonColumn) {
+    return handleJsonPublicList({
+      table: config.jsonColumn.table,
+      column: config.jsonColumn.column,
+      resourceName: config.resourceName,
+    });
+  }
+
   try {
     const supabase = getServiceSupabase();
     let query = supabase
       .from(config.table)
       .select("*")
-      .eq("is_visible", true);
+      .eq("is_visible", true)
+      .eq("is_archived", false);
+
+    if (config.fixedFilter) {
+      query = query.match(config.fixedFilter);
+    }
 
     if (config.defaultOrder) {
       query = query.order(config.defaultOrder.column, {
@@ -42,12 +67,24 @@ export async function handlePublicList(config: CrudConfig) {
 }
 
 export async function handleAdminList(req: Request, config: CrudConfig) {
+  if (config.jsonColumn) {
+    return handleJsonAdminList(req, {
+      table: config.jsonColumn.table,
+      column: config.jsonColumn.column,
+      resourceName: config.resourceName,
+    });
+  }
+
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
   try {
     const supabase = getServiceSupabase();
-    let query = supabase.from(config.table).select("*");
+    let query = supabase.from(config.table).select("*").eq("is_archived", false);
+
+    if (config.fixedFilter) {
+      query = query.match(config.fixedFilter);
+    }
 
     if (config.defaultOrder) {
       query = query.order(config.defaultOrder.column, {
@@ -66,12 +103,23 @@ export async function handleAdminList(req: Request, config: CrudConfig) {
 }
 
 export async function handleAdminCreate(req: Request, config: CrudConfig) {
+  if (config.jsonColumn) {
+    return handleJsonAdminCreate(req, {
+      table: config.jsonColumn.table,
+      column: config.jsonColumn.column,
+      resourceName: config.resourceName,
+    });
+  }
+
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
   try {
     const body = await req.json();
     const row = camelToRow(body, config.allowedFields);
+    if (config.fixedFilter) {
+      Object.assign(row, config.fixedFilter);
+    }
 
     if (config.hasSlug && !row.slug && row.title) {
       row.slug = slugify(row.title);
@@ -101,15 +149,23 @@ export async function handleAdminCreate(req: Request, config: CrudConfig) {
 }
 
 export async function handleAdminGetById(req: Request, id: string, config: CrudConfig) {
+  if (config.jsonColumn) {
+    return handleJsonAdminGetById(req, id, {
+      table: config.jsonColumn.table,
+      column: config.jsonColumn.column,
+      resourceName: config.resourceName,
+    });
+  }
+
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
   const supabase = getServiceSupabase();
-  const { data, error } = await supabase
-    .from(config.table)
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  let query = supabase.from(config.table).select("*").eq("id", id);
+  if (config.fixedFilter) {
+    query = query.match(config.fixedFilter);
+  }
+  const { data, error } = await query.maybeSingle();
 
   if (error) return fail(error.message, 500);
   if (!data) return fail(`${config.resourceName} not found`, 404);
@@ -117,6 +173,14 @@ export async function handleAdminGetById(req: Request, id: string, config: CrudC
 }
 
 export async function handleAdminUpdateById(req: Request, id: string, config: CrudConfig) {
+  if (config.jsonColumn) {
+    return handleJsonAdminUpdateById(req, id, {
+      table: config.jsonColumn.table,
+      column: config.jsonColumn.column,
+      resourceName: config.resourceName,
+    });
+  }
+
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
@@ -125,17 +189,12 @@ export async function handleAdminUpdateById(req: Request, id: string, config: Cr
     const row = camelToRow(body, config.allowedFields);
     row.updated_at = new Date().toISOString();
 
-    if (config.hasSlug && body.title && !body.slug) {
-      // keep existing slug unless explicitly changed
-    }
-
     const supabase = getServiceSupabase();
-    const { data, error } = await supabase
-      .from(config.table)
-      .update(row)
-      .eq("id", id)
-      .select()
-      .maybeSingle();
+    let query = supabase.from(config.table).update(row).eq("id", id);
+    if (config.fixedFilter) {
+      query = query.match(config.fixedFilter);
+    }
+    const { data, error } = await query.select().maybeSingle();
 
     if (error) return fail(error.message, 400);
     if (!data) return fail(`${config.resourceName} not found`, 404);
@@ -155,32 +214,51 @@ export async function handleAdminUpdateById(req: Request, id: string, config: Cr
 }
 
 export async function handleAdminDeleteById(req: Request, id: string, config: CrudConfig) {
+  if (config.jsonColumn) {
+    return handleJsonAdminDeleteById(req, id, {
+      table: config.jsonColumn.table,
+      column: config.jsonColumn.column,
+      resourceName: config.resourceName,
+    });
+  }
+
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
+  const now = new Date().toISOString();
   const supabase = getServiceSupabase();
-  const { data, error } = await supabase
+  let query = supabase
     .from(config.table)
-    .delete()
-    .eq("id", id)
-    .select()
-    .maybeSingle();
+    .update({ is_archived: true, archived_at: now, updated_at: now })
+    .eq("id", id);
+  if (config.fixedFilter) {
+    query = query.match(config.fixedFilter);
+  }
+  const { data, error } = await query.select().maybeSingle();
 
   if (error) return fail(error.message, 400);
   if (!data) return fail(`${config.resourceName} not found`, 404);
 
   await logAdminActivity(
     admin,
-    "DELETE",
+    "ARCHIVE",
     config.resourceName,
-    `Deleted ${config.resourceName}: ${data.title || data.name || data.company || data.id}`,
+    `Moved ${config.resourceName} to trash: ${data.title || data.name || data.company || data.id}`,
     data.id
   );
 
-  return ok({ deleted: true, id: data.id });
+  return ok({ archived: true, id: data.id });
 }
 
 export async function handleAdminReorder(req: Request, config: CrudConfig) {
+  if (config.jsonColumn) {
+    return handleJsonAdminReorder(req, {
+      table: config.jsonColumn.table,
+      column: config.jsonColumn.column,
+      resourceName: config.resourceName,
+    });
+  }
+
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
@@ -193,10 +271,14 @@ export async function handleAdminReorder(req: Request, config: CrudConfig) {
       items.map((item: { id?: string; _id?: string; order: number }, idx: number) => {
         const targetId = item.id || item._id;
         if (!targetId) return Promise.resolve();
-        return supabase
+        let query = supabase
           .from(config.table)
           .update({ order: item.order ?? idx, updated_at: new Date().toISOString() })
           .eq("id", targetId);
+        if (config.fixedFilter) {
+          query = query.match(config.fixedFilter);
+        }
+        return query;
       })
     );
 
@@ -214,15 +296,23 @@ export async function handleAdminReorder(req: Request, config: CrudConfig) {
 }
 
 export async function handleAdminToggleVisibility(req: Request, id: string, config: CrudConfig) {
+  if (config.jsonColumn) {
+    return handleJsonAdminToggleVisibility(req, id, {
+      table: config.jsonColumn.table,
+      column: config.jsonColumn.column,
+      resourceName: config.resourceName,
+    });
+  }
+
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
   const supabase = getServiceSupabase();
-  const { data: existing, error: fetchError } = await supabase
-    .from(config.table)
-    .select("id, is_visible")
-    .eq("id", id)
-    .maybeSingle();
+  let fetchQuery = supabase.from(config.table).select("id, is_visible").eq("id", id);
+  if (config.fixedFilter) {
+    fetchQuery = fetchQuery.match(config.fixedFilter);
+  }
+  const { data: existing, error: fetchError } = await fetchQuery.maybeSingle();
 
   if (fetchError) return fail(fetchError.message, 500);
   if (!existing) return fail(`${config.resourceName} not found`, 404);

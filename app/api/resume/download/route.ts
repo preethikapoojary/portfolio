@@ -1,25 +1,22 @@
 import { NextResponse } from "next/server";
-import { getServiceSupabase, fail } from "@/lib/adminAuth";
+import { fail } from "@/lib/adminAuth";
+import { getSingletonRow } from "@/lib/jsonListHandler";
 
 export async function GET() {
   try {
-    const supabase = getServiceSupabase();
-    const { data, error } = await supabase
-      .from("resume_versions")
-      .select("*")
-      .eq("is_active", true)
-      .order("uploaded_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const { supabase, row } = await getSingletonRow("about");
+    const versions: any[] = Array.isArray(row.resume_versions) ? row.resume_versions : [];
+    const active = versions
+      .filter((v) => v?.isActive && !v?.isArchived)
+      .sort((a, b) => new Date(b.uploadedAt || 0).getTime() - new Date(a.uploadedAt || 0).getTime())[0];
 
-    if (error) return fail(error.message, 500);
-    const url = data?.file?.url;
+    const url = active?.file?.url;
     if (!url) return fail("No active resume uploaded", 404);
 
     // Non-blocking analytics log
     await supabase.from("analytics_events").insert({
       type: "resume_download",
-      ref_id: data.id,
+      ref_id: active._id || active.id || null,
       visitor_hash: "anonymous",
       path: "/api/resume/download",
     });

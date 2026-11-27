@@ -1,17 +1,6 @@
-import { getServiceSupabase, ok, fail } from "@/lib/adminAuth";
-import { rowsToCamel } from "@/lib/mappers";
+import { handlePublicList } from "@/lib/crudHandler";
+import { CRUD_CONFIGS } from "@/lib/moduleConfigs";
 
 export async function GET() {
-  try {
-    const supabase = getServiceSupabase();
-    const { data, error } = await supabase
-      .from("sections")
-      .select("*")
-      .eq("is_visible", true)
-      .order("order", { ascending: true });
-    if (error) return fail(error.message, 500);
-    return ok(rowsToCamel(data));
-  } catch (err: any) {
-    return fail(err.message || "Failed to fetch sections", 500);
-  }
+  return handlePublicList(CRUD_CONFIGS.sections);
 }

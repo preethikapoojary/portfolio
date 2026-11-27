@@ -15,10 +15,11 @@ export async function DELETE(
   if (!admin) return unauthorizedResponse();
 
   const { id } = await context.params;
+  const now = new Date().toISOString();
   const supabase = getServiceSupabase();
   const { data, error } = await supabase
     .from("contact_messages")
-    .delete()
+    .update({ is_archived: true, archived_at: now, updated_at: now })
     .eq("id", id)
     .select()
     .maybeSingle();
@@ -26,6 +27,6 @@ export async function DELETE(
   if (error) return fail(error.message, 400);
   if (!data) return fail("Message not found", 404);
 
-  await logAdminActivity(admin, "DELETE", "ContactMessage", `Deleted message from ${data.email}`, id);
-  return ok({ deleted: true });
+  await logAdminActivity(admin, "ARCHIVE", "ContactMessage", `Moved message from ${data.email} to trash`, id);
+  return ok({ archived: true });
 }

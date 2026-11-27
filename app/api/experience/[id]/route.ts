@@ -12,7 +12,9 @@ export async function GET(
       .from("experience")
       .select("*")
       .eq("id", id)
+      .eq("entry_type", "experience")
       .eq("is_visible", true)
+      .eq("is_archived", false)
       .maybeSingle();
 
     if (error) return fail(error.message, 500);

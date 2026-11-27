@@ -15,6 +15,7 @@ export async function GET(req: Request) {
   const { data, error } = await supabase
     .from("contact_messages")
     .select("*")
+    .eq("is_archived", false)
     .order("created_at", { ascending: false });
 
   if (error) return fail(error.message, 500);

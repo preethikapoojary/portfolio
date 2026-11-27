@@ -28,7 +28,8 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    const row = camelToRow(body);
+    const { sections: _sections, ...settingsBody } = body || {};
+    const row = camelToRow(settingsBody);
     row.updated_at = new Date().toISOString();
 
     const supabase = getServiceSupabase();

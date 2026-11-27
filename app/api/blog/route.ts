@@ -11,6 +11,7 @@ export async function GET(req: Request) {
       .from("blog_posts")
       .select("*")
       .eq("status", "published")
+      .eq("is_archived", false)
       .order("published_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false });
 

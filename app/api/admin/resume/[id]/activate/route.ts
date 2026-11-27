@@ -1,12 +1,11 @@
 import {
-  getServiceSupabase,
   verifyAdminRequest,
   unauthorizedResponse,
   ok,
   fail,
   logAdminActivity,
 } from "@/lib/adminAuth";
-import { rowToCamel } from "@/lib/mappers";
+import { getSingletonRow } from "@/lib/jsonListHandler";
 
 export async function PATCH(
   req: Request,
@@ -15,20 +14,31 @@ export async function PATCH(
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
-  const { id } = await context.params;
-  const supabase = getServiceSupabase();
+  try {
+    const { id } = await context.params;
+    const { supabase, row } = await getSingletonRow("about");
+    const versions: any[] = Array.isArray(row.resume_versions) ? row.resume_versions : [];
+    const target = versions.find((v) => v._id === id || v.id === id);
+    if (!target) return fail("Resume not found", 404);
 
-  await supabase.from("resume_versions").update({ is_active: false }).neq("id", id);
-  const { data, error } = await supabase
-    .from("resume_versions")
-    .update({ is_active: true, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select()
-    .maybeSingle();
+    const now = new Date().toISOString();
+    let activatedItem = null;
+    const nextVersions = versions.map((v) => {
+      const isMatch = v._id === id || v.id === id;
+      const updated = { ...v, isActive: isMatch, updatedAt: isMatch ? now : v.updatedAt };
+      if (isMatch) activatedItem = updated;
+      return updated;
+    });
 
-  if (error) return fail(error.message, 400);
-  if (!data) return fail("Resume not found", 404);
+    const { error } = await supabase
+      .from("about")
+      .update({ resume_versions: nextVersions, updated_at: now })
+      .eq("id", row.id);
+    if (error) return fail(error.message, 400);
 
-  await logAdminActivity(admin, "ACTIVATE", "ResumeVersion", `Activated resume: ${data.label || id}`, id);
-  return ok(rowToCamel(data));
+    await logAdminActivity(admin, "ACTIVATE", "ResumeVersion", `Activated resume: ${target.label || id}`, id);
+    return ok(activatedItem);
+  } catch (err: any) {
+    return fail(err.message || "Failed to activate resume", 500);
+  }
 }

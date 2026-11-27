@@ -1,25 +1,29 @@
+import crypto from "crypto";
 import {
-  getServiceSupabase,
   verifyAdminRequest,
   unauthorizedResponse,
   ok,
   fail,
   logAdminActivity,
 } from "@/lib/adminAuth";
-import { rowToCamel, rowsToCamel } from "@/lib/mappers";
+import { getSingletonRow } from "@/lib/jsonListHandler";
 
 export async function GET(req: Request) {
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
-  const supabase = getServiceSupabase();
-  const { data, error } = await supabase
-    .from("resume_versions")
-    .select("*")
-    .order("uploaded_at", { ascending: false });
-
-  if (error) return fail(error.message, 500);
-  return ok(rowsToCamel(data));
+  try {
+    const { row } = await getSingletonRow("about");
+    const versions: any[] = Array.isArray(row.resume_versions) ? row.resume_versions : [];
+    const sorted = versions
+      .filter((v) => !v?.isArchived)
+      .sort(
+        (a, b) => new Date(b.uploadedAt || 0).getTime() - new Date(a.uploadedAt || 0).getTime()
+      );
+    return ok(sorted);
+  } catch (err: any) {
+    return fail(err.message || "Failed to fetch resumes", 500);
+  }
 }
 
 export async function POST(req: Request) {
@@ -32,7 +36,7 @@ export async function POST(req: Request) {
     const label = (formData.get("label") as string) || "";
     if (!file) return fail("Resume PDF file is required", 400);
 
-    const supabase = getServiceSupabase();
+    const { supabase, row } = await getSingletonRow("about");
     const bucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-media";
     const ext = file.name.split(".").pop() || "pdf";
     const path = `resumes/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
@@ -45,24 +49,30 @@ export async function POST(req: Request) {
     if (uploadErr) return fail(uploadErr.message, 500);
 
     const { data: pub } = supabase.storage.from(bucket).getPublicUrl(path);
+    const now = new Date().toISOString();
+    const id = crypto.randomUUID();
+    const newVersion = {
+      _id: id,
+      id,
+      file: { url: pub.publicUrl, publicId: path, alt: file.name },
+      label: label || file.name,
+      isActive: true,
+      uploadedAt: now,
+      createdAt: now,
+      updatedAt: now,
+    };
 
-    // Deactivate previous versions if this is the first or auto-activate
-    await supabase.from("resume_versions").update({ is_active: false }).neq("id", "00000000-0000-0000-0000-000000000000");
+    const prev: any[] = Array.isArray(row.resume_versions) ? row.resume_versions : [];
+    const updated = [newVersion, ...prev.map((v) => ({ ...v, isActive: false }))];
 
-    const { data, error } = await supabase
-      .from("resume_versions")
-      .insert({
-        file: { url: pub.publicUrl, publicId: path, alt: file.name },
-        label: label || file.name,
-        is_active: true,
-        uploaded_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-
+    const { error } = await supabase
+      .from("about")
+      .update({ resume_versions: updated, updated_at: now })
+      .eq("id", row.id);
     if (error) return fail(error.message, 400);
-    await logAdminActivity(admin, "CREATE", "ResumeVersion", `Uploaded resume: ${label || file.name}`, data.id);
-    return ok(rowToCamel(data), 201);
+
+    await logAdminActivity(admin, "CREATE", "ResumeVersion", `Uploaded resume: ${newVersion.label}`, id);
+    return ok(newVersion, 201);
   } catch (err: any) {
     return fail(err.message || "Resume upload failed", 500);
   }

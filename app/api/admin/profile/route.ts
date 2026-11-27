@@ -1,25 +1,36 @@
 import {
-  getServiceSupabase,
   verifyAdminRequest,
   unauthorizedResponse,
   ok,
   fail,
   logAdminActivity,
 } from "@/lib/adminAuth";
+import { getSingletonRow } from "@/lib/jsonListHandler";
 import { rowToCamel, camelToRow } from "@/lib/mappers";
+
+const PROFILE_FIELDS = [
+  "name",
+  "title",
+  "about_me",
+  "career_objective",
+  "profile_photo",
+  "cover_banner",
+  "email",
+  "phone",
+  "location",
+  "social_links",
+];
 
 export async function GET(req: Request) {
   const admin = await verifyAdminRequest(req);
   if (!admin) return unauthorizedResponse();
 
-  const supabase = getServiceSupabase();
-  let { data, error } = await supabase.from("profile").select("*").limit(1).maybeSingle();
-  if (error) return fail(error.message, 500);
-  if (!data) {
-    const created = await supabase.from("profile").insert({}).select().single();
-    data = created.data;
+  try {
+    const { row } = await getSingletonRow("about");
+    return ok(rowToCamel(row));
+  } catch (err: any) {
+    return fail(err.message || "Failed to fetch profile", 500);
   }
-  return ok(rowToCamel(data));
 }
 
 export async function PUT(req: Request) {
@@ -28,20 +39,12 @@ export async function PUT(req: Request) {
 
   try {
     const body = await req.json();
-    const row = camelToRow(body);
+    const row = camelToRow(body, PROFILE_FIELDS);
     row.updated_at = new Date().toISOString();
 
-    const supabase = getServiceSupabase();
-    let { data: existing } = await supabase.from("profile").select("id").limit(1).maybeSingle();
-    if (!existing) {
-      const created = await supabase.from("profile").insert(row).select().single();
-      if (created.error) return fail(created.error.message, 400);
-      await logAdminActivity(admin, "UPDATE", "Profile", "Updated profile", created.data.id);
-      return ok(rowToCamel(created.data));
-    }
-
+    const { supabase, row: existing } = await getSingletonRow("about");
     const { data, error } = await supabase
-      .from("profile")
+      .from("about")
       .update(row)
       .eq("id", existing.id)
       .select()

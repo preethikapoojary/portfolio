@@ -12,6 +12,7 @@ export async function GET(req: Request) {
       .from("projects")
       .select("*")
       .eq("is_visible", true)
+      .eq("is_archived", false)
       .order("order", { ascending: true })
       .order("created_at", { ascending: false });
 
