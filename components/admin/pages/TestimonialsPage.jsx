@@ -12,6 +12,7 @@ const STATUS_STYLES = {
 };
 
 const editFields = [
+  { key: 'avatar', label: 'Profile Photo', type: 'image' },
   { key: 'name', label: 'Full Name', type: 'text' },
   { key: 'role', label: 'Role / Designation', type: 'text' },
   { key: 'company', label: 'Company / College', type: 'text' },
