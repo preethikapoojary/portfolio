@@ -24,11 +24,10 @@ export default function UpdatePassword() {
         return;
       }
       try {
-        const res = await fetch('/api/admin/auth/me', {
+        const res = await fetch('/api/admin/auth/update-password', {
           headers: { Authorization: `Bearer ${session.access_token}` },
         });
         if (!res.ok) {
-          await supabase.auth.signOut();
           setHasSession(false);
         } else {
           setHasSession(true);
@@ -69,8 +68,24 @@ export default function UpdatePassword() {
 
     setLoading(true);
     try {
-      const { error: updateErr } = await supabase.auth.updateUser({ password });
-      if (updateErr) throw updateErr;
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Recovery link has expired or is invalid.');
+      }
+      const res = await fetch('/api/admin/auth/update-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ password }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json?.success) {
+        throw new Error(json?.message || 'Unable to update password.');
+      }
       setUpdated(true);
       setTimeout(() => {
         router.replace('/admin');

@@ -1,10 +1,10 @@
 'use client';
 import { useEffect } from 'react';
-import { FiLogOut, FiMoon, FiSun } from 'react-icons/fi';
+import { FiLogOut, FiMenu, FiMoon, FiSun } from 'react-icons/fi';
 import { useAuth } from '@/context/AdminAuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
-export default function Topbar() {
+export default function Topbar({ onMenuClick = () => {} }) {
   const { admin, logout } = useAuth();
   const { mode, toggle } = useTheme();
 
@@ -20,11 +20,21 @@ export default function Topbar() {
   }, [toggle]);
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-[#DCD9D1] bg-[#F6F4EF] px-6">
-      <div className="text-xs font-medium uppercase tracking-[0.16em] text-[#89877F]">
-        Administration
+    <header className="flex h-16 items-center justify-between border-b border-[#DCD9D1] bg-[#F6F4EF] px-4 sm:px-6">
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="p-1.5 text-[#22221F] md:hidden"
+          aria-label="Open navigation menu"
+        >
+          <FiMenu size={20} />
+        </button>
+        <div className="text-xs font-medium uppercase tracking-[0.16em] text-[#89877F]">
+          Administration
+        </div>
       </div>
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-2.5 sm:gap-4">
         <div className="group relative">
           <button
             type="button"
@@ -48,7 +58,7 @@ export default function Topbar() {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 border border-[#DCD9D1] px-3 py-1.5 text-xs font-medium text-[#22221F] transition-colors hover:border-[#22221F] hover:bg-[#E9E5DC]/40"
+          className="inline-flex items-center gap-1.5 border border-[#DCD9D1] px-2.5 py-1.5 text-xs font-medium text-[#22221F] transition-colors hover:border-[#22221F] hover:bg-[#E9E5DC]/40 sm:px-3"
         >
           View Site <span aria-hidden="true">↗</span>
         </a>

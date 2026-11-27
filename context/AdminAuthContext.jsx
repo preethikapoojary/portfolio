@@ -32,18 +32,19 @@ export function AdminAuthProvider({ children }) {
       }
 
       const json = await res.json();
-      if (!json?.success || !json?.data?.id) {
+      const serverAdmin = json?.data?.admin || json?.data;
+      if (!json?.success || !serverAdmin?.id) {
         await supabase.auth.signOut();
         setAdmin(null);
         return;
       }
 
       const nextAdmin = {
-        id: json.data.id,
-        email: json.data.email || session.user.email,
+        id: serverAdmin.id,
+        email: serverAdmin.email || session.user.email,
         name:
           session.user.user_metadata?.name ||
-          (json.data.email || session.user.email)?.split("@")[0] ||
+          (serverAdmin.email || session.user.email)?.split("@")[0] ||
           "Admin",
       };
       setAdmin((prev) =>
