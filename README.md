@@ -8,7 +8,7 @@ Personal portfolio website with a built-in `/admin` CMS to manage projects, expe
 
 - **Frontend & API:** Next.js 15 (App Router), React 19, Tailwind CSS, TypeScript
 - **Database, Auth & Storage:** Supabase (PostgreSQL with RLS, Auth, Storage)
-- **Hosting:** Netlify
+- **Hosting:** Vercel
 
 ## Quick Setup
 
