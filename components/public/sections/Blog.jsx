@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
+import ShareMenu from '@/components/public/common/ShareMenu';
 
 export default function Blog() {
   const { data: posts, loading } = useFetch(() => api.getBlogPosts(), []);
@@ -51,10 +52,11 @@ export default function Blog() {
                 )}
               </div>
 
-              <div className="flex items-center md:col-span-2 md:justify-end">
+              <div className="flex items-center gap-3 md:col-span-2 md:justify-end">
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-[#22221F] group-hover:text-[#85806D]">
                   Read <FiArrowRight size={14} />
                 </span>
+                <ShareMenu path={`/blog/${post.slug}`} title={post.title} />
               </div>
             </Link>
           ))}

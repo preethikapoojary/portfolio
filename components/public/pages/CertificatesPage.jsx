@@ -6,6 +6,7 @@ import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import PageHeader from '@/components/public/common/PageHeader';
 import Lightbox from '@/components/public/common/Lightbox';
+import ShareMenu from '@/components/public/common/ShareMenu';
 
 export default function CertificatesPage() {
   const { data: items, loading } = useFetch(api.getCertificates, []);
@@ -57,16 +58,21 @@ export default function CertificatesPage() {
                 )}
               </div>
 
-              {cert.credentialUrl && (
-                <a
-                  href={cert.credentialUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-[#22221F] hover:text-[#85806D]"
-                >
-                  Verify credential <FiExternalLink size={12} />
-                </a>
-              )}
+              <div className="mt-3 flex items-center justify-between gap-2">
+                {cert.credentialUrl ? (
+                  <a
+                    href={cert.credentialUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[#22221F] hover:text-[#85806D]"
+                  >
+                    Verify credential <FiExternalLink size={12} />
+                  </a>
+                ) : (
+                  <span />
+                )}
+                <ShareMenu path={cert.credentialUrl || '/certificates'} title={cert.title} />
+              </div>
             </article>
           ))}
         </div>

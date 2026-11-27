@@ -7,6 +7,7 @@ import { FiArrowLeft, FiExternalLink, FiFileText, FiGithub } from 'react-icons/f
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import Lightbox from '@/components/public/common/Lightbox';
+import ShareMenu from '@/components/public/common/ShareMenu';
 
 export default function ProjectDetail() {
   const { slug } = useParams();
@@ -34,10 +35,6 @@ export default function ProjectDetail() {
 
   return (
     <article className="mx-auto max-w-4xl px-6 pb-20 pt-12 sm:px-8 sm:pt-16">
-      <Link href="/projects" className="editorial-link mb-8">
-        <FiArrowLeft size={14} /> All Projects
-      </Link>
-
       <header className="border-b border-[#DCD9D1] pb-8">
         {project.category && (
           <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
@@ -55,37 +52,41 @@ export default function ProjectDetail() {
           </p>
         )}
 
-        <div className="mt-6 flex flex-wrap items-center gap-6">
-          {project.githubUrl && (
-            <a
-              href={project.githubUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="editorial-link"
-            >
-              <FiGithub size={14} /> GitHub Repository
-            </a>
-          )}
-          {project.liveDemoUrl && (
-            <a
-              href={project.liveDemoUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="editorial-link"
-            >
-              <FiExternalLink size={14} /> Live Demo
-            </a>
-          )}
-          {project.reportPdf?.url && (
-            <a
-              href={project.reportPdf.url}
-              target="_blank"
-              rel="noreferrer"
-              className="editorial-link"
-            >
-              <FiFileText size={14} /> Project Report (PDF)
-            </a>
-          )}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-6">
+            {project.githubUrl && (
+              <a
+                href={project.githubUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="editorial-link"
+              >
+                <FiGithub size={14} /> GitHub Repository
+              </a>
+            )}
+            {project.liveDemoUrl && (
+              <a
+                href={project.liveDemoUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="editorial-link"
+              >
+                <FiExternalLink size={14} /> Live Demo
+              </a>
+            )}
+            {project.reportPdf?.url && (
+              <a
+                href={project.reportPdf.url}
+                target="_blank"
+                rel="noreferrer"
+                className="editorial-link"
+              >
+                <FiFileText size={14} /> Project Report (PDF)
+              </a>
+            )}
+          </div>
+
+          <ShareMenu title={project.title} />
         </div>
       </header>
 

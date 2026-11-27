@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
+import ShareMenu from '@/components/public/common/ShareMenu';
 
 export default function Projects() {
   const { data: projects, loading } = useFetch(() => api.getProjects(), []);
@@ -76,10 +77,11 @@ export default function Projects() {
                     </div>
                   )}
 
-                  <div className="mt-6">
+                  <div className="mt-6 flex items-center justify-between gap-4">
                     <Link href={`/projects/${project.slug}`} className="editorial-link text-[15px]">
                       View Project <FiArrowRight size={15} />
                     </Link>
+                    <ShareMenu path={`/projects/${project.slug}`} title={project.title} />
                   </div>
                 </div>
 

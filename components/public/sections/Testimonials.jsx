@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
+import ShareMenu from '@/components/public/common/ShareMenu';
 
 export default function Testimonials() {
   const { data: items, loading } = useFetch(api.getApprovedTestimonials, []);
@@ -36,22 +37,25 @@ export default function Testimonials() {
                 <p className="text-base leading-relaxed text-[#22221F] sm:text-lg">
                   “{t.message}”
                 </p>
-                <footer className="mt-6 flex items-center gap-3 border-t border-[#DCD9D1] pt-4">
-                  {t.avatar?.url && (
-                    <img
-                      src={t.avatar.url}
-                      alt={t.name}
-                      className="h-10 w-10 rounded-full object-cover"
-                    />
-                  )}
-                  <div>
-                    <p className="text-sm font-medium text-[#22221F]">{t.name}</p>
-                    {(t.role || t.company) && (
-                      <p className="text-xs text-[#89877F]">
-                        {[t.role, t.company].filter(Boolean).join(', ')}
-                      </p>
+                <footer className="mt-6 flex items-center justify-between gap-3 border-t border-[#DCD9D1] pt-4">
+                  <div className="flex items-center gap-3">
+                    {t.avatar?.url && (
+                      <img
+                        src={t.avatar.url}
+                        alt={t.name}
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
                     )}
+                    <div>
+                      <p className="text-sm font-medium text-[#22221F]">{t.name}</p>
+                      {(t.role || t.company) && (
+                        <p className="text-xs text-[#89877F]">
+                          {[t.role, t.company].filter(Boolean).join(', ')}
+                        </p>
+                      )}
+                    </div>
                   </div>
+                  <ShareMenu path="/testimonials" title={`Testimonial by ${t.name}`} />
                 </footer>
               </blockquote>
             ))}

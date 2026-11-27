@@ -6,6 +6,7 @@ import { FiArrowRight, FiExternalLink } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import Lightbox from '@/components/public/common/Lightbox';
+import ShareMenu from '@/components/public/common/ShareMenu';
 
 export default function Certificates() {
   const { data: items, loading } = useFetch(api.getCertificates, []);
@@ -63,16 +64,21 @@ export default function Certificates() {
                 )}
               </div>
 
-              {cert.credentialUrl && (
-                <a
-                  href={cert.credentialUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-[#22221F] hover:text-[#85806D]"
-                >
-                  Verify credential <FiExternalLink size={12} />
-                </a>
-              )}
+              <div className="mt-3 flex items-center justify-between gap-2">
+                {cert.credentialUrl ? (
+                  <a
+                    href={cert.credentialUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-[#22221F] hover:text-[#85806D]"
+                  >
+                    Verify credential <FiExternalLink size={12} />
+                  </a>
+                ) : (
+                  <span />
+                )}
+                <ShareMenu path={cert.credentialUrl || '/certificates'} title={cert.title} />
+              </div>
             </article>
           ))}
         </div>

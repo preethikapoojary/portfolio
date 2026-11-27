@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
+import ShareMenu from '@/components/public/common/ShareMenu';
 
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -210,17 +211,17 @@ export default function TestimonialsPage() {
             Testimonial Message *
           </label>
           <span className="text-[11px] text-[#89877F]">
-            {form.message.length} / 280
+            {form.message.length} / 140
           </span>
         </div>
         <textarea
           id="t-message"
           rows={4}
           required
-          maxLength={280}
+          maxLength={140}
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
-          placeholder="Share your experience working with me (max 280 characters with spaces)…"
+          placeholder="Share your experience working with me (max 140 characters with spaces)…"
           className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
         />
       </div>
@@ -297,7 +298,7 @@ export default function TestimonialsPage() {
 
         <div className="mt-7">
           <a
-            href="#leave-testimonial"
+            href="#testimonial-form"
             className="inline-block border border-[#22221F] bg-transparent px-6 py-2.5 text-xs font-medium uppercase tracking-[0.12em] text-[#22221F] transition-colors hover:bg-[#22221F] hover:text-[#F6F4EF]"
           >
             Leave a testimonial
@@ -339,9 +340,11 @@ export default function TestimonialsPage() {
                       {[item.role, item.company].filter(Boolean).join(', ')}
                     </p>
                   )}
+                </div>
 
+                <div className="flex shrink-0 items-center gap-2">
                   {(item.linkedinUrl || item.githubUrl) && (
-                    <div className="mt-1.5 flex items-center gap-2.5 text-[#89877F]">
+                    <div className="flex items-center gap-2.5 text-[#89877F]">
                       {item.linkedinUrl && (
                         <a
                           href={item.linkedinUrl}
@@ -366,6 +369,7 @@ export default function TestimonialsPage() {
                       )}
                     </div>
                   )}
+                  <ShareMenu path="/testimonials" title={`Testimonial by ${item.name}`} />
                 </div>
               </footer>
             </blockquote>
@@ -384,7 +388,7 @@ export default function TestimonialsPage() {
 
       {/* Leave a Testimonial Section */}
       <section
-        id="leave-testimonial"
+        id="testimonial-form"
         className="border border-[#DCD9D1] bg-[#E9E5DC]/25 p-6 sm:p-10 lg:p-12"
       >
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">

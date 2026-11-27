@@ -6,6 +6,7 @@ import { FiArrowRight, FiExternalLink, FiGithub } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import PageHeader from '@/components/public/common/PageHeader';
+import ShareMenu from '@/components/public/common/ShareMenu';
 
 export default function ProjectsPage() {
   const { data: projects, loading } = useFetch(() => api.getProjects(), []);
@@ -133,6 +134,10 @@ export default function ProjectsPage() {
                       <FiExternalLink size={14} /> Live Demo
                     </a>
                   )}
+
+                  <div className="ml-auto">
+                    <ShareMenu path={`/projects/${project.slug}`} title={project.title} />
+                  </div>
                 </div>
               </div>
             </article>
