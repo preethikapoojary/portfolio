@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { FiMail, FiCheckCircle, FiTrash2 } from 'react-icons/fi';
 import { messagesApi } from '@/lib/adminApi/endpoints';
-import Modal from '@/components/admin/ui/Modal';
+import AdminDrawer from '@/components/admin/ui/AdminDrawer';
 
 export default function MessagesPage() {
   const [messages, setMessages] = useState([]);
@@ -104,13 +104,13 @@ export default function MessagesPage() {
       </div>
 
       {viewing && (
-        <Modal title={viewing.subject || 'Message'} onClose={() => setViewing(null)}>
-          <div className="space-y-3 text-sm">
+        <AdminDrawer isOpen={!!viewing} title={viewing.subject || 'Message'} onClose={() => setViewing(null)}>
+          <div className="space-y-4 text-sm">
             <p><span className="text-muted">From:</span> {viewing.name} ({viewing.email})</p>
-            <p className="whitespace-pre-line">{viewing.message}</p>
+            <p className="whitespace-pre-line leading-relaxed">{viewing.message}</p>
             <p className="text-xs text-muted">{new Date(viewing.createdAt).toLocaleString()}</p>
           </div>
-        </Modal>
+        </AdminDrawer>
       )}
     </div>
   );

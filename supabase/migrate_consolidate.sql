@@ -156,14 +156,20 @@ alter table public.contact_messages add column if not exists is_archived boolean
 create table if not exists public.admin_notes (
   id uuid primary key default gen_random_uuid(),
   title text not null,
+  notebook text not null default 'Personal Notes',
   content text not null default '',
-  category text not null default 'General',
-  is_pinned boolean not null default false,
+  tags text[] not null default '{}',
+  status text not null default 'Published' check (status in ('Published', 'Draft')),
   is_archived boolean not null default false,
   archived_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.admin_notes
+  add column if not exists notebook text not null default 'Personal Notes',
+  add column if not exists tags text[] not null default '{}',
+  add column if not exists status text not null default 'Published';
 
 alter table public.admin_notes enable row level security;
 drop policy if exists "Admin all admin_notes" on public.admin_notes;

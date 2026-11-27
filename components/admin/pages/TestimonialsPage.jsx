@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { FiCheck, FiX, FiEdit2, FiTrash2, FiEye, FiEyeOff } from 'react-icons/fi';
 import { testimonialsApi } from '@/lib/adminApi/endpoints';
-import Modal from '@/components/admin/ui/Modal';
+import AdminDrawer from '@/components/admin/ui/AdminDrawer';
 import DynamicForm from '@/components/admin/ui/DynamicForm';
 
 const STATUS_STYLES = {
@@ -154,10 +154,10 @@ export default function TestimonialsPage() {
       </div>
 
       {editing && (
-        <Modal title="Edit Testimonial" onClose={() => setEditing(null)} wide>
+        <AdminDrawer isOpen={!!editing} title="Edit Testimonial" onClose={() => setEditing(null)} maxWidth="640px">
           <form onSubmit={submitEdit}>
             <DynamicForm fields={editFields} values={editing} onChange={setEditing} />
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-6 flex justify-end gap-3 border-t border-[#DCD9D1] pt-4">
               <button type="button" onClick={() => setEditing(null)} className="btn-secondary">
                 Cancel
               </button>
@@ -166,7 +166,7 @@ export default function TestimonialsPage() {
               </button>
             </div>
           </form>
-        </Modal>
+        </AdminDrawer>
       )}
     </div>
   );

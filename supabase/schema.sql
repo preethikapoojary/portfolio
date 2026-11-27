@@ -226,9 +226,10 @@ create index if not exists idx_activity_created on public.activity_logs (created
 create table if not exists public.admin_notes (
   id uuid primary key default gen_random_uuid(),
   title text not null,
+  notebook text not null default 'Personal Notes',
   content text not null default '',
-  category text not null default 'General',
-  is_pinned boolean not null default false,
+  tags text[] not null default '{}',
+  status text not null default 'Published' check (status in ('Published', 'Draft')),
   is_archived boolean not null default false,
   archived_at timestamptz,
   created_at timestamptz not null default now(),

@@ -1,7 +1,8 @@
 'use client';
 import { FiX } from 'react-icons/fi';
 
-export default function Modal({ title, onClose, children, wide = false }) {
+export default function Modal({ open = true, title, onClose, children, wide = false }) {
+  if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className={`max-h-[90vh] w-full ${wide ? 'max-w-2xl' : 'max-w-lg'} overflow-y-auto rounded-xl bg-panel p-6 shadow-xl`}>

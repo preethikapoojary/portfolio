@@ -5,7 +5,7 @@ import DataTable from './DataTable';
 import ReorderableList from './ReorderableList';
 import SearchBar from './SearchBar';
 import DynamicForm from './DynamicForm';
-import Modal from './Modal';
+import AdminDrawer from './AdminDrawer';
 
 /**
  * The single generic page every content module (Education, Skills, Projects,
@@ -126,10 +126,15 @@ export default function CrudModulePage({
       )}
 
       {modalOpen && (
-        <Modal title={editing ? `Edit ${title}` : `Add ${title}`} onClose={() => setModalOpen(false)} wide={wideForm}>
+        <AdminDrawer
+          isOpen={modalOpen}
+          title={editing ? `Edit ${title}` : `Add ${title}`}
+          onClose={() => setModalOpen(false)}
+          maxWidth={wideForm ? '760px' : '560px'}
+        >
           <form onSubmit={submit}>
             <DynamicForm fields={fields} values={formValues} onChange={setFormValues} />
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-6 flex justify-end gap-3 border-t border-[#DCD9D1] pt-4">
               <button type="button" onClick={() => setModalOpen(false)} className="btn-secondary">
                 Cancel
               </button>
@@ -138,7 +143,7 @@ export default function CrudModulePage({
               </button>
             </div>
           </form>
-        </Modal>
+        </AdminDrawer>
       )}
     </div>
   );

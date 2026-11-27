@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { FiRotateCcw, FiTrash2 } from 'react-icons/fi';
+import { FiLock, FiRotateCcw, FiTrash2 } from 'react-icons/fi';
 import { trashApi } from '@/lib/adminApi/endpoints';
 import Modal from '@/components/admin/ui/Modal';
 
@@ -54,7 +54,7 @@ export default function TrashPage() {
       setConfirmTarget(null);
       setPassword('');
     } catch (err) {
-      setPasswordError(err?.response?.data?.message || 'Incorrect admin password.');
+      setPasswordError(err?.response?.data?.message || 'Incorrect password.');
     } finally {
       setBusyKey('');
     }
@@ -68,7 +68,7 @@ export default function TrashPage() {
         <div>
           <h1 className="text-xl font-semibold">Trash</h1>
           <p className="mt-1 text-xs text-muted">
-            Deleted items are archived here. Restore them or permanently delete with your admin password.
+            Manage deleted notes, projects, blogs, certificates, and other items.
           </p>
         </div>
         <span className="text-xs font-medium text-muted">
@@ -76,111 +76,127 @@ export default function TrashPage() {
         </span>
       </div>
 
-      {items.length === 0 ? (
-        <div className="card text-center text-sm text-muted">
-          Trash is empty.
+      <div className="border border-[#DCD9D1] bg-[#F6F4EF]">
+        <div className="hidden grid-cols-12 gap-4 border-b border-[#DCD9D1] bg-[#E9E5DC]/40 px-4 py-3 text-[11px] font-medium uppercase tracking-[0.12em] text-muted sm:grid">
+          <div className="col-span-5">Title</div>
+          <div className="col-span-2">Type</div>
+          <div className="col-span-2">Deleted Date</div>
+          <div className="col-span-3 text-right">Actions</div>
         </div>
-      ) : (
-        <div className="divide-y divide-[#DCD9D1] border border-[#DCD9D1] bg-[#F6F4EF]">
-          {items.map((item) => {
-            const key = `${item.module}:${item.id}`;
-            const isBusy = busyKey === key;
-            return (
-              <div
-                key={key}
-                className="flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center"
-              >
-                <div className="min-w-0 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="border border-[#DCD9D1] bg-[#E9E5DC]/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-muted">
-                      {item.moduleLabel}
-                    </span>
-                    <span className="truncate text-sm font-medium text-ink">
+
+        {items.length === 0 ? (
+          <div className="p-10 text-center text-sm text-muted">Trash is empty.</div>
+        ) : (
+          <div className="divide-y divide-[#DCD9D1]">
+            {items.map((item) => {
+              const key = `${item.module}:${item.id}`;
+              const isBusy = busyKey === key;
+              return (
+                <div
+                  key={key}
+                  className="grid grid-cols-1 items-center gap-3 px-4 py-3.5 sm:grid-cols-12 sm:gap-4"
+                >
+                  <div className="min-w-0 sm:col-span-5">
+                    <p className="truncate text-sm font-medium text-ink">
                       {item.title || 'Untitled'}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-muted">
-                    {item.subtitle && <span>{item.subtitle}</span>}
-                    {item.archivedAt && (
-                      <span>
-                        Archived {new Date(item.archivedAt).toLocaleDateString()}
-                      </span>
+                    </p>
+                    {item.subtitle && (
+                      <p className="truncate text-xs text-muted">{item.subtitle}</p>
                     )}
                   </div>
-                </div>
 
-                <div className="flex shrink-0 items-center gap-2">
-                  <button
-                    type="button"
-                    disabled={isBusy}
-                    onClick={() => handleRestore(item)}
-                    className="btn-secondary inline-flex items-center gap-1.5 !px-3 !py-1.5"
-                  >
-                    <FiRotateCcw size={13} /> Restore
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isBusy}
-                    onClick={() => openPermanentModal(item)}
-                    className="inline-flex items-center gap-1.5 border border-red-300 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.08em] text-red-700 transition-colors hover:bg-red-50"
-                  >
-                    <FiTrash2 size={13} /> Delete Permanently
-                  </button>
+                  <div className="sm:col-span-2">
+                    <span className="inline-block border border-[#DCD9D1] bg-[#E9E5DC]/50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-ink">
+                      {item.moduleLabel}
+                    </span>
+                  </div>
+
+                  <div className="text-xs text-muted sm:col-span-2">
+                    {item.archivedAt ? new Date(item.archivedAt).toLocaleDateString() : '—'}
+                  </div>
+
+                  <div className="flex items-center gap-2 sm:col-span-3 sm:justify-end">
+                    <button
+                      type="button"
+                      disabled={isBusy}
+                      onClick={() => handleRestore(item)}
+                      className="btn-secondary inline-flex items-center gap-1.5 !px-3 !py-1.5"
+                      title="Restore"
+                    >
+                      <FiRotateCcw size={13} /> Restore
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isBusy}
+                      onClick={() => openPermanentModal(item)}
+                      className="inline-flex items-center gap-1.5 border border-red-300 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.08em] text-red-700 transition-colors hover:bg-red-50"
+                      title="Delete Permanently"
+                    >
+                      <FiTrash2 size={13} /> Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {confirmTarget && (
+        <Modal
+          open={!!confirmTarget}
+          onClose={() => setConfirmTarget(null)}
+          title={
+            <span className="inline-flex items-center gap-2">
+              <FiLock className="text-red-600" size={16} />
+              Authentication Required
+            </span>
+          }
+        >
+          <form onSubmit={handlePermanentDelete} className="space-y-4">
+            <p className="text-sm text-muted">
+              Permanently deleting{' '}
+              <span className="font-medium text-ink">{confirmTarget.title || 'this item'}</span>{' '}
+              cannot be undone. Please verify your identity.
+            </p>
+
+            <div>
+              <label className="label" htmlFor="confirm-admin-password">
+                Admin Password
+              </label>
+              <input
+                id="confirm-admin-password"
+                type="password"
+                required
+                autoFocus
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password to confirm"
+                className="input"
+              />
+            </div>
+
+            {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmTarget(null)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!!busyKey}
+                className="border border-red-700 bg-red-700 px-4 py-2 text-xs font-medium uppercase tracking-[0.08em] text-white transition-colors hover:bg-red-800 disabled:opacity-60"
+              >
+                {busyKey ? 'Verifying…' : 'Verify & Delete Permanently'}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
-
-      <Modal
-        open={!!confirmTarget}
-        onClose={() => setConfirmTarget(null)}
-        title="Confirm Permanent Deletion"
-      >
-        <form onSubmit={handlePermanentDelete} className="space-y-4">
-          <p className="text-sm text-muted">
-            This will permanently delete{' '}
-            <span className="font-medium text-ink">{confirmTarget?.title || 'this item'}</span>{' '}
-            from the database. This action cannot be undone.
-          </p>
-
-          <div>
-            <label className="label" htmlFor="confirm-admin-password">
-              Admin Password
-            </label>
-            <input
-              id="confirm-admin-password"
-              type="password"
-              required
-              autoFocus
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your admin password"
-              className="input"
-            />
-          </div>
-
-          {passwordError && <p className="text-xs text-red-600">{passwordError}</p>}
-
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() => setConfirmTarget(null)}
-              className="btn-secondary"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!!busyKey}
-              className="border border-red-700 bg-red-700 px-4 py-2 text-xs font-medium uppercase tracking-[0.08em] text-white transition-colors hover:bg-red-800 disabled:opacity-60"
-            >
-              {busyKey ? 'Deleting…' : 'Delete Permanently'}
-            </button>
-          </div>
-        </form>
-      </Modal>
     </div>
   );
 }

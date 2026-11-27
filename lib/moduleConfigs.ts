@@ -53,6 +53,6 @@ export const CRUD_CONFIGS: Record<string, CrudConfig> = {
   notes: {
     table: "admin_notes",
     resourceName: "AdminNote",
-    defaultOrder: { column: "created_at", ascending: false },
+    defaultOrder: { column: "updated_at", ascending: false },
   },
 };
