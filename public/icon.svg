@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="10" fill="#22221F" />
+  <rect x="2" y="2" width="60" height="60" rx="8" fill="none" stroke="#85806D" stroke-opacity="0.45" stroke-width="1.5" />
+  <text
+    x="50%"
+    y="54%"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    fill="#F6F4EF"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="30"
+    font-weight="600"
+    letter-spacing="-1"
+  >
+    PP
+  </text>
+</svg>
