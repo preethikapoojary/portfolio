@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { SettingsProvider, useSettings } from '@/context/SettingsContext';
@@ -9,6 +10,14 @@ import LoadingScreen from '@/components/public/layout/LoadingScreen';
 
 function PublicContent({ children }) {
   const { ready } = useSettings();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (!window.location.hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [pathname]);
+
   if (!ready) return <LoadingScreen />;
 
   return (
