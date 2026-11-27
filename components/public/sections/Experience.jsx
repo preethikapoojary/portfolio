@@ -15,9 +15,8 @@ function formatRange(start, end, isCurrent) {
 
 export default function Experience() {
   const { data: items, loading: expLoading } = useFetch(api.getExperience, []);
-  const { data: achievements, loading: achLoading } = useFetch(api.getAchievements, []);
 
-  if ((expLoading || !items?.length) && (achLoading || !achievements?.length)) {
+  if (expLoading || !items?.length) {
     return null;
   }
 
@@ -83,48 +82,6 @@ export default function Experience() {
                 </div>
               </article>
             ))}
-          </div>
-        )}
-
-        {/* Merged Achievements & Milestones */}
-        {achievements?.length > 0 && (
-          <div className={items?.length > 0 ? 'mt-8 border-t border-[#DCD9D1] pt-10' : ''}>
-            <p className="mb-6 text-xs font-medium uppercase tracking-[0.18em] text-[#89877F]">
-              Honors &amp; Milestones
-            </p>
-            <div className="divide-y divide-[#DCD9D1]">
-              {achievements.map((item, index) => (
-                <div
-                  key={item._id}
-                  className="grid gap-3 py-5 first:pt-0 last:pb-0 md:grid-cols-12 md:items-baseline md:gap-8"
-                >
-                  <div className="flex items-baseline gap-4 md:col-span-4">
-                    <span className="text-xs font-medium tracking-[0.16em] text-[#85806D]">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span className="text-sm text-[#89877F]">
-                      {item.date
-                        ? new Date(item.date).toLocaleDateString('en-US', {
-                            month: 'short',
-                            year: 'numeric',
-                          })
-                        : 'Milestone'}
-                    </span>
-                  </div>
-
-                  <div className="md:col-span-8">
-                    <h3 className="font-display text-2xl font-medium text-[#22221F]">
-                      {item.title}
-                    </h3>
-                    {item.description && (
-                      <p className="mt-1.5 text-base leading-relaxed text-[#89877F]">
-                        {item.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 
