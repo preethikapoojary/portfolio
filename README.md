@@ -2,7 +2,7 @@
 
 Personal portfolio website with a built-in `/admin` CMS to manage projects, experience, education, skills, certificates, achievements, blog posts, and testimonials.
 
-🔗 **Live Site:** [preethika-poojary.netlify.app](https://preethika-poojary.netlify.app/)
+🔗 **Live Site:** [preethika-poojary.vercel.app](https://preethika-poojary.vercel.app/)
 
 ## Tech Stack
 
