@@ -102,6 +102,46 @@ export async function handleAdminList(req: Request, config: CrudConfig) {
   }
 }
 
+async function isSlugTaken(
+  supabase: ReturnType<typeof getServiceSupabase>,
+  table: string,
+  slug: string,
+  excludeId?: string
+): Promise<boolean> {
+  let query = supabase.from(table).select("id").eq("slug", slug);
+  if (excludeId) query = query.neq("id", excludeId);
+  const { data } = await query.limit(1);
+  return Boolean(data && data.length > 0);
+}
+
+async function resolveUniqueSlug(
+  supabase: ReturnType<typeof getServiceSupabase>,
+  table: string,
+  rawSlug: string | undefined,
+  fallbackTitle: string,
+  excludeId?: string
+): Promise<{ slug?: string; error?: string }> {
+  const explicit = typeof rawSlug === "string" ? rawSlug.trim() : "";
+  if (explicit) {
+    const normalized = slugify(explicit);
+    if (await isSlugTaken(supabase, table, normalized, excludeId)) {
+      return {
+        error: `Slug "${normalized}" is already in use. Every item must have a unique slug/URL.`,
+      };
+    }
+    return { slug: normalized };
+  }
+
+  const base = slugify(fallbackTitle);
+  let candidate = base;
+  let counter = 2;
+  while (await isSlugTaken(supabase, table, candidate, excludeId)) {
+    candidate = `${base}-${counter}`;
+    counter += 1;
+  }
+  return { slug: candidate };
+}
+
 export async function handleAdminCreate(req: Request, config: CrudConfig) {
   if (config.jsonColumn) {
     return handleJsonAdminCreate(req, {
@@ -121,18 +161,31 @@ export async function handleAdminCreate(req: Request, config: CrudConfig) {
       Object.assign(row, config.fixedFilter);
     }
 
-    if (config.hasSlug && !row.slug && row.title) {
-      row.slug = slugify(row.title);
+    const supabase = getServiceSupabase();
+
+    if (config.hasSlug) {
+      const resolved = await resolveUniqueSlug(
+        supabase,
+        config.table,
+        row.slug,
+        row.title || config.resourceName
+      );
+      if (resolved.error) return fail(resolved.error, 409);
+      row.slug = resolved.slug;
     }
 
-    const supabase = getServiceSupabase();
     const { data, error } = await supabase
       .from(config.table)
       .insert(row)
       .select()
       .single();
 
-    if (error) return fail(error.message, 400);
+    if (error) {
+      if (error.code === "23505") {
+        return fail("This slug/URL is already in use. Please choose a unique value.", 409);
+      }
+      return fail(error.message, 400);
+    }
 
     await logAdminActivity(
       admin,
@@ -190,13 +243,33 @@ export async function handleAdminUpdateById(req: Request, id: string, config: Cr
     row.updated_at = new Date().toISOString();
 
     const supabase = getServiceSupabase();
+
+    if (config.hasSlug && ("slug" in row || "title" in row)) {
+      if ("slug" in row) {
+        const resolved = await resolveUniqueSlug(
+          supabase,
+          config.table,
+          row.slug,
+          row.title || config.resourceName,
+          id
+        );
+        if (resolved.error) return fail(resolved.error, 409);
+        row.slug = resolved.slug;
+      }
+    }
+
     let query = supabase.from(config.table).update(row).eq("id", id);
     if (config.fixedFilter) {
       query = query.match(config.fixedFilter);
     }
     const { data, error } = await query.select().maybeSingle();
 
-    if (error) return fail(error.message, 400);
+    if (error) {
+      if (error.code === "23505") {
+        return fail("This slug/URL is already in use. Please choose a unique value.", 409);
+      }
+      return fail(error.message, 400);
+    }
     if (!data) return fail(`${config.resourceName} not found`, 404);
 
     await logAdminActivity(

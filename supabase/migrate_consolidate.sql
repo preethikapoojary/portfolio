@@ -228,6 +228,18 @@ update public.certificates
 set slug = trim(both '-' from regexp_replace(lower(title), '[^a-z0-9]+', '-', 'g'))
 where slug = '' or slug is null;
 
+with ranked as (
+  select id, slug,
+         row_number() over (partition by slug order by created_at asc, id asc) as rn
+  from public.certificates
+)
+update public.certificates c
+set slug = r.slug || '-' || r.rn
+from ranked r
+where c.id = r.id and r.rn > 1;
+
+create unique index if not exists certificates_slug_key on public.certificates(slug);
+
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;

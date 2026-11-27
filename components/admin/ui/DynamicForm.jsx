@@ -19,14 +19,31 @@ function makeSlug(text) {
     .replace(/^-+|-+$/g, '');
 }
 
-export default function DynamicForm({ fields, values, onChange }) {
+function makeUniqueSlug(text, existingSlugs = []) {
+  const base = makeSlug(text);
+  if (!base) return '';
+  const taken = new Set(existingSlugs.map((s) => makeSlug(s)));
+  let candidate = base;
+  let counter = 2;
+  while (taken.has(candidate)) {
+    candidate = `${base}-${counter}`;
+    counter += 1;
+  }
+  return candidate;
+}
+
+export default function DynamicForm({ fields, values, onChange, existingSlugs = [] }) {
   const hasSlugField = fields.some((f) => f.key === 'slug');
+  const takenSet = new Set(existingSlugs.map((s) => makeSlug(s)));
+  const currentSlug = makeSlug(values.slug);
+  const slugConflict = hasSlugField && currentSlug && takenSet.has(currentSlug);
+
   const set = (key, value) => {
     const next = { ...values, [key]: value };
     if (key === 'title' && hasSlugField) {
-      const prevAutoSlug = makeSlug(values.title);
-      if (!values.slug || values.slug === prevAutoSlug) {
-        next.slug = makeSlug(value);
+      const prevAutoSlug = makeUniqueSlug(values.title, existingSlugs);
+      if (!values.slug || values.slug === prevAutoSlug || values.slug === makeSlug(values.title)) {
+        next.slug = makeUniqueSlug(value, existingSlugs);
       }
     }
     onChange(next);
@@ -38,6 +55,11 @@ export default function DynamicForm({ fields, values, onChange }) {
         <div key={field.key}>
           <label className="label">{field.label}</label>
           {renderField(field, values, set)}
+          {field.key === 'slug' && slugConflict && (
+            <p className="mt-1 text-xs text-red-600">
+              This slug is already in use. Every item must have a unique slug/URL.
+            </p>
+          )}
         </div>
       ))}
     </div>

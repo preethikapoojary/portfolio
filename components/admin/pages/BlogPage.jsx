@@ -4,6 +4,7 @@ import { blogApi } from '@/lib/adminApi/endpoints';
 
 const fields = [
   { key: 'title', label: 'Title', type: 'text' },
+  { key: 'slug', label: 'Slug (optional — auto-generated from title)', type: 'text' },
   { key: 'category', label: 'Category', type: 'text' },
   { key: 'excerpt', label: 'Excerpt', type: 'textarea', rows: 2 },
   { key: 'content', label: 'Content', type: 'richtext' },
@@ -56,6 +57,7 @@ export default function BlogPage() {
       wideForm
       emptyValues={{
         title: '',
+        slug: '',
         category: 'General',
         excerpt: '',
         content: '',

@@ -133,7 +133,15 @@ export default function CrudModulePage({
           maxWidth={wideForm ? '760px' : '560px'}
         >
           <form onSubmit={submit}>
-            <DynamicForm fields={fields} values={formValues} onChange={setFormValues} />
+            <DynamicForm
+              fields={fields}
+              values={formValues}
+              onChange={setFormValues}
+              existingSlugs={rows
+                .filter((r) => r._id !== editing?._id)
+                .map((r) => r.slug)
+                .filter(Boolean)}
+            />
             <div className="mt-6 flex justify-end gap-3 border-t border-[#DCD9D1] pt-4">
               <button type="button" onClick={() => setModalOpen(false)} className="btn-secondary">
                 Cancel
