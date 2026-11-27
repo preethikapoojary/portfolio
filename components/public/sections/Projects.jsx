@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
-import SectionHeading from '@/components/public/common/SectionHeading';
 
 export default function Projects() {
   const { data: projects, loading } = useFetch(() => api.getProjects(), []);
@@ -18,13 +17,14 @@ export default function Projects() {
       className="flex flex-col justify-center border-t border-[#DCD9D1] py-16 lg:min-h-[calc(100vh-4rem)] lg:py-20"
     >
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
-        <SectionHeading
-          number="02"
-          eyebrow="Selected Work"
-          title="Projects"
-          actionLabel="View All Projects"
-          actionHref="/projects"
-        />
+        <div className="mb-10 border-b border-[#DCD9D1] pb-6 text-center">
+          <h2 className="font-display text-4xl font-medium tracking-tight text-[#22221F] sm:text-5xl">
+            My Projects
+          </h2>
+          <p className="mt-2.5 text-sm text-[#89877F] sm:text-base">
+            Selected machine learning, database, and software engineering work.
+          </p>
+        </div>
 
         <div className="divide-y divide-[#DCD9D1]">
           {featured.map((project, index) => {
@@ -110,6 +110,12 @@ export default function Projects() {
               </article>
             );
           })}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link href="/projects" className="editorial-link text-base">
+            View All Projects <FiArrowRight size={15} />
+          </Link>
         </div>
       </div>
     </section>
