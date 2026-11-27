@@ -135,16 +135,34 @@ export default function AboutPage() {
             Technical Skills
           </p>
 
-          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(groupedSkills).map(([category, items]) => (
               <div key={category} className="border-t border-[#DCD9D1] pt-4">
                 <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#22221F]">
                   {category}
                 </h3>
-                <ul className="mt-3 space-y-1.5 text-sm text-[#89877F]">
-                  {items.map((skill) => (
-                    <li key={skill._id}>{skill.name}</li>
-                  ))}
+                <ul className="mt-4 space-y-3 text-sm">
+                  {items.map((skill) => {
+                    const pct = Math.min(100, Math.max(0, Number(skill.proficiency) || 0));
+                    return (
+                      <li key={skill._id}>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[#22221F]">{skill.name}</span>
+                          {pct > 0 && (
+                            <span className="text-xs text-[#89877F]">{pct}%</span>
+                          )}
+                        </div>
+                        {pct > 0 && (
+                          <div className="mt-1.5 h-[2px] w-full bg-[#DCD9D1]">
+                            <div
+                              className="h-full bg-[#85806D] transition-all duration-300"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}
