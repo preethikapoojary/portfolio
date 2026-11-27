@@ -57,10 +57,10 @@ export default function ForgotPassword() {
             <div className="border border-[#DCD9D1] bg-[#F6F4EF] p-5">
               <div className="flex items-center gap-2 text-[#22221F]">
                 <FiCheck size={16} />
-                <p className="text-sm font-medium">Magic link sent</p>
+                <p className="text-sm font-medium">Request submitted</p>
               </div>
               <p className="mt-2 text-xs leading-relaxed text-[#89877F]">
-                Check <span className="font-medium text-[#22221F]">{email}</span> and click the recovery link to set a new password.
+                If <span className="font-medium text-[#22221F]">{email}</span> is registered as an administrator, a recovery link has been sent.
               </p>
               <Link
                 href="/admin/login"
