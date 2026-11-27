@@ -43,6 +43,7 @@ export const CRUD_CONFIGS: Record<string, CrudConfig> = {
     table: "certificates",
     resourceName: "Certificate",
     defaultOrder: { column: "order", ascending: true },
+    hasSlug: true,
   },
   blog: {
     table: "blog_posts",

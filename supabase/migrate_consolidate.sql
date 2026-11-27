@@ -219,6 +219,15 @@ create policy "Admin all page_views" on public.page_views for all using (public.
 drop policy if exists "Admin all section_views" on public.section_views;
 create policy "Admin all section_views" on public.section_views for all using (public.is_admin());
 
+-- 8. Certificates slug and homepage sort order
+alter table public.certificates
+  add column if not exists slug text not null default '',
+  add column if not exists home_order integer;
+
+update public.certificates
+set slug = trim(both '-' from regexp_replace(lower(title), '[^a-z0-9]+', '-', 'g')) || '-' || left(id::text, 6)
+where slug = '' or slug is null;
+
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;

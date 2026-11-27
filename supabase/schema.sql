@@ -134,11 +134,13 @@ create table if not exists public.experience (
 create table if not exists public.certificates (
   id uuid primary key default gen_random_uuid(),
   title text not null,
+  slug text not null default '',
   issuer text not null default '',
   image jsonb not null default '{"url": null, "publicId": null, "alt": ""}'::jsonb,
   credential_url text not null default '',
   issue_date timestamptz,
   "order" integer not null default 0,
+  home_order integer,
   is_visible boolean not null default true,
   is_archived boolean not null default false,
   archived_at timestamptz,

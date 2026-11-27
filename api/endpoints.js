@@ -24,6 +24,7 @@ export const api = {
   getExperience: () => unwrap(axiosClient.get('/experience')),
   getExperienceById: (id) => unwrap(axiosClient.get(`/experience/${id}`)),
   getCertificates: () => unwrap(axiosClient.get('/certificates')),
+  getCertificateBySlug: (slug) => unwrap(axiosClient.get(`/certificates/${slug}`)),
   getAchievements: () => unwrap(axiosClient.get('/achievements')),
   getGallery: (params) => unwrap(axiosClient.get('/gallery', { params })),
   getBlogPosts: (params) => unwrap(axiosClient.get('/blog', { params })),

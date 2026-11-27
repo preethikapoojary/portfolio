@@ -127,10 +127,7 @@ export default function ProjectDetail() {
       )}
 
       {project.screenshots?.length > 0 && (
-        <section className="mt-14 border-t border-[#DCD9D1] pt-10">
-          <p className="mb-6 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
-            Screenshots
-          </p>
+        <section className="mt-12 border-t border-[#DCD9D1] pt-10">
           <div className="grid gap-6 sm:grid-cols-2">
             {project.screenshots.map((shot, idx) => (
               <button
@@ -141,8 +138,8 @@ export default function ProjectDetail() {
               >
                 <img
                   src={shot.url}
-                  alt={shot.alt || `${project.title} screenshot ${idx + 1}`}
-                  className="aspect-video w-full object-cover"
+                  alt={shot.alt || `${project.title} ${idx + 1}`}
+                  className="w-full object-contain"
                 />
               </button>
             ))}

@@ -39,7 +39,13 @@ export function camelToRow(
     if (skip.has(key)) continue;
     if (allowedCamelKeys && !allowedCamelKeys.includes(key)) continue;
     const snake = toSnakeKey(key);
-    out[snake] = value === "" && (snake.endsWith("_date") || snake.endsWith("_at")) ? null : value;
+    if (value === "" && (snake.endsWith("_date") || snake.endsWith("_at") || snake === "home_order")) {
+      out[snake] = null;
+    } else if (value === "" && snake === "order") {
+      out[snake] = 0;
+    } else {
+      out[snake] = value;
+    }
   }
   return out;
 }
