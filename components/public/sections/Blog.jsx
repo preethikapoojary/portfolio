@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
-import SectionHeading from '@/components/public/common/SectionHeading';
 
 export default function Blog() {
   const { data: posts, loading } = useFetch(() => api.getBlogPosts(), []);
@@ -13,16 +12,17 @@ export default function Blog() {
   return (
     <section
       id="blog"
-      className="flex flex-col justify-center border-t border-[#DCD9D1] py-16 lg:min-h-[calc(100vh-4rem)] lg:py-20"
+      className="flex flex-col justify-center border-t border-[#DCD9D1] bg-[#E9E5DC]/35 py-16 lg:min-h-[calc(100vh-4rem)] lg:py-20"
     >
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
-        <SectionHeading
-          number="06"
-          eyebrow="Writing"
-          title="Articles & Notes"
-          actionLabel="Read All Articles"
-          actionHref="/blog"
-        />
+        <div className="mb-10 border-b border-[#DCD9D1] pb-6 text-center">
+          <h2 className="font-display text-4xl font-medium tracking-tight text-[#22221F] sm:text-5xl">
+            Articles &amp; Notes
+          </h2>
+          <p className="mt-2.5 text-sm text-[#89877F] sm:text-base">
+            Technical writing, learnings, and project reflections.
+          </p>
+        </div>
 
         <div className="divide-y divide-[#DCD9D1]">
           {posts.slice(0, 3).map((post) => (
@@ -58,6 +58,12 @@ export default function Blog() {
               </div>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link href="/blog" className="editorial-link text-base">
+            Read All Articles <FiArrowRight size={15} />
+          </Link>
         </div>
       </div>
     </section>

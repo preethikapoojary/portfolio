@@ -1,83 +1,73 @@
 'use client';
+
 import Link from 'next/link';
-import { FiLinkedin, FiGithub } from 'react-icons/fi';
-import SectionHeading from '../common/SectionHeading';
-import SectionNavArrow from '../common/SectionNavArrow';
-import EmptyState from '../common/EmptyState';
-import TiltCard from '../common/TiltCard';
-import useFetch from '@/hooks/useFetch';
+import { FiArrowRight } from 'react-icons/fi';
+import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 
 export default function Testimonials() {
-  const { data: testimonials, loading } = useFetch(api.getApprovedTestimonials, []);
-  const featuredTestimonials = (testimonials || []).slice(0, 3);
+  const { data: items, loading } = useFetch(api.getApprovedTestimonials, []);
+  if (loading) return null;
+
+  const approved = items || [];
 
   return (
-    <section id="testimonials" className="relative w-full px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading eyebrow="Testimonials" title="What people say" />
-
-      {loading ? (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="glass-card h-40 animate-pulse" />
-          ))}
+    <section
+      id="testimonials"
+      className="flex flex-col justify-center border-t border-[#DCD9D1] py-16 lg:min-h-[calc(100vh-4rem)] lg:py-20"
+    >
+      <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
+        <div className="mb-10 border-b border-[#DCD9D1] pb-6 text-center">
+          <h2 className="font-display text-4xl font-medium tracking-tight text-[#22221F] sm:text-5xl">
+            Testimonials
+          </h2>
+          <p className="mt-2.5 text-sm text-[#89877F] sm:text-base">
+            Words from collaborators, peers, and mentors.
+          </p>
         </div>
-      ) : !testimonials?.length ? (
-        <EmptyState message="Approved testimonials will appear here." />
-      ) : (
-        <>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredTestimonials.map((t, i) => (
-              <TiltCard key={t._id} delay={i * 0.06} className="glass-card p-6 transition-shadow hover:shadow-glow flex flex-col justify-between">
-                <div>
-                  <p className="text-sm text-slate-300">&ldquo;{t.message}&rdquo;</p>
-                </div>
 
-                <div className="mt-4 flex items-center gap-3">
-                  {t.avatar?.url ? (
-                    <img src={t.avatar.url} alt={t.name} className="h-10 w-10 rounded-full object-cover" />
-                  ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-sm text-slate-400">
-                      {t.name?.[0]}
-                    </div>
+        {approved.length > 0 ? (
+          <div className="grid gap-8 md:grid-cols-2">
+            {approved.slice(0, 4).map((t) => (
+              <blockquote
+                key={t._id}
+                className="flex flex-col justify-between border border-[#DCD9D1] bg-[#E9E5DC]/25 p-7"
+              >
+                <p className="text-base leading-relaxed text-[#22221F] sm:text-lg">
+                  “{t.message}”
+                </p>
+                <footer className="mt-6 flex items-center gap-3 border-t border-[#DCD9D1] pt-4">
+                  {t.avatar?.url && (
+                    <img
+                      src={t.avatar.url}
+                      alt={t.name}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
                   )}
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium">{t.name}</p>
-                    <p className="truncate text-xs text-slate-500">
-                      {t.role} {t.company ? `· ${t.company}` : ''}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 gap-2 text-slate-400">
-                    {t.linkedinUrl && (
-                      <a href={t.linkedinUrl} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="hover:text-primary">
-                        <FiLinkedin />
-                      </a>
-                    )}
-                    {t.githubUrl && (
-                      <a href={t.githubUrl} target="_blank" rel="noreferrer" aria-label="GitHub" className="hover:text-primary">
-                        <FiGithub />
-                      </a>
+                  <div>
+                    <p className="text-sm font-medium text-[#22221F]">{t.name}</p>
+                    {(t.role || t.company) && (
+                      <p className="text-xs text-[#89877F]">
+                        {[t.role, t.company].filter(Boolean).join(', ')}
+                      </p>
                     )}
                   </div>
-                </div>
-              </TiltCard>
+                </footer>
+              </blockquote>
             ))}
           </div>
+        ) : (
+          <p className="py-8 text-center text-base text-[#89877F]">
+            No testimonials published yet. Be the first to share a note.
+          </p>
+        )}
 
-          <div className="mt-12 text-center">
-            <Link
-              href="/testimonials"
-              className="glass-card inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium text-slate-200 transition duration-300 hover:scale-[1.04] hover:text-primary hover:shadow-glow"
-            >
-              View More / Leave a Testimonial →
-            </Link>
-          </div>
-        </>
-      )}
+        <div className="mt-12 text-center">
+          <Link href="/testimonials" className="editorial-link text-base">
+            Leave a Testimonial <FiArrowRight size={15} />
+          </Link>
+        </div>
       </div>
-
-      <SectionNavArrow currentId="testimonials" />
     </section>
   );
 }
