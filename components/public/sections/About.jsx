@@ -34,12 +34,6 @@ export default function About() {
             <p className="text-lg leading-relaxed text-[#22221F] sm:text-xl sm:leading-relaxed">
               {profile.aboutMe}
             </p>
-
-            <div className="mt-9">
-              <Link href="/about" className="editorial-link text-base">
-                Explore About <FiArrowRight size={15} />
-              </Link>
-            </div>
           </div>
 
           <div className="border-t border-[#DCD9D1] pt-6 lg:col-span-5 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0">
@@ -80,6 +74,12 @@ export default function About() {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link href="/about" className="editorial-link text-base">
+            Explore About <FiArrowRight size={15} />
+          </Link>
         </div>
       </div>
     </section>
