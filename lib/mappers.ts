@@ -41,8 +41,10 @@ export function camelToRow(
     const snake = toSnakeKey(key);
     if (value === "" && (snake.endsWith("_date") || snake.endsWith("_at") || snake === "home_order")) {
       out[snake] = null;
-    } else if (value === "" && snake === "order") {
-      out[snake] = 0;
+    } else if (snake === "home_order") {
+      out[snake] = value === null || value === undefined ? null : Math.max(0, Math.floor(Number(value) || 0));
+    } else if (snake === "order") {
+      out[snake] = value === "" || value === null || value === undefined ? 0 : Math.max(0, Math.floor(Number(value) || 0));
     } else {
       out[snake] = value;
     }

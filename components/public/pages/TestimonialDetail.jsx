@@ -74,8 +74,6 @@ export default function TestimonialDetail({ slug }) {
           <ShareMenu
             path={sharePath}
             title={`Testimonial by ${item.name}`}
-            onDownload={handleDownload}
-            downloadLabel="Download"
           />
         </div>
       </header>

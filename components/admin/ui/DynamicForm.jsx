@@ -83,17 +83,39 @@ function renderField(field, values, set) {
     case 'richtext':
       return <RichTextEditor value={value} onChange={(html) => set(field.key, html)} />;
 
-    case 'number':
+    case 'number': {
+      const effectiveMin =
+        field.min !== undefined
+          ? field.min
+          : field.key === 'order' || field.key === 'homeOrder'
+            ? 0
+            : undefined;
       return (
         <input
           type="number"
           className="input"
-          min={field.min}
+          min={effectiveMin}
           max={field.max}
           value={value ?? ''}
-          onChange={(e) => set(field.key, e.target.value === '' ? '' : Number(e.target.value))}
+          onKeyDown={(e) => {
+            if (effectiveMin !== undefined && effectiveMin >= 0 && (e.key === '-' || e.key === 'e' || e.key === 'E')) {
+              e.preventDefault();
+            }
+          }}
+          onChange={(e) => {
+            if (e.target.value === '') {
+              set(field.key, '');
+              return;
+            }
+            let num = Number(e.target.value);
+            if (Number.isNaN(num)) return;
+            if (effectiveMin !== undefined) num = Math.max(effectiveMin, num);
+            if (field.max !== undefined) num = Math.min(field.max, num);
+            set(field.key, num);
+          }}
         />
       );
+    }
 
     case 'date':
       return (

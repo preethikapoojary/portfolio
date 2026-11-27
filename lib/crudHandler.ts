@@ -344,9 +344,10 @@ export async function handleAdminReorder(req: Request, config: CrudConfig) {
       items.map((item: { id?: string; _id?: string; order: number }, idx: number) => {
         const targetId = item.id || item._id;
         if (!targetId) return Promise.resolve();
+        const nextOrder = Math.max(0, Math.floor(Number(item.order ?? idx) || 0));
         let query = supabase
           .from(config.table)
-          .update({ order: item.order ?? idx, updated_at: new Date().toISOString() })
+          .update({ order: nextOrder, updated_at: new Date().toISOString() })
           .eq("id", targetId);
         if (config.fixedFilter) {
           query = query.match(config.fixedFilter);

@@ -72,7 +72,7 @@ export async function handleJsonAdminCreate(req: Request, config: JsonListConfig
       ...body,
       _id: id,
       id,
-      order: body.order ?? items.length,
+      order: Math.max(0, Math.floor(Number(body.order ?? items.length) || 0)),
       isVisible: body.isVisible ?? true,
       createdAt: now,
       updatedAt: now,
@@ -128,6 +128,9 @@ export async function handleJsonAdminUpdateById(req: Request, id: string, config
     const updated = {
       ...items[idx],
       ...body,
+      ...(body.order !== undefined
+        ? { order: Math.max(0, Math.floor(Number(body.order) || 0)) }
+        : {}),
       _id: items[idx]._id || id,
       id: items[idx].id || id,
       updatedAt: now,
@@ -199,7 +202,7 @@ export async function handleJsonAdminReorder(req: Request, config: JsonListConfi
     const orderMap = new Map<string, number>();
     orderItems.forEach((entry: { id?: string; _id?: string; order?: number }, idx: number) => {
       const targetId = entry.id || entry._id;
-      if (targetId) orderMap.set(targetId, entry.order ?? idx);
+      if (targetId) orderMap.set(targetId, Math.max(0, Math.floor(Number(entry.order ?? idx) || 0)));
     });
 
     const now = new Date().toISOString();

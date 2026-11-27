@@ -260,6 +260,29 @@ where t.id = r.id and r.rn > 1;
 
 create unique index if not exists testimonials_slug_key on public.testimonials(slug);
 
+-- 10. Non-negative sort orders
+update public.projects set "order" = 0 where "order" < 0;
+update public.experience set "order" = 0 where "order" < 0;
+update public.certificates set "order" = 0 where "order" < 0;
+update public.certificates set home_order = 0 where home_order < 0;
+
+do $$ begin
+  alter table public.projects add constraint projects_order_non_negative check ("order" >= 0);
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.experience add constraint experience_order_non_negative check ("order" >= 0);
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.certificates add constraint certificates_order_non_negative check ("order" >= 0);
+exception when duplicate_object then null;
+end $$;
+do $$ begin
+  alter table public.certificates add constraint certificates_home_order_non_negative check (home_order is null or home_order >= 0);
+exception when duplicate_object then null;
+end $$;
+
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;
