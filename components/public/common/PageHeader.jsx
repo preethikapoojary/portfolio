@@ -2,7 +2,7 @@
 
 export default function PageHeader({ eyebrow, title, description }) {
   return (
-    <header className="border-b border-[#DCD9D1] pb-12 pt-16 sm:pb-14 sm:pt-24">
+    <header className="border-b border-[#DCD9D1] pb-12 pt-16 text-center sm:pb-14 sm:pt-24">
       {eyebrow && (
         <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-[#89877F]">
           {eyebrow}
@@ -12,7 +12,7 @@ export default function PageHeader({ eyebrow, title, description }) {
         {title}
       </h1>
       {description && (
-        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[#89877F]">
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-[#89877F]">
           {description}
         </p>
       )}
