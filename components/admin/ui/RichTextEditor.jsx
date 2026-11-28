@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fi';
 import axiosClient from '@/lib/adminApi/axiosClient';
 import AssetPickerModal from './AssetPickerModal';
+import ImageCropModal from '@/components/common/ImageCropModal';
 
 const InlineImage = Node.create({
   name: 'image',
@@ -45,6 +46,7 @@ const InlineImage = Node.create({
 export default function RichTextEditor({ value, onChange }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [pendingFile, setPendingFile] = useState(null);
   const fileInputRef = useRef(null);
 
   const editor = useEditor({
@@ -80,8 +82,7 @@ export default function RichTextEditor({ value, onChange }) {
       .run();
   };
 
-  const handleUploadImage = async (e) => {
-    const file = e.target.files?.[0];
+  const uploadAndInsertImage = async (file) => {
     if (!file) return;
     setUploading(true);
     try {
@@ -95,8 +96,14 @@ export default function RichTextEditor({ value, onChange }) {
       if (url) insertImage(url, file.name);
     } finally {
       setUploading(false);
-      e.target.value = '';
     }
+  };
+
+  const handleUploadImage = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setPendingFile(file);
   };
 
   const setLink = () => {
@@ -206,6 +213,16 @@ export default function RichTextEditor({ value, onChange }) {
         onSelect={(asset) => {
           insertImage(asset.url, asset.name || '');
           setPickerOpen(false);
+        }}
+      />
+
+      <ImageCropModal
+        file={pendingFile}
+        defaultAspect="original"
+        onCancel={() => setPendingFile(null)}
+        onConfirm={(croppedFile) => {
+          setPendingFile(null);
+          uploadAndInsertImage(croppedFile);
         }}
       />
     </div>

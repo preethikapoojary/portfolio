@@ -17,6 +17,7 @@ import {
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
+import ImageCropModal from '@/components/common/ImageCropModal';
 import { downloadTestimonialImage } from '@/utils/downloadTestimonialImage';
 
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
@@ -46,6 +47,7 @@ export default function TestimonialsPage() {
     avatar: { url: null, publicId: null, alt: '' },
   });
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [pendingAvatarFile, setPendingAvatarFile] = useState(null);
   const [turnstileToken, setTurnstileToken] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -65,8 +67,7 @@ export default function TestimonialsPage() {
     }));
   };
 
-  const handleAvatarUpload = async (e) => {
-    const file = e.target.files?.[0];
+  const uploadCroppedAvatar = async (file) => {
     if (!file) return;
     setUploadingAvatar(true);
     setError('');
@@ -78,6 +79,13 @@ export default function TestimonialsPage() {
     } finally {
       setUploadingAvatar(false);
     }
+  };
+
+  const handleAvatarUpload = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setPendingAvatarFile(file);
   };
 
   const handleSubmit = async (e) => {
@@ -167,6 +175,16 @@ export default function TestimonialsPage() {
           </div>
         </div>
       </div>
+
+      <ImageCropModal
+        file={pendingAvatarFile}
+        defaultAspect="circle"
+        onCancel={() => setPendingAvatarFile(null)}
+        onConfirm={(croppedFile) => {
+          setPendingAvatarFile(null);
+          uploadCroppedAvatar(croppedFile);
+        }}
+      />
 
       <div>
         <label

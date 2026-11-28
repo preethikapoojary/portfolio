@@ -3,18 +3,19 @@ import { useState } from 'react';
 import { FiFolder, FiTrash2, FiUpload } from 'react-icons/fi';
 import axiosClient from '@/lib/adminApi/axiosClient';
 import AssetPickerModal from './AssetPickerModal';
+import ImageCropModal from '@/components/common/ImageCropModal';
 
 /**
  * Image field with live preview, manual path/URL input, Clear, /public/assets
- * picker modal, and direct upload to POST /admin/upload/image.
+ * picker modal, interactive crop & preview, and direct upload to POST /admin/upload/image.
  */
-export default function ImageUploader({ value, onChange, folder = 'portfolio/images' }) {
+export default function ImageUploader({ value, onChange, folder = 'portfolio/images', isAvatar = false }) {
   const [uploading, setUploading] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [pendingFile, setPendingFile] = useState(null);
   const [error, setError] = useState('');
 
-  const handleFile = async (e) => {
-    const file = e.target.files?.[0];
+  const uploadFile = async (file) => {
     if (!file) return;
     setUploading(true);
     setError('');
@@ -30,12 +31,19 @@ export default function ImageUploader({ value, onChange, folder = 'portfolio/ima
       setError('Upload failed. Please try again.');
     } finally {
       setUploading(false);
-      e.target.value = '';
     }
+  };
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setPendingFile(file);
   };
 
   const currentUrl = value?.url || '';
   const isCertificateFolder = /certificate/i.test(folder);
+  const useCirclePreview = isAvatar || /profile|avatar/i.test(folder);
 
   return (
     <div className="space-y-2.5">
@@ -44,10 +52,16 @@ export default function ImageUploader({ value, onChange, folder = 'portfolio/ima
           <img
             src={currentUrl}
             alt={value?.alt || ''}
-            className="h-11 w-11 shrink-0 rounded border border-[#DCD9D1] object-cover"
+            className={`h-11 w-11 shrink-0 border border-[#DCD9D1] object-cover ${
+              useCirclePreview ? 'rounded-full' : 'rounded'
+            }`}
           />
         ) : (
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded border border-dashed border-[#DCD9D1] bg-[#E9E5DC]/30 text-[10px] text-[#89877F]">
+          <div
+            className={`flex h-11 w-11 shrink-0 items-center justify-center border border-dashed border-[#DCD9D1] bg-[#E9E5DC]/30 text-[10px] text-[#89877F] ${
+              useCirclePreview ? 'rounded-full' : 'rounded'
+            }`}
+          >
             No img
           </div>
         )}
@@ -111,6 +125,16 @@ export default function ImageUploader({ value, onChange, folder = 'portfolio/ima
         onSelect={(assetPath) =>
           onChange({ url: assetPath, publicId: null, alt: value?.alt || '' })
         }
+      />
+
+      <ImageCropModal
+        file={pendingFile}
+        defaultAspect={useCirclePreview ? 'circle' : isCertificateFolder ? 'original' : '16:10'}
+        onCancel={() => setPendingFile(null)}
+        onConfirm={(croppedFile) => {
+          setPendingFile(null);
+          uploadFile(croppedFile);
+        }}
       />
     </div>
   );

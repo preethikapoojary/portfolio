@@ -207,6 +207,7 @@ function renderField(field, values, set) {
           value={value}
           onChange={(media) => set(field.key, media)}
           folder={field.folder || 'portfolio/images'}
+          isAvatar={field.key === 'avatar'}
         />
       );
 
