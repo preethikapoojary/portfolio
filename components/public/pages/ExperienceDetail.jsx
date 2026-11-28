@@ -7,6 +7,7 @@ import { FiArrowLeft, FiExternalLink, FiFileText, FiGithub } from 'react-icons/f
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import Lightbox from '@/components/public/common/Lightbox';
+import ShareMenu from '@/components/public/common/ShareMenu';
 import { getExperienceCoverUrl } from '@/utils/experience';
 import { formatDateRange } from '@/utils/date';
 
@@ -46,7 +47,13 @@ export default function ExperienceDetail() {
           {exp.role}
         </h1>
 
-        <p className="mt-2 text-lg text-[#85806D]">{exp.company}</p>
+        <div className="mt-3 flex items-center justify-between gap-4">
+          <p className="text-lg text-[#85806D]">{exp.company}</p>
+          <ShareMenu
+            path={`/experience/${exp.slug || exp._id}`}
+            title={`${exp.role}${exp.company ? ` — ${exp.company}` : ''}`}
+          />
+        </div>
       </header>
 
       <div className="space-y-10 py-10">
