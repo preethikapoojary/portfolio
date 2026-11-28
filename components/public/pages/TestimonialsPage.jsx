@@ -269,6 +269,8 @@ export default function TestimonialsPage() {
         <Turnstile
           siteKey={turnstileSiteKey}
           onSuccess={(token) => setTurnstileToken(token)}
+          onExpire={() => setTurnstileToken('')}
+          onError={() => setTurnstileToken('')}
         />
       )}
 

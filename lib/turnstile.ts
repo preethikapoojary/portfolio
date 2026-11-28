@@ -3,7 +3,11 @@ export async function verifyTurnstileToken(
   remoteIp?: string
 ): Promise<{ ok: boolean; message?: string }> {
   const secret = process.env.TURNSTILE_SECRET_KEY?.trim();
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
   if (!secret) {
+    if (siteKey) {
+      return { ok: false, message: "Turnstile verification is not configured on the server." };
+    }
     return { ok: true };
   }
 

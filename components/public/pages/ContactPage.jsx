@@ -170,6 +170,8 @@ export default function ContactPage() {
                 <Turnstile
                   siteKey={turnstileSiteKey}
                   onSuccess={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken('')}
+                  onError={() => setTurnstileToken('')}
                 />
               )}
 
