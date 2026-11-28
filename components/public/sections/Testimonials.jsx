@@ -65,10 +65,8 @@ export default function Testimonials() {
                     )}
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-[#22221F]">{t.name}</p>
-                      {(t.role || t.company) && (
-                        <p className="truncate text-xs text-[#89877F]">
-                          {[t.role, t.company].filter(Boolean).join(', ')}
-                        </p>
+                      {t.role && (
+                        <p className="truncate text-xs text-[#89877F]">{t.role}</p>
                       )}
                     </div>
                   </Link>

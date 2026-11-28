@@ -96,8 +96,12 @@ export default function TestimonialsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!form.name.trim() || !form.message.trim()) {
-      setError('Full name and testimonial message are required.');
+    if (!form.name.trim() || !form.role.trim() || !form.message.trim()) {
+      setError('Full name, role, and testimonial message are required.');
+      return;
+    }
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      setError('Please enter a valid email address.');
       return;
     }
     const linkedin = form.linkedinUrl.trim();
@@ -233,6 +237,24 @@ export default function TestimonialsPage() {
           value={form.role}
           onChange={(e) => setForm({ ...form, role: e.target.value })}
           placeholder="e.g., Peer, ISE'28, NMAMIT or Software Engineer at XYZ"
+          className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="t-email"
+          className="mb-1.5 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]"
+        >
+          Email *
+        </label>
+        <input
+          id="t-email"
+          type="email"
+          required
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          placeholder="you@example.com"
           className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
         />
       </div>
@@ -379,10 +401,8 @@ export default function TestimonialsPage() {
 
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-[#22221F]">{item.name}</p>
-                    {(item.role || item.company) && (
-                      <p className="truncate text-xs text-[#89877F]">
-                        {[item.role, item.company].filter(Boolean).join(', ')}
-                      </p>
+                    {item.role && (
+                      <p className="truncate text-xs text-[#89877F]">{item.role}</p>
                     )}
                   </div>
                 </Link>

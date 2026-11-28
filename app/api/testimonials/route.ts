@@ -42,7 +42,6 @@ export async function POST(req: Request) {
     const {
       name,
       role = "",
-      company = "",
       email = "",
       linkedinUrl = "",
       githubUrl = "",
@@ -52,8 +51,11 @@ export async function POST(req: Request) {
       turnstileToken,
     } = body;
 
-    if (!name?.trim() || !message?.trim()) {
-      return fail("Name and message are required", 400);
+    if (!name?.trim() || !role?.trim() || !message?.trim()) {
+      return fail("Name, role, and message are required", 400);
+    }
+    if (!email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return fail("A valid email address is required", 400);
     }
     if (!/^https:\/\/(www\.)?linkedin\.com\/in\/[^/\s]+/i.test(linkedinUrl.trim())) {
       return fail("A valid LinkedIn profile URL (https://www.linkedin.com/in/...) is required", 400);
@@ -79,7 +81,6 @@ export async function POST(req: Request) {
         name: name.trim(),
         slug: resolvedSlug.slug,
         role: role.trim(),
-        company: company.trim(),
         email: email.trim(),
         linkedin_url: linkedinUrl.trim(),
         github_url: githubUrl.trim(),

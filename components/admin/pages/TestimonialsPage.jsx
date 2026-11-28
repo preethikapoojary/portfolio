@@ -17,7 +17,6 @@ const editFields = [
   { key: 'name', label: 'Full Name', type: 'text' },
   { key: 'slug', label: 'Slug (auto-generated from name)', type: 'text' },
   { key: 'role', label: 'Role / Designation', type: 'text' },
-  { key: 'company', label: 'Company / College', type: 'text' },
   { key: 'email', label: 'Email', type: 'text' },
   { key: 'linkedinUrl', label: 'LinkedIn URL', type: 'text' },
   { key: 'linkedinVerified', label: 'Verified LinkedIn Link (show on public site)', type: 'checkbox' },
@@ -112,10 +111,8 @@ export default function TestimonialsPage() {
                   )}
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-[#22221F]">{t.name}</p>
-                    {(t.role || t.company) && (
-                      <p className="text-xs text-muted">
-                        {t.role} {t.company ? `· ${t.company}` : ''}
-                      </p>
+                    {t.role && (
+                      <p className="text-xs text-muted">{t.role}</p>
                     )}
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       <span className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLES[t.status]}`}>{t.status}</span>

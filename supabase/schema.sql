@@ -176,7 +176,6 @@ create table if not exists public.testimonials (
   name text not null,
   slug text not null unique,
   role text not null default '',
-  company text not null default '',
   email text not null default '',
   linkedin_url text not null default '',
   github_url text not null default '',
