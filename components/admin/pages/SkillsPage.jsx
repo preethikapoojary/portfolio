@@ -3,16 +3,6 @@ import { useEffect, useMemo, useState } from 'react';
 import CrudModulePage from '@/components/admin/ui/CrudModulePage';
 import { skillsApi } from '@/lib/adminApi/endpoints';
 
-const DEFAULT_CATEGORIES = [
-  'General',
-  'Programming Languages',
-  'AI / ML & Data',
-  'Frontend',
-  'Backend',
-  'Databases',
-  'Tools & Platforms',
-];
-
 const ADD_NEW_OPTION = '__add_new_category__';
 
 function SkillCategorySelect({ value, onChange, categories, onAddCategory }) {
@@ -38,7 +28,7 @@ function SkillCategorySelect({ value, onChange, categories, onAddCategory }) {
     <div className="space-y-2">
       <select
         className="input"
-        value={adding ? ADD_NEW_OPTION : value || 'General'}
+        value={adding ? ADD_NEW_OPTION : value || ''}
         onChange={(e) => {
           if (e.target.value === ADD_NEW_OPTION) {
             setAdding(true);
@@ -49,6 +39,11 @@ function SkillCategorySelect({ value, onChange, categories, onAddCategory }) {
           }
         }}
       >
+        {options.length === 0 && (
+          <option value="" disabled>
+            Select or add a category…
+          </option>
+        )}
         {options.map((cat) => (
           <option key={cat} value={cat}>
             {cat}
@@ -98,7 +93,7 @@ const columns = [
 ];
 
 export default function SkillsPage() {
-  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     skillsApi
@@ -141,7 +136,7 @@ export default function SkillsPage() {
       api={skillsApi}
       columns={columns}
       fields={fields}
-      emptyValues={{ name: '', category: 'General', proficiency: 80, icon: '' }}
+      emptyValues={{ name: '', category: categories[0] || '', proficiency: 80, icon: '' }}
     />
   );
 }
