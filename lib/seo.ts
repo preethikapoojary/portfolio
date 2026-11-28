@@ -79,3 +79,21 @@ export function buildShareMetadata({
     },
   };
 }
+
+export async function buildPageMetadata({
+  title,
+  description,
+  path,
+}: {
+  title: string;
+  description: string;
+  path: string;
+}): Promise<Metadata> {
+  const profile = await getSiteProfileSeo();
+  return buildShareMetadata({
+    title,
+    description,
+    path,
+    imageUrl: profile.imageUrl,
+  });
+}
