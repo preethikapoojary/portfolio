@@ -66,6 +66,33 @@ export async function handlePublicList(config: CrudConfig) {
   }
 }
 
+export function matchesSearch(item: any, rawQuery: string): boolean {
+  const q = rawQuery.trim().toLowerCase();
+  if (!q) return true;
+  const candidates = [
+    item?.title,
+    item?.name,
+    item?.role,
+    item?.company,
+    item?.issuer,
+    item?.category,
+    item?.institution,
+    item?.degree,
+    item?.fieldOfStudy,
+    item?.platform,
+    item?.username,
+    item?.slug,
+    item?.status,
+    item?.location,
+    item?.shortDescription,
+    item?.description,
+    item?.excerpt,
+    ...(Array.isArray(item?.technologies) ? item.technologies : []),
+    ...(Array.isArray(item?.tags) ? item.tags : []),
+  ];
+  return candidates.some((v) => typeof v === "string" && v.toLowerCase().includes(q));
+}
+
 export async function handleAdminList(req: Request, config: CrudConfig) {
   if (config.jsonColumn) {
     return handleJsonAdminList(req, {
@@ -79,6 +106,7 @@ export async function handleAdminList(req: Request, config: CrudConfig) {
   if (!admin) return unauthorizedResponse();
 
   try {
+    const search = new URL(req.url).searchParams.get("search") || "";
     const supabase = getServiceSupabase();
     let query = supabase.from(config.table).select("*").eq("is_archived", false);
 
@@ -96,7 +124,8 @@ export async function handleAdminList(req: Request, config: CrudConfig) {
 
     const { data, error } = await query;
     if (error) return fail(error.message, 500);
-    return ok(rowsToCamel(data));
+    const items = rowsToCamel(data).filter((item) => matchesSearch(item, search));
+    return ok(items);
   } catch (err: any) {
     return fail(err.message || "Failed to fetch items", 500);
   }

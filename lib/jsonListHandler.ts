@@ -7,6 +7,7 @@ import {
   fail,
   logAdminActivity,
 } from "@/lib/adminAuth";
+import { matchesSearch } from "@/lib/crudHandler";
 
 export interface JsonListConfig {
   table: string;
@@ -50,9 +51,13 @@ export async function handleJsonAdminList(req: Request, config: JsonListConfig) 
   if (!admin) return unauthorizedResponse();
 
   try {
+    const search = new URL(req.url).searchParams.get("search") || "";
     const { row } = await getSingletonRow(config.table);
     const items = Array.isArray(row[config.column]) ? row[config.column] : [];
-    return ok(sortItems(items.filter((item: any) => !item?.isArchived)));
+    const filtered = items
+      .filter((item: any) => !item?.isArchived)
+      .filter((item: any) => matchesSearch(item, search));
+    return ok(sortItems(filtered));
   } catch (err: any) {
     return fail(err.message || "Failed to fetch items", 500);
   }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FiArrowLeft, FiArrowRight, FiDownload, FiExternalLink } from 'react-icons/fi';
+import { FiArrowLeft, FiDownload, FiExternalLink } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
@@ -147,7 +147,7 @@ export default function CertificateDetail({ slug }) {
 
       <div className="mt-12 text-center">
         <Link href="/certificates" className="editorial-link text-base">
-          All Certificates <FiArrowRight size={15} />
+          <FiArrowLeft size={15} /> All Certificates
         </Link>
       </div>
 
