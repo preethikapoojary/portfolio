@@ -2,6 +2,8 @@
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
 import CrudModulePage from '@/components/admin/ui/CrudModulePage';
 import { experienceApi } from '@/lib/adminApi/endpoints';
+import { getExperienceCoverMedia } from '@/utils/experience';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 
 /* ---------- Related Projects inline editor ---------- */
 const emptyProject = { name: '', description: '', githubUrl: '', liveDemoUrl: '' };
@@ -120,16 +122,21 @@ const columns = [
   {
     key: 'thumb',
     label: '',
-    render: (row) =>
-      row.coverImage?.url || row.certificate?.url || row.proofFile?.url ? (
-        <img
-          src={row.coverImage?.url || row.certificate?.url || row.proofFile?.url}
-          alt=""
-          className="h-10 w-14 rounded object-cover"
-        />
+    render: (row) => {
+      const media = getExperienceCoverMedia(row);
+      return media?.url ? (
+        <div className="h-10 w-14 overflow-hidden rounded">
+          <img
+            src={media.url}
+            alt=""
+            style={getCroppedImageStyle(media)}
+            className="h-full w-full object-cover"
+          />
+        </div>
       ) : (
         <div className="h-10 w-14 rounded bg-slate-100" />
-      ),
+      );
+    },
   },
   { key: 'role', label: 'Role' },
   { key: 'company', label: 'Company' },
