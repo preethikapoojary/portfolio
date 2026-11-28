@@ -1,58 +1,72 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import PublicShell from "@/components/public/PublicShell";
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_TITLE,
+  getSiteProfileSeo,
+  SITE_URL,
+} from "@/lib/seo";
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_APP_URL || "https://preethika-poojary.netlify.app";
+export async function generateMetadata(): Promise<Metadata> {
+  const profile = await getSiteProfileSeo();
+  const previewImage = profile.imageUrl;
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: "Preethika Poojary — Portfolio",
-    template: "%s | Preethika Poojary",
-  },
-  description:
-    "Personal portfolio of Preethika Poojary — Information Science & Engineering student at NMAMIT, aspiring Software Engineer, and AI/ML & Full-Stack enthusiast.",
-  keywords: [
-    "Preethika Poojary",
-    "Software Engineer",
-    "Information Science and Engineering",
-    "NMAMIT",
-    "AI ML Portfolio",
-    "Full-Stack Developer",
-  ],
-  authors: [{ name: "Preethika Poojary", url: siteUrl }],
-  creator: "Preethika Poojary",
-  icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    shortcut: "/icon.svg",
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: siteUrl,
-    siteName: "Preethika Poojary — Portfolio",
-    title: "Preethika Poojary — Portfolio",
-    description:
-      "Information Science & Engineering student, aspiring Software Engineer, and AI/ML & Full-Stack enthusiast.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Preethika Poojary — Portfolio",
-    description:
-      "Information Science & Engineering student, aspiring Software Engineer, and AI/ML & Full-Stack enthusiast.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: DEFAULT_TITLE,
+      template: "%s | Preethika Poojary",
+    },
+    description: DEFAULT_DESCRIPTION,
+    keywords: [
+      "Preethika Poojary",
+      "Software Engineer",
+      "Information Science and Engineering",
+      "NMAMIT",
+      "AI ML Portfolio",
+      "Full-Stack Developer",
+    ],
+    authors: [{ name: "Preethika Poojary", url: SITE_URL }],
+    creator: "Preethika Poojary",
+    icons: {
+      icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+      shortcut: "/icon.svg",
+    },
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      url: SITE_URL,
+      siteName: DEFAULT_TITLE,
+      title: DEFAULT_TITLE,
+      description: profile.description || DEFAULT_DESCRIPTION,
+      images: [
+        {
+          url: previewImage,
+          width: 1200,
+          height: 630,
+          alt: "Preethika Poojary — Portfolio",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: DEFAULT_TITLE,
+      description: profile.description || DEFAULT_DESCRIPTION,
+      images: [previewImage],
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
-};
+  };
+}
 
 export default function RootLayout({
   children,
