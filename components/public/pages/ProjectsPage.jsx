@@ -25,7 +25,7 @@ export default function ProjectsPage() {
     <div className="mx-auto max-w-6xl px-6 pb-20 sm:px-8">
       <PageHeader
         eyebrow="Selected Work"
-        title="Projects & Case Studies"
+        title={!loading && projects ? `My Projects (${filtered.length})` : 'My Projects'}
         description="A collection of machine learning systems, database applications, and software engineering projects."
       />
 

@@ -30,7 +30,7 @@ export default function ExperiencePage() {
     <div className="mx-auto max-w-6xl px-6 pb-20 sm:px-8">
       <PageHeader
         eyebrow="Experience & Recognition"
-        title="Professional Journey & Milestones"
+        title="My Experience"
         description="Internships, hackathons, research presentations, and academic accomplishments."
       />
 

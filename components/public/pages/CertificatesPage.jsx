@@ -29,7 +29,7 @@ export default function CertificatesPage() {
     <div className="mx-auto max-w-6xl px-6 pb-20 sm:px-8">
       <PageHeader
         eyebrow="Credentials"
-        title="Certificates"
+        title={!loading && items ? `Certificates (${items.length})` : 'Certificates'}
         description="Verified coursework, technical specializations, and workshop credentials."
       />
 
