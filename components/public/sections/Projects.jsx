@@ -10,7 +10,13 @@ export default function Projects() {
   const { data: projects, loading } = useFetch(() => api.getProjects(), []);
   if (loading || !projects?.length) return null;
 
-  const featured = projects.slice(0, 3);
+  const hasHomeOrder = projects.some((p) => p.homeOrder !== null && p.homeOrder !== undefined);
+  const featured = hasHomeOrder
+    ? [...projects]
+        .filter((p) => p.homeOrder !== null && p.homeOrder !== undefined)
+        .sort((a, b) => a.homeOrder - b.homeOrder)
+        .slice(0, 6)
+    : projects.slice(0, 3);
 
   return (
     <section

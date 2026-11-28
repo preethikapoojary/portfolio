@@ -37,7 +37,7 @@ export default function MessagesPage() {
 
   const remove = async (msg, e) => {
     e.stopPropagation();
-    if (!window.confirm('Delete this message?')) return;
+    if (!window.confirm('Are you sure you want to move this message to Trash?')) return;
     await messagesApi.remove(msg._id);
     load();
   };

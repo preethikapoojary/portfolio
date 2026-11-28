@@ -308,6 +308,14 @@ alter table public.certificates
   add column if not exists gallery_heading text not null default '',
   add column if not exists event_photos jsonb not null default '[]'::jsonb;
 
+-- 13. Projects and Testimonials sort order and home_order
+alter table public.projects
+  add column if not exists home_order integer check (home_order is null or home_order >= 0);
+
+alter table public.testimonials
+  add column if not exists "order" integer not null default 0 check ("order" >= 0),
+  add column if not exists home_order integer check (home_order is null or home_order >= 0);
+
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;

@@ -21,6 +21,8 @@ const editFields = [
   { key: 'linkedinUrl', label: 'LinkedIn URL', type: 'text' },
   { key: 'githubUrl', label: 'GitHub URL', type: 'text' },
   { key: 'message', label: 'Testimonial', type: 'textarea', rows: 4 },
+  { key: 'order', label: 'Sort Order (Testimonials Page)', type: 'number', min: 1 },
+  { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 1 },
 ];
 
 export default function TestimonialsPage() {
@@ -45,7 +47,7 @@ export default function TestimonialsPage() {
   const reject = async (id) => { await testimonialsApi.reject(id); load(); };
   const toggleVisibility = async (id) => { await testimonialsApi.toggleVisibility(id); load(); };
   const remove = async (id) => {
-    if (!window.confirm('Delete this testimonial? This cannot be undone.')) return;
+    if (!window.confirm('Are you sure you want to move this testimonial to Trash?')) return;
     await testimonialsApi.remove(id);
     load();
   };
@@ -107,6 +109,12 @@ export default function TestimonialsPage() {
                   <p className="font-medium">{t.name}</p>
                   <span className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLES[t.status]}`}>{t.status}</span>
                   {!t.isVisible && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-muted">Hidden</span>}
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-muted">Order: {t.order ?? 0}</span>
+                  {t.homeOrder !== null && t.homeOrder !== undefined && (
+                    <span className="rounded-full bg-[#E9E5DC] px-2 py-0.5 text-xs font-medium text-[#22221F]">
+                      Home #{t.homeOrder}
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-muted">
                   {t.role} {t.company ? `· ${t.company}` : ''}

@@ -15,6 +15,8 @@ const fields = [
   { key: 'liveDemoUrl', label: 'Live Demo URL', type: 'text' },
   { key: 'videoUrl', label: 'Video URL', type: 'text' },
   { key: 'reportPdf', label: 'Project Report PDF (optional)', type: 'pdf' },
+  { key: 'order', label: 'Sort Order (Projects Page)', type: 'number', min: 1 },
+  { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 1 },
   { key: 'isFeatured', label: 'Featured project', type: 'checkbox' },
 ];
 
@@ -31,6 +33,12 @@ const columns = [
   },
   { key: 'title', label: 'Title' },
   { key: 'category', label: 'Category' },
+  { key: 'order', label: 'Order', render: (row) => row.order ?? 0 },
+  {
+    key: 'homeOrder',
+    label: 'Home',
+    render: (row) => (row.homeOrder !== null && row.homeOrder !== undefined ? `#${row.homeOrder}` : '—'),
+  },
   { key: 'isFeatured', label: 'Featured', render: (row) => (row.isFeatured ? '★' : '') },
 ];
 
@@ -56,6 +64,8 @@ export default function ProjectsPage() {
         liveDemoUrl: '',
         videoUrl: '',
         reportPdf: null,
+        order: 1,
+        homeOrder: '',
         isFeatured: false,
       }}
     />

@@ -19,6 +19,7 @@ export async function GET(req: Request) {
     .from("testimonials")
     .select("*")
     .eq("is_archived", false)
+    .order("order", { ascending: true })
     .order("created_at", { ascending: false });
 
   if (status && ["pending", "approved", "rejected"].includes(status)) {

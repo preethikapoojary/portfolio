@@ -38,7 +38,7 @@ export default function ResumePage() {
   };
 
   const remove = async (id) => {
-    if (!window.confirm('Delete this resume version?')) return;
+    if (!window.confirm('Are you sure you want to move this resume version to Trash?')) return;
     try {
       await resumeApi.remove(id);
       await load();

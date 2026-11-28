@@ -12,6 +12,13 @@ export default function Testimonials() {
   if (loading) return null;
 
   const approved = items || [];
+  const hasHomeOrder = approved.some((t) => t.homeOrder !== null && t.homeOrder !== undefined);
+  const homeItems = hasHomeOrder
+    ? [...approved]
+        .filter((t) => t.homeOrder !== null && t.homeOrder !== undefined)
+        .sort((a, b) => a.homeOrder - b.homeOrder)
+        .slice(0, 6)
+    : approved.slice(0, 4);
 
   return (
     <section
@@ -28,9 +35,9 @@ export default function Testimonials() {
           </p>
         </div>
 
-        {approved.length > 0 ? (
+        {homeItems.length > 0 ? (
           <div className="grid gap-8 md:grid-cols-2">
-            {approved.slice(0, 4).map((t) => {
+            {homeItems.map((t) => {
               const itemPath = `/testimonials-${t.slug || t._id}`;
               return (
               <blockquote

@@ -76,7 +76,7 @@ export default function CrudModulePage({
   };
 
   const remove = async (row) => {
-    if (!window.confirm('Delete this item? This cannot be undone.')) return;
+    if (!window.confirm('Are you sure you want to move this item to Trash?')) return;
     await api.remove(row._id);
     await load(meta.page);
   };
