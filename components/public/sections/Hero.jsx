@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FiArrowRight, FiDownload, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 import { useSettings } from '@/context/SettingsContext';
 import { getNonEmailSocialLinks } from '@/utils/socialLinks';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 import api from '@/api/endpoints';
 
 export default function Hero() {
@@ -108,11 +109,14 @@ export default function Hero() {
         {profile?.profilePhoto?.url && (
           <div className="lg:col-span-5">
             <div className="mx-auto max-w-md border border-[#DCD9D1] bg-[#E9E5DC]/40 p-3 lg:ml-auto lg:mr-0">
-              <img
-                src={profile.profilePhoto.url}
-                alt={profile.name || 'Preethika Poojary'}
-                className="aspect-[4/5] w-full object-cover object-top"
-              />
+              <div className="aspect-[4/5] w-full overflow-hidden">
+                <img
+                  src={profile.profilePhoto.url}
+                  alt={profile.name || 'Preethika Poojary'}
+                  style={getCroppedImageStyle(profile.profilePhoto)}
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
             </div>
           </div>
         )}

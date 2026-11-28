@@ -5,6 +5,7 @@ import { FiArrowRight, FiGithub } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 
 export default function Projects() {
   const { data: projects, loading } = useFetch(() => api.getProjects(), []);
@@ -72,6 +73,7 @@ export default function Projects() {
                       <img
                         src={project.coverImage.url}
                         alt={project.title}
+                        style={getCroppedImageStyle(project.coverImage)}
                         className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       />
                     ) : (
@@ -135,6 +137,7 @@ export default function Projects() {
                       <img
                         src={project.coverImage.url}
                         alt={project.title}
+                        style={getCroppedImageStyle(project.coverImage)}
                         className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       />
                     ) : (

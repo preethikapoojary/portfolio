@@ -6,6 +6,7 @@ import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
 import { downloadTestimonialImage } from '@/utils/downloadTestimonialImage';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 
 export default function Testimonials() {
   const { data: items, loading } = useFetch(api.getApprovedTestimonials, []);
@@ -52,11 +53,14 @@ export default function Testimonials() {
                 <footer className="mt-6 flex items-center justify-between gap-3 border-t border-[#DCD9D1] pt-4">
                   <Link href={itemPath} className="flex min-w-0 flex-1 items-center gap-3">
                     {t.avatar?.url && (
-                      <img
-                        src={t.avatar.url}
-                        alt={t.name}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                        <img
+                          src={t.avatar.url}
+                          alt={t.name}
+                          style={getCroppedImageStyle(t.avatar)}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
                     )}
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-[#22221F]">{t.name}</p>

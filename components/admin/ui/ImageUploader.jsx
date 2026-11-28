@@ -1,21 +1,23 @@
 'use client';
 import { useState } from 'react';
-import { FiFolder, FiTrash2, FiUpload } from 'react-icons/fi';
+import { FiCrop, FiFolder, FiTrash2, FiUpload } from 'react-icons/fi';
 import axiosClient from '@/lib/adminApi/axiosClient';
 import AssetPickerModal from './AssetPickerModal';
 import ImageCropModal from '@/components/common/ImageCropModal';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 
 /**
  * Image field with live preview, manual path/URL input, Clear, /public/assets
- * picker modal, interactive crop & preview, and direct upload to POST /admin/upload/image.
+ * picker modal, interactive non-destructive crop & preview, and direct upload.
  */
 export default function ImageUploader({ value, onChange, folder = 'portfolio/images', isAvatar = false }) {
   const [uploading, setUploading] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pendingFile, setPendingFile] = useState(null);
+  const [recropOpen, setRecropOpen] = useState(false);
   const [error, setError] = useState('');
 
-  const uploadFile = async (file) => {
+  const uploadFile = async (file, crop) => {
     if (!file) return;
     setUploading(true);
     setError('');
@@ -26,7 +28,7 @@ export default function ImageUploader({ value, onChange, folder = 'portfolio/ima
       const res = await axiosClient.post('/admin/upload/image', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      onChange({ ...res.data.data, alt: value?.alt || '' });
+      onChange({ ...res.data.data, alt: value?.alt || '', ...(crop ? { crop } : {}) });
     } catch {
       setError('Upload failed. Please try again.');
     } finally {
@@ -49,13 +51,18 @@ export default function ImageUploader({ value, onChange, folder = 'portfolio/ima
     <div className="space-y-2.5">
       <div className="flex flex-wrap items-center gap-2.5">
         {currentUrl ? (
-          <img
-            src={currentUrl}
-            alt={value?.alt || ''}
-            className={`h-11 w-11 shrink-0 border border-[#DCD9D1] object-cover ${
+          <div
+            className={`h-11 w-11 shrink-0 overflow-hidden border border-[#DCD9D1] ${
               useCirclePreview ? 'rounded-full' : 'rounded'
             }`}
-          />
+          >
+            <img
+              src={currentUrl}
+              alt={value?.alt || ''}
+              style={getCroppedImageStyle(value)}
+              className="h-full w-full object-cover"
+            />
+          </div>
         ) : (
           <div
             className={`flex h-11 w-11 shrink-0 items-center justify-center border border-dashed border-[#DCD9D1] bg-[#E9E5DC]/30 text-[10px] text-[#89877F] ${
@@ -78,13 +85,22 @@ export default function ImageUploader({ value, onChange, folder = 'portfolio/ima
         />
 
         {currentUrl && (
-          <button
-            type="button"
-            onClick={() => onChange(null)}
-            className="inline-flex items-center gap-1.5 border border-red-200 px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
-          >
-            <FiTrash2 size={13} /> Clear
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => setRecropOpen(true)}
+              className="btn-secondary inline-flex items-center gap-1.5 text-xs"
+            >
+              <FiCrop size={13} /> Crop
+            </button>
+            <button
+              type="button"
+              onClick={() => onChange(null)}
+              className="inline-flex items-center gap-1.5 border border-red-200 px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+            >
+              <FiTrash2 size={13} /> Clear
+            </button>
+          </>
         )}
 
         <button
@@ -129,11 +145,21 @@ export default function ImageUploader({ value, onChange, folder = 'portfolio/ima
 
       <ImageCropModal
         file={pendingFile}
+        srcUrl={recropOpen ? currentUrl : ''}
+        initialCrop={recropOpen ? value?.crop || null : null}
         defaultAspect={useCirclePreview ? 'circle' : isCertificateFolder ? 'original' : '16:10'}
-        onCancel={() => setPendingFile(null)}
-        onConfirm={(croppedFile) => {
+        onCancel={() => {
           setPendingFile(null);
-          uploadFile(croppedFile);
+          setRecropOpen(false);
+        }}
+        onConfirm={({ file, crop }) => {
+          if (file) {
+            setPendingFile(null);
+            uploadFile(file, crop);
+          } else if (recropOpen && value) {
+            setRecropOpen(false);
+            onChange({ ...value, crop: crop || undefined });
+          }
         }}
       />
     </div>

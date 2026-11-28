@@ -7,6 +7,7 @@ import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import PageHeader from '@/components/public/common/PageHeader';
 import ShareMenu from '@/components/public/common/ShareMenu';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 
 export default function ProjectsPage() {
   const { data: projects, loading } = useFetch(() => api.getProjects(), []);
@@ -66,6 +67,7 @@ export default function ProjectsPage() {
                     <img
                       src={project.coverImage.url}
                       alt={project.title}
+                      style={getCroppedImageStyle(project.coverImage)}
                       className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                     />
                   ) : (
@@ -97,6 +99,7 @@ export default function ProjectsPage() {
                     <img
                       src={project.coverImage.url}
                       alt={project.title}
+                      style={getCroppedImageStyle(project.coverImage)}
                       className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                     />
                   ) : (

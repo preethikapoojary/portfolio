@@ -220,9 +220,9 @@ export default function RichTextEditor({ value, onChange }) {
         file={pendingFile}
         defaultAspect="original"
         onCancel={() => setPendingFile(null)}
-        onConfirm={(croppedFile) => {
+        onConfirm={({ file }) => {
           setPendingFile(null);
-          uploadAndInsertImage(croppedFile);
+          uploadAndInsertImage(file);
         }}
       />
     </div>

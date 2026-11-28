@@ -6,6 +6,7 @@ import { useSettings } from '@/context/SettingsContext';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import PageHeader from '@/components/public/common/PageHeader';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 
 function formatYearRange(start, end) {
   const y = (d) => (d ? new Date(d).getFullYear() : '');
@@ -41,11 +42,14 @@ export default function AboutPage() {
         {profile?.profilePhoto?.url && (
           <div className="lg:col-span-4">
             <div className="border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2.5">
-              <img
-                src={profile.profilePhoto.url}
-                alt={profile.name || 'Preethika Poojary'}
-                className="aspect-[4/5] w-full object-cover object-top"
-              />
+              <div className="aspect-[4/5] w-full overflow-hidden">
+                <img
+                  src={profile.profilePhoto.url}
+                  alt={profile.name || 'Preethika Poojary'}
+                  style={getCroppedImageStyle(profile.profilePhoto)}
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
             </div>
           </div>
         )}

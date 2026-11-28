@@ -14,35 +14,37 @@ const ASPECT_OPTIONS = [
 
 export default function ImageCropModal({
   file,
+  srcUrl = '',
+  initialCrop = null,
   defaultAspect = 'original',
   onCancel,
   onConfirm,
 }) {
-  const [imageUrl, setImageUrl] = useState('');
+  const [objectUrl, setObjectUrl] = useState('');
   const [natural, setNatural] = useState({ w: 0, h: 0 });
-  const [aspectKey, setAspectKey] = useState(defaultAspect);
-  const [zoom, setZoom] = useState(1);
+  const [aspectKey, setAspectKey] = useState(initialCrop?.aspect || defaultAspect);
+  const [zoom, setZoom] = useState(Number(initialCrop?.zoom || 1));
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [processing, setProcessing] = useState(false);
 
-  const imgRef = useRef(null);
   const dragRef = useRef({ active: false, startX: 0, startY: 0, origX: 0, origY: 0 });
 
   useEffect(() => {
-    setAspectKey(defaultAspect);
-    setZoom(1);
+    setAspectKey(initialCrop?.aspect || defaultAspect);
+    setZoom(Number(initialCrop?.zoom || 1));
     setOffset({ x: 0, y: 0 });
-  }, [file, defaultAspect]);
+  }, [file, srcUrl, initialCrop, defaultAspect]);
 
   useEffect(() => {
     if (!file) {
-      setImageUrl('');
+      setObjectUrl('');
       return undefined;
     }
     const url = URL.createObjectURL(file);
-    setImageUrl(url);
+    setObjectUrl(url);
     return () => URL.revokeObjectURL(url);
   }, [file]);
+
+  const previewUrl = objectUrl || srcUrl;
 
   const activeOption = useMemo(
     () => ASPECT_OPTIONS.find((o) => o.key === aspectKey) || ASPECT_OPTIONS[0],
@@ -79,11 +81,17 @@ export default function ImageCropModal({
   };
 
   useEffect(() => {
+    if (initialCrop && box.w && box.h && natural.w && natural.h) {
+      const initX = (Number(initialCrop.tx || 0) / 100) * box.w;
+      const initY = (Number(initialCrop.ty || 0) / 100) * box.h;
+      setOffset(clampOffset(initX, initY, effectiveScale));
+      return;
+    }
     setOffset((prev) => clampOffset(prev.x, prev.y, effectiveScale));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoom, box.w, box.h, natural.w, natural.h]);
 
-  if (!file || !imageUrl) return null;
+  if (!previewUrl) return null;
 
   const onPointerDown = (e) => {
     e.preventDefault();
@@ -108,53 +116,8 @@ export default function ImageCropModal({
     dragRef.current.active = false;
   };
 
-  const handleCropConfirm = async () => {
-    if (!imgRef.current || !natural.w || !natural.h) {
-      onConfirm(file);
-      return;
-    }
-    setProcessing(true);
-    try {
-      const srcW = box.w / effectiveScale;
-      const srcH = box.h / effectiveScale;
-      const srcX = Math.max(0, natural.w / 2 - offset.x / effectiveScale - srcW / 2);
-      const srcY = Math.max(0, natural.h / 2 - offset.y / effectiveScale - srcH / 2);
-
-      const targetW = Math.min(1600, Math.max(600, Math.round(srcW)));
-      const targetH = Math.max(1, Math.round(targetW * (box.h / box.w)));
-
-      const canvas = document.createElement('canvas');
-      canvas.width = targetW;
-      canvas.height = targetH;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        onConfirm(file);
-        return;
-      }
-      ctx.drawImage(
-        imgRef.current,
-        srcX,
-        srcY,
-        Math.min(srcW, natural.w - srcX),
-        Math.min(srcH, natural.h - srcY),
-        0,
-        0,
-        targetW,
-        targetH
-      );
-
-      const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-      const blob = await new Promise((resolve) => canvas.toBlob(resolve, mime, 0.92));
-      if (!blob) {
-        onConfirm(file);
-        return;
-      }
-      const croppedFile = new File([blob], file.name, { type: mime });
-      onConfirm(croppedFile);
-    } finally {
-      setProcessing(false);
-    }
-  };
+  const tx = box.w ? Number(((offset.x / box.w) * 100).toFixed(2)) : 0;
+  const ty = box.h ? Number(((offset.y / box.h) * 100).toFixed(2)) : 0;
 
   return (
     <div
@@ -170,7 +133,7 @@ export default function ImageCropModal({
               Crop &amp; Preview Image
             </h3>
             <p className="text-[11px] text-[#89877F]">
-              Drag to reposition and zoom to frame your image.
+              Original image is uploaded; only the framed area is displayed.
             </p>
           </div>
           <button
@@ -218,8 +181,7 @@ export default function ImageCropModal({
             }`}
           >
             <img
-              ref={imgRef}
-              src={imageUrl}
+              src={previewUrl}
               alt="Crop preview"
               draggable={false}
               onLoad={(e) =>
@@ -229,12 +191,10 @@ export default function ImageCropModal({
                 })
               }
               style={{
-                width: natural.w ? natural.w * effectiveScale : '100%',
-                height: natural.h ? natural.h * effectiveScale : '100%',
-                maxWidth: 'none',
-                transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px)`,
+                transform: `translate(${tx}%, ${ty}%) scale(${zoom})`,
+                transformOrigin: 'center center',
               }}
-              className="pointer-events-none absolute left-1/2 top-1/2 select-none"
+              className="pointer-events-none h-full w-full select-none object-cover"
             />
           </div>
         </div>
@@ -268,20 +228,18 @@ export default function ImageCropModal({
           </button>
           <button
             type="button"
-            onClick={() => onConfirm(file)}
-            disabled={processing}
+            onClick={() => onConfirm({ file, crop: null })}
             className="border border-[#DCD9D1] bg-white px-3 py-1.5 text-xs font-medium text-[#22221F] hover:border-[#22221F]"
           >
-            Use Original
+            Use Uncropped
           </button>
           <button
             type="button"
-            onClick={handleCropConfirm}
-            disabled={processing}
+            onClick={() => onConfirm({ file, crop: { tx, ty, zoom, aspect: aspectKey } })}
             className="inline-flex items-center gap-1.5 border border-[#22221F] bg-[#22221F] px-4 py-1.5 text-xs font-medium text-[#F6F4EF] hover:bg-[#85806D]"
           >
             <FiCheck size={13} />
-            {processing ? 'Processing…' : 'Crop & Upload'}
+            {file ? 'Save Crop & Upload' : 'Save Crop'}
           </button>
         </div>
       </div>

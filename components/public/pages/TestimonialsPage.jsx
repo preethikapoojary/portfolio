@@ -19,6 +19,7 @@ import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
 import ImageCropModal from '@/components/common/ImageCropModal';
 import { downloadTestimonialImage } from '@/utils/downloadTestimonialImage';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -67,13 +68,16 @@ export default function TestimonialsPage() {
     }));
   };
 
-  const uploadCroppedAvatar = async (file) => {
+  const uploadCroppedAvatar = async (file, crop) => {
     if (!file) return;
     setUploadingAvatar(true);
     setError('');
     try {
       const uploaded = await api.uploadTestimonialAvatar(file);
-      setForm((prev) => ({ ...prev, avatar: uploaded }));
+      setForm((prev) => ({
+        ...prev,
+        avatar: uploaded ? { ...uploaded, ...(crop ? { crop } : {}) } : prev.avatar,
+      }));
     } catch {
       setError('Unable to upload photo. Please try an image under 10 MB.');
     } finally {
@@ -180,9 +184,9 @@ export default function TestimonialsPage() {
         file={pendingAvatarFile}
         defaultAspect="circle"
         onCancel={() => setPendingAvatarFile(null)}
-        onConfirm={(croppedFile) => {
+        onConfirm={({ file, crop }) => {
           setPendingAvatarFile(null);
-          uploadCroppedAvatar(croppedFile);
+          uploadCroppedAvatar(file, crop);
         }}
       />
 
@@ -349,11 +353,14 @@ export default function TestimonialsPage() {
               <footer className="mt-6 flex items-center gap-3.5 border-t border-[#DCD9D1] pt-4">
                 <Link href={itemPath} className="flex min-w-0 flex-1 items-center gap-3.5">
                   {item.avatar?.url ? (
-                    <img
-                      src={item.avatar.url}
-                      alt={item.name}
-                      className="h-11 w-11 shrink-0 rounded-full border border-[#DCD9D1] object-cover"
-                    />
+                    <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-[#DCD9D1]">
+                      <img
+                        src={item.avatar.url}
+                        alt={item.name}
+                        style={getCroppedImageStyle(item.avatar)}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
                   ) : (
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#DCD9D1] bg-[#E9E5DC] font-display text-base font-semibold text-[#22221F]">
                       {item.name?.charAt(0)?.toUpperCase() || 'T'}

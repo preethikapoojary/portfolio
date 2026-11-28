@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
-import { getExperienceCoverUrl } from '@/utils/experience';
+import { getExperienceCoverMedia } from '@/utils/experience';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 import { formatDateRange } from '@/utils/date';
 
 function summarizeDescription(text) {
@@ -49,7 +50,8 @@ export default function Experience() {
         {homeItems?.length > 0 && (
           <div className="divide-y divide-[#DCD9D1]">
             {homeItems.map((exp) => {
-              const coverUrl = getExperienceCoverUrl(exp);
+              const coverMedia = getExperienceCoverMedia(exp);
+              const coverUrl = coverMedia?.url || '';
               return (
               <article
                 key={exp._id}
@@ -73,6 +75,7 @@ export default function Experience() {
                       <img
                         src={coverUrl}
                         alt={exp.role}
+                        style={getCroppedImageStyle(coverMedia)}
                         className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       />
                     </Link>
@@ -92,6 +95,7 @@ export default function Experience() {
                       <img
                         src={coverUrl}
                         alt={exp.role}
+                        style={getCroppedImageStyle(coverMedia)}
                         className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       />
                     </Link>
