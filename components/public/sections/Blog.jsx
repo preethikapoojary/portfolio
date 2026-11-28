@@ -12,6 +12,14 @@ export default function Blog() {
   const { data: posts, loading } = useFetch(() => api.getBlogPosts(), []);
   if (loading || !posts?.length) return null;
 
+  const hasHomeOrder = posts.some((p) => p.homeOrder !== null && p.homeOrder !== undefined);
+  const homePosts = hasHomeOrder
+    ? [...posts]
+        .filter((p) => p.homeOrder !== null && p.homeOrder !== undefined)
+        .sort((a, b) => a.homeOrder - b.homeOrder)
+        .slice(0, 6)
+    : posts.slice(0, 3);
+
   return (
     <section
       id="blog"
@@ -28,7 +36,7 @@ export default function Blog() {
         </div>
 
         <div className="divide-y divide-[#DCD9D1]">
-          {posts.slice(0, 3).map((post, index) => {
+          {homePosts.map((post, index) => {
             const num = String(index + 1).padStart(2, '0');
             const imageFirst = index % 2 === 1;
             const detailHref = `/blog/${post.slug}`;

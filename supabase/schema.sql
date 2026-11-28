@@ -165,6 +165,8 @@ create table if not exists public.blog_posts (
   tags text[] not null default '{}',
   seo jsonb not null default '{"metaTitle": "", "metaDescription": "", "ogImage": {"url": null, "publicId": null, "alt": ""}}'::jsonb,
   published_at timestamptz,
+  "order" integer not null default 0 check ("order" >= 0),
+  home_order integer check (home_order is null or home_order >= 0),
   is_archived boolean not null default false,
   archived_at timestamptz,
   created_at timestamptz not null default now(),

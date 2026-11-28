@@ -377,7 +377,7 @@ export default function TestimonialsPage() {
               className="flex flex-col justify-between border border-[#DCD9D1] bg-[#E9E5DC]/25 p-6 transition-colors hover:border-[#85806D]"
             >
               <div className="flex-1">
-                <p className="text-center text-sm italic leading-relaxed text-[#22221F] sm:text-[15px]">
+                <p className="text-base leading-relaxed text-[#22221F] sm:text-lg">
                   “{item.message}”
                 </p>
               </div>

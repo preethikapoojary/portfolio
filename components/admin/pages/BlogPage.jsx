@@ -1,6 +1,7 @@
 'use client';
 import CrudModulePage from '@/components/admin/ui/CrudModulePage';
 import { blogApi } from '@/lib/adminApi/endpoints';
+import { formatCalendarDate } from '@/utils/date';
 
 const fields = [
   { key: 'title', label: 'Title', type: 'text' },
@@ -11,6 +12,8 @@ const fields = [
   { key: 'coverImage', label: 'Cover Image', type: 'image' },
   { key: 'tags', label: 'Tags', type: 'tags' },
   { key: 'status', label: 'Status', type: 'select', options: ['draft', 'published'] },
+  { key: 'order', label: 'Sort Order (Blog Page)', type: 'number', min: 1 },
+  { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 1 },
 ];
 
 const columns = [
@@ -41,7 +44,13 @@ const columns = [
   {
     key: 'publishedAt',
     label: 'Published',
-    render: (row) => (row.publishedAt ? new Date(row.publishedAt).toLocaleDateString() : '—'),
+    render: (row) => (row.publishedAt ? formatCalendarDate(row.publishedAt) : '—'),
+  },
+  { key: 'order', label: 'Order', render: (row) => row.order ?? 0 },
+  {
+    key: 'homeOrder',
+    label: 'Home',
+    render: (row) => (row.homeOrder !== null && row.homeOrder !== undefined ? `#${row.homeOrder}` : '—'),
   },
 ];
 
@@ -53,7 +62,6 @@ export default function BlogPage() {
       api={blogApi}
       columns={columns}
       fields={fields}
-      hasOrder={false}
       wideForm
       emptyValues={{
         title: '',
@@ -64,6 +72,8 @@ export default function BlogPage() {
         coverImage: null,
         tags: [],
         status: 'draft',
+        order: 1,
+        homeOrder: '',
       }}
     />
   );

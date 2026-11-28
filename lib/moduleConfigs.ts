@@ -50,7 +50,7 @@ export const CRUD_CONFIGS: Record<string, CrudConfig> = {
   blog: {
     table: "blog_posts",
     resourceName: "BlogPost",
-    defaultOrder: { column: "created_at", ascending: false },
+    defaultOrder: { column: "order", ascending: true },
     hasSlug: true,
   },
   notes: {
