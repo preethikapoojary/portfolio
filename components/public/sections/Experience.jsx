@@ -50,80 +50,119 @@ export default function Experience() {
         {/* Internships & Roles */}
         {homeItems?.length > 0 && (
           <div className="divide-y divide-[#DCD9D1]">
-            {homeItems.map((exp) => {
+            {homeItems.map((exp, index) => {
               const coverMedia = getExperienceCoverMedia(exp);
               const coverUrl = coverMedia?.url || '';
+              const detailHref = `/experience/${exp.slug || exp._id}`;
+              const num = String(index + 1).padStart(2, '0');
+              const imageFirst = index % 2 === 1;
               return (
               <article
                 key={exp._id}
-                className="grid gap-6 py-8 first:pt-2 last:pb-6 md:grid-cols-12 md:gap-10"
+                className="grid items-center gap-8 py-12 first:pt-2 last:pb-2 lg:grid-cols-12 lg:gap-12"
               >
-                <div className="md:col-span-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#89877F]">
-                    {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
+                <div className={`lg:col-span-6 ${imageFirst ? 'lg:order-2' : 'lg:order-1'}`}>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-[#89877F]">
+                    {num}
                   </p>
-                  <p className="mt-2 text-base font-medium text-[#22221F]">
-                    {exp.company}
-                  </p>
-                  {exp.location && (
-                    <p className="mt-0.5 text-sm text-[#89877F]">{exp.location}</p>
-                  )}
-                  {coverUrl && (
-                    <Link
-                      href={`/experience/${exp.slug || exp._id}`}
-                      className="group mt-4 hidden overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 md:block"
-                    >
-                      <img
-                        src={coverUrl}
-                        alt={exp.role}
-                        style={getCroppedImageStyle(coverMedia)}
-                        className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                      />
-                    </Link>
-                  )}
-                </div>
 
-                <div className="md:col-span-8">
-                  <h3 className="font-display text-3xl font-medium text-[#22221F]">
-                    {exp.role}
-                  </h3>
+                  <Link href={detailHref} className="group block">
+                    <h3 className="font-display text-3xl font-medium tracking-tight text-[#22221F] transition-colors group-hover:text-[#85806D] sm:text-4xl">
+                      {exp.role}
+                    </h3>
+                  </Link>
 
-                  {coverUrl && (
+                  <div className="my-5 lg:hidden">
                     <Link
-                      href={`/experience/${exp.slug || exp._id}`}
-                      className="group my-4 block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 md:hidden"
+                      href={detailHref}
+                      className="group block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40"
                     >
-                      <img
-                        src={coverUrl}
-                        alt={exp.role}
-                        style={getCroppedImageStyle(coverMedia)}
-                        className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                      />
+                      {coverUrl ? (
+                        <img
+                          src={coverUrl}
+                          alt={exp.role}
+                          style={getCroppedImageStyle(coverMedia)}
+                          className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                        />
+                      ) : (
+                        <div className="flex aspect-[16/10] w-full items-center justify-center bg-[#E9E5DC] px-6 text-center">
+                          <span className="font-display text-2xl text-[#85806D]">
+                            {exp.role}
+                          </span>
+                        </div>
+                      )}
                     </Link>
-                  )}
+                    <div className="mt-3">
+                      <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#89877F]">
+                        {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-[#22221F]">{exp.company}</p>
+                      {exp.location && (
+                        <p className="mt-0.5 text-xs text-[#89877F]">{exp.location}</p>
+                      )}
+                    </div>
+                  </div>
 
                   {exp.description && (
-                    <p className="mt-4 text-base leading-relaxed text-[#22221F]/85 sm:text-lg">
+                    <p className="mt-4 text-base leading-relaxed text-[#89877F] sm:text-lg">
                       {summarizeDescription(exp.description)}
                     </p>
                   )}
 
-                  {exp.responsibilities?.length > 0 && (
-                    <ul className="mt-5 space-y-2.5 border-l border-[#DCD9D1] pl-5 text-base text-[#89877F]">
-                      {exp.responsibilities.slice(0, 3).map((item, idx) => (
-                        <li key={idx}>{item}</li>
+                  {exp.technologies?.length > 0 && (
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {exp.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="border border-[#DCD9D1] bg-[#E9E5DC]/45 px-3 py-1 text-xs font-medium text-[#22221F]"
+                        >
+                          {tech}
+                        </span>
                       ))}
-                    </ul>
+                    </div>
                   )}
 
                   <div className="mt-6 flex items-center justify-between gap-4">
-                    <Link href={`/experience/${exp.slug || exp._id}`} className="editorial-link text-[15px]">
+                    <Link href={detailHref} className="editorial-link text-[15px]">
                       View details <FiArrowRight size={15} />
                     </Link>
                     <ShareMenu
-                      path={`/experience/${exp.slug || exp._id}`}
+                      path={detailHref}
                       title={`${exp.role}${exp.company ? ` — ${exp.company}` : ''}`}
                     />
+                  </div>
+                </div>
+
+                <div className={`hidden lg:block lg:col-span-6 ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}>
+                  <Link
+                    href={detailHref}
+                    className="group block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40"
+                  >
+                    {coverUrl ? (
+                      <img
+                        src={coverUrl}
+                        alt={exp.role}
+                        style={getCroppedImageStyle(coverMedia)}
+                        className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="flex aspect-[16/10] w-full items-center justify-center bg-[#E9E5DC] px-6 text-center">
+                        <span className="font-display text-3xl text-[#85806D]">
+                          {exp.role}
+                        </span>
+                      </div>
+                    )}
+                  </Link>
+                  <div className="mt-4">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#89877F]">
+                      {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
+                    </p>
+                    <p className="mt-1.5 text-base font-medium text-[#22221F]">
+                      {exp.company}
+                    </p>
+                    {exp.location && (
+                      <p className="mt-0.5 text-sm text-[#89877F]">{exp.location}</p>
+                    )}
                   </div>
                 </div>
               </article>

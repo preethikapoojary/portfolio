@@ -47,65 +47,85 @@ export default function ExperiencePage() {
             {experience.map((exp) => {
               const coverMedia = getExperienceCoverMedia(exp);
               const coverUrl = coverMedia?.url || '';
+              const detailHref = `/experience/${exp.slug || exp._id}`;
               return (
               <article
                 key={exp._id}
-                className="grid gap-4 py-8 first:pt-0 last:pb-0 md:grid-cols-12 md:gap-8"
+                className="grid items-start gap-8 py-10 first:pt-0 last:pb-0 lg:grid-cols-12 lg:gap-12"
               >
-                <div className="md:col-span-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#89877F]">
-                    {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
-                  </p>
-                  <p className="mt-1.5 text-sm font-medium text-[#22221F]">{exp.company}</p>
-                  {exp.location && (
-                    <p className="mt-0.5 text-xs text-[#89877F]">{exp.location}</p>
-                  )}
-                  {coverUrl && (
-                    <Link
-                      href={`/experience/${exp.slug || exp._id}`}
-                      className="group mt-4 hidden overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 md:block"
-                    >
+                <div className="hidden lg:col-span-5 lg:block">
+                  <Link
+                    href={detailHref}
+                    className="group block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40"
+                  >
+                    {coverUrl ? (
                       <img
                         src={coverUrl}
                         alt={exp.role}
                         style={getCroppedImageStyle(coverMedia)}
                         className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       />
-                    </Link>
-                  )}
+                    ) : (
+                      <div className="flex aspect-[16/10] items-center justify-center bg-[#E9E5DC] p-6 text-center">
+                        <span className="font-display text-2xl text-[#85806D]">
+                          {exp.role}
+                        </span>
+                      </div>
+                    )}
+                  </Link>
+                  <div className="mt-3.5">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#89877F]">
+                      {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
+                    </p>
+                    <p className="mt-1.5 text-sm font-medium text-[#22221F]">{exp.company}</p>
+                    {exp.location && (
+                      <p className="mt-0.5 text-xs text-[#89877F]">{exp.location}</p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="md:col-span-8">
-                  <h2 className="font-display text-2xl font-medium text-[#22221F] sm:text-3xl">
-                    {exp.role}
-                  </h2>
+                <div className="lg:col-span-7">
+                  <Link href={detailHref} className="group block">
+                    <h2 className="font-display text-2xl font-medium text-[#22221F] transition-colors group-hover:text-[#85806D] sm:text-3xl">
+                      {exp.role}
+                    </h2>
+                  </Link>
 
-                  {coverUrl && (
+                  <div className="my-4 lg:hidden">
                     <Link
-                      href={`/experience/${exp.slug || exp._id}`}
-                      className="group my-4 block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 md:hidden"
+                      href={detailHref}
+                      className="group block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40"
                     >
-                      <img
-                        src={coverUrl}
-                        alt={exp.role}
-                        style={getCroppedImageStyle(coverMedia)}
-                        className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                      />
+                      {coverUrl ? (
+                        <img
+                          src={coverUrl}
+                          alt={exp.role}
+                          style={getCroppedImageStyle(coverMedia)}
+                          className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                        />
+                      ) : (
+                        <div className="flex aspect-[16/10] items-center justify-center bg-[#E9E5DC] p-6 text-center">
+                          <span className="font-display text-2xl text-[#85806D]">
+                            {exp.role}
+                          </span>
+                        </div>
+                      )}
                     </Link>
-                  )}
+                    <div className="mt-3">
+                      <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#89877F]">
+                        {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-[#22221F]">{exp.company}</p>
+                      {exp.location && (
+                        <p className="mt-0.5 text-xs text-[#89877F]">{exp.location}</p>
+                      )}
+                    </div>
+                  </div>
 
                   {exp.description && (
                     <p className="mt-3 text-sm leading-relaxed text-[#22221F]/85 sm:text-base">
                       {summarizeDescription(exp.description)}
                     </p>
-                  )}
-
-                  {exp.responsibilities?.length > 0 && (
-                    <ul className="mt-4 space-y-2 border-l border-[#DCD9D1] pl-4 text-sm text-[#89877F]">
-                      {exp.responsibilities.map((r, i) => (
-                        <li key={i}>{r}</li>
-                      ))}
-                    </ul>
                   )}
 
                   {exp.technologies?.length > 0 && (
@@ -122,11 +142,11 @@ export default function ExperiencePage() {
                   )}
 
                   <div className="mt-6 flex items-center justify-between gap-4">
-                    <Link href={`/experience/${exp.slug || exp._id}`} className="editorial-link">
+                    <Link href={detailHref} className="editorial-link">
                       View role details &amp; artifacts <FiArrowRight size={14} />
                     </Link>
                     <ShareMenu
-                      path={`/experience/${exp.slug || exp._id}`}
+                      path={detailHref}
                       title={`${exp.role}${exp.company ? ` — ${exp.company}` : ''}`}
                     />
                   </div>
