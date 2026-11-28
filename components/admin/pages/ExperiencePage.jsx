@@ -80,7 +80,7 @@ const fields = [
   { key: 'startDate', label: 'Start Date', type: 'date' },
   { key: 'endDate', label: 'End Date', type: 'date' },
   { key: 'isCurrent', label: 'I currently work here (shows "Present")', type: 'checkbox' },
-  { key: 'description', label: 'Short Professional Overview', type: 'textarea', rows: 2 },
+  { key: 'description', label: 'Overview / Description', type: 'richtext' },
   { key: 'coverImage', label: 'Cover Image (shown on the experience card — separate from certificate)', type: 'image' },
   {
     key: 'responsibilities',

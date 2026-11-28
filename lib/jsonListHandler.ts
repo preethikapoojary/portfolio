@@ -69,6 +69,9 @@ export async function handleJsonAdminCreate(req: Request, config: JsonListConfig
 
   try {
     const body = await req.json();
+    if (config.resourceName === "Skill" && !String(body?.name || "").trim()) {
+      return fail("Skill name is required", 400);
+    }
     const { supabase, row } = await getSingletonRow(config.table);
     const items: any[] = Array.isArray(row[config.column]) ? [...row[config.column]] : [];
     const now = new Date().toISOString();
@@ -124,6 +127,9 @@ export async function handleJsonAdminUpdateById(req: Request, id: string, config
 
   try {
     const body = await req.json();
+    if (config.resourceName === "Skill" && !String(body?.name || "").trim()) {
+      return fail("Skill name is required", 400);
+    }
     const { supabase, row } = await getSingletonRow(config.table);
     const items: any[] = Array.isArray(row[config.column]) ? [...row[config.column]] : [];
     const idx = items.findIndex((item) => item._id === id || item.id === id);

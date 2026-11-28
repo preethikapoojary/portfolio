@@ -5,6 +5,7 @@ import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import SectionHeading from '@/components/public/common/SectionHeading';
+import { formatCalendarDate } from '@/utils/date';
 
 export default function Achievements() {
   const { data: items, loading } = useFetch(api.getAchievements, []);
@@ -35,12 +36,7 @@ export default function Achievements() {
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <span className="text-sm text-[#89877F]">
-                  {item.date
-                    ? new Date(item.date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        year: 'numeric',
-                      })
-                    : 'Milestone'}
+                  {item.date ? formatCalendarDate(item.date) : 'Milestone'}
                 </span>
               </div>
 

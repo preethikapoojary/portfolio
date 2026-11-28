@@ -7,14 +7,8 @@ import { FiArrowLeft, FiExternalLink, FiFileText, FiGithub } from 'react-icons/f
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import Lightbox from '@/components/public/common/Lightbox';
-
-function formatRange(start, end, isCurrent) {
-  const fmt = (d) =>
-    d ? new Date(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
-  const s = fmt(start);
-  const e = isCurrent ? 'Present' : fmt(end);
-  return [s, e].filter(Boolean).join(' – ');
-}
+import { getExperienceCoverUrl } from '@/utils/experience';
+import { formatDateRange } from '@/utils/date';
 
 export default function ExperienceDetail() {
   const { id } = useParams();
@@ -44,7 +38,7 @@ export default function ExperienceDetail() {
     <article className="mx-auto max-w-4xl px-6 pb-20 pt-12 sm:px-8 sm:pt-16">
       <header className="border-b border-[#DCD9D1] pb-8">
         <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
-          {formatRange(exp.startDate, exp.endDate, exp.isCurrent)}
+          {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
           {exp.location ? ` · ${exp.location}` : ''}
         </p>
 
@@ -56,14 +50,14 @@ export default function ExperienceDetail() {
       </header>
 
       <div className="space-y-10 py-10">
-        {exp.coverImage?.url && (
+        {getExperienceCoverUrl(exp) && (
           <button
             type="button"
-            onClick={() => setPreviewImg(exp.coverImage.url)}
+            onClick={() => setPreviewImg(getExperienceCoverUrl(exp))}
             className="block w-full overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 text-left"
           >
             <img
-              src={exp.coverImage.url}
+              src={getExperienceCoverUrl(exp)}
               alt={exp.role}
               className="aspect-[16/9] w-full object-cover"
             />
@@ -158,6 +152,32 @@ export default function ExperienceDetail() {
                   External Link <FiExternalLink size={13} />
                 </a>
               )}
+            </div>
+          </section>
+        )}
+
+        {exp.attachments?.some((a) => a?.url) && (
+          <section className="border-t border-[#DCD9D1] pt-8">
+            <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
+              Supporting Images
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {exp.attachments
+                .filter((a) => a?.url)
+                .map((att, idx) => (
+                  <button
+                    key={att.url + idx}
+                    type="button"
+                    onClick={() => setPreviewImg(att.url)}
+                    className="group overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 text-left"
+                  >
+                    <img
+                      src={att.url}
+                      alt={att.alt || `${exp.role} image ${idx + 1}`}
+                      className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    />
+                  </button>
+                ))}
             </div>
           </section>
         )}

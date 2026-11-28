@@ -1,6 +1,7 @@
 'use client';
 import CrudModulePage from '@/components/admin/ui/CrudModulePage';
 import { achievementsApi } from '@/lib/adminApi/endpoints';
+import { formatCalendarDate } from '@/utils/date';
 
 const fields = [
   { key: 'title', label: 'Title', type: 'text' },
@@ -13,7 +14,7 @@ const fields = [
 const columns = [
   { key: 'title', label: 'Title' },
   { key: 'description', label: 'Description' },
-  { key: 'date', label: 'Date', render: (row) => (row.date ? new Date(row.date).toLocaleDateString() : '—') },
+  { key: 'date', label: 'Date', render: (row) => (row.date ? formatCalendarDate(row.date) : '—') },
   { key: 'order', label: 'Order', render: (row) => row.order ?? 0 },
   {
     key: 'homeOrder',

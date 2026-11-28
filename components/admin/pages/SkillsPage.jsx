@@ -112,7 +112,7 @@ export default function SkillsPage() {
   };
 
   const fields = [
-    { key: 'name', label: 'Skill Name', type: 'text' },
+    { key: 'name', label: 'Skill Name *', type: 'text', required: true },
     {
       key: 'category',
       label: 'Category',

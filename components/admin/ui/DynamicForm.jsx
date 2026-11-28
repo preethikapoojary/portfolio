@@ -239,6 +239,7 @@ function renderField(field, values, set) {
       return (
         <input
           className="input"
+          required={Boolean(field.required)}
           value={value || ''}
           onChange={(e) => set(field.key, e.target.value)}
           onBlur={

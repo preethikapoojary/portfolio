@@ -5,14 +5,8 @@ import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import PageHeader from '@/components/public/common/PageHeader';
-
-function formatRange(start, end, isCurrent) {
-  const fmt = (d) =>
-    d ? new Date(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
-  const s = fmt(start);
-  const e = isCurrent ? 'Present' : fmt(end);
-  return [s, e].filter(Boolean).join(' – ');
-}
+import { getExperienceCoverUrl } from '@/utils/experience';
+import { formatCalendarDate, formatDateRange } from '@/utils/date';
 
 function summarizeDescription(text) {
   if (!text) return '';
@@ -48,26 +42,28 @@ export default function ExperiencePage() {
           <p className="text-sm text-[#89877F]">No experience entries yet.</p>
         ) : (
           <div className="divide-y divide-[#DCD9D1]">
-            {experience.map((exp) => (
+            {experience.map((exp) => {
+              const coverUrl = getExperienceCoverUrl(exp);
+              return (
               <article
                 key={exp._id}
                 className="grid gap-4 py-8 first:pt-0 last:pb-0 md:grid-cols-12 md:gap-8"
               >
                 <div className="md:col-span-4">
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#89877F]">
-                    {formatRange(exp.startDate, exp.endDate, exp.isCurrent)}
+                    {formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}
                   </p>
                   <p className="mt-1.5 text-sm font-medium text-[#22221F]">{exp.company}</p>
                   {exp.location && (
                     <p className="mt-0.5 text-xs text-[#89877F]">{exp.location}</p>
                   )}
-                  {exp.coverImage?.url && (
+                  {coverUrl && (
                     <Link
                       href={`/experience/${exp.slug || exp._id}`}
                       className="group mt-4 hidden overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 md:block"
                     >
                       <img
-                        src={exp.coverImage.url}
+                        src={coverUrl}
                         alt={exp.role}
                         className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       />
@@ -80,13 +76,13 @@ export default function ExperiencePage() {
                     {exp.role}
                   </h2>
 
-                  {exp.coverImage?.url && (
+                  {coverUrl && (
                     <Link
                       href={`/experience/${exp.slug || exp._id}`}
                       className="group my-4 block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 md:hidden"
                     >
                       <img
-                        src={exp.coverImage.url}
+                        src={coverUrl}
                         alt={exp.role}
                         className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                       />
@@ -127,7 +123,8 @@ export default function ExperiencePage() {
                   </div>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
@@ -156,12 +153,7 @@ export default function ExperiencePage() {
                     {String(idx + 1).padStart(2, '0')}
                   </span>
                   <span className="text-xs text-[#89877F]">
-                    {item.date
-                      ? new Date(item.date).toLocaleDateString('en-US', {
-                          month: 'short',
-                          year: 'numeric',
-                        })
-                      : ''}
+                    {item.date ? formatCalendarDate(item.date) : ''}
                   </span>
                 </div>
 
