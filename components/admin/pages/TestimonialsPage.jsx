@@ -89,90 +89,107 @@ export default function TestimonialsPage() {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="overflow-x-auto border border-[#DCD9D1] bg-[#F6F4EF]">
         {loading ? (
-          <p className="card text-sm text-muted">Loading testimonials…</p>
+          <p className="p-6 text-sm text-muted">Loading testimonials…</p>
         ) : items.length === 0 ? (
-          <p className="card text-sm text-muted">No testimonials in this filter.</p>
+          <p className="p-6 text-sm text-muted">No testimonials in this filter.</p>
         ) : (
-          items.map((t) => (
-            <div key={t._id} className="card flex gap-4">
-              {t.avatar?.url ? (
-                <img src={t.avatar.url} alt={t.name} className="h-12 w-12 rounded-full object-cover" />
-              ) : (
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-muted">
-                  {t.name?.[0]}
-                </div>
-              )}
-
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-medium">{t.name}</p>
-                  <span className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLES[t.status]}`}>{t.status}</span>
-                  {!t.isVisible && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-muted">Hidden</span>}
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-muted">Order: {t.order ?? 0}</span>
-                  {t.homeOrder !== null && t.homeOrder !== undefined && (
-                    <span className="rounded-full bg-[#E9E5DC] px-2 py-0.5 text-xs font-medium text-[#22221F]">
-                      Home #{t.homeOrder}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-muted">
-                  {t.role} {t.company ? `· ${t.company}` : ''}
-                </p>
-                <p className="mt-2 text-sm">{t.message}</p>
-                {(t.linkedinUrl || t.githubUrl || t.email) && (
-                  <p className="mt-1 text-xs text-muted">
-                    {t.email && <span>{t.email} </span>}
-                    {t.linkedinUrl && (
-                      <a href={t.linkedinUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                        LinkedIn
-                      </a>
-                    )}{' '}
-                    {t.githubUrl && (
-                      <a href={t.githubUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                        GitHub
-                      </a>
-                    )}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex shrink-0 flex-col items-end gap-2">
-                <div className="flex gap-1">
-                  {t.status !== 'approved' && (
-                    <IconTooltip label="Approve">
-                      <button onClick={() => approve(t._id)} className="rounded p-1.5 text-emerald-600 hover:bg-emerald-50" aria-label="Approve">
-                        <FiCheck />
-                      </button>
-                    </IconTooltip>
-                  )}
-                  {t.status !== 'rejected' && (
-                    <IconTooltip label="Reject">
-                      <button onClick={() => reject(t._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Reject">
-                        <FiX />
-                      </button>
-                    </IconTooltip>
-                  )}
-                  <IconTooltip label={t.isVisible ? 'Hide from public' : 'Show on public'}>
-                    <button onClick={() => toggleVisibility(t._id)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Toggle visibility">
-                      {t.isVisible ? <FiEye /> : <FiEyeOff />}
-                    </button>
-                  </IconTooltip>
-                  <IconTooltip label="Edit">
-                    <button onClick={() => setEditing(t)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Edit">
-                      <FiEdit2 />
-                    </button>
-                  </IconTooltip>
-                  <IconTooltip label="Move to Trash">
-                    <button onClick={() => remove(t._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Delete">
-                      <FiTrash2 />
-                    </button>
-                  </IconTooltip>
-                </div>
-              </div>
-            </div>
-          ))
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-[#DCD9D1] bg-[#E9E5DC]/40 text-xs uppercase tracking-wider text-muted">
+              <tr>
+                <th className="px-4 py-3 font-medium">Testimonial</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Order</th>
+                <th className="px-4 py-3 font-medium">Home</th>
+                <th className="px-4 py-3 text-right font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#DCD9D1]">
+              {items.map((t) => (
+                <tr key={t._id} className="align-top transition-colors hover:bg-[#E9E5DC]/20">
+                  <td className="px-4 py-3">
+                    <div className="flex gap-3">
+                      {t.avatar?.url ? (
+                        <img src={t.avatar.url} alt={t.name} className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                      ) : (
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-muted">
+                          {t.name?.[0]}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-medium text-[#22221F]">{t.name}</p>
+                        {(t.role || t.company) && (
+                          <p className="text-xs text-muted">
+                            {t.role} {t.company ? `· ${t.company}` : ''}
+                          </p>
+                        )}
+                        <p className="mt-1.5 text-sm text-[#22221F]">{t.message}</p>
+                        {(t.linkedinUrl || t.githubUrl || t.email) && (
+                          <p className="mt-1 text-xs text-muted">
+                            {t.email && <span>{t.email} </span>}
+                            {t.linkedinUrl && (
+                              <a href={t.linkedinUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                                LinkedIn
+                              </a>
+                            )}{' '}
+                            {t.githubUrl && (
+                              <a href={t.githubUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                                GitHub
+                              </a>
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLES[t.status]}`}>{t.status}</span>
+                      {!t.isVisible && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-muted">Hidden</span>}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-[#22221F]">{t.order ?? 0}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-[#22221F]">
+                    {t.homeOrder !== null && t.homeOrder !== undefined ? `#${t.homeOrder}` : '—'}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex justify-end gap-1">
+                      {t.status !== 'approved' && (
+                        <IconTooltip label="Approve">
+                          <button onClick={() => approve(t._id)} className="rounded p-1.5 text-emerald-600 hover:bg-emerald-50" aria-label="Approve">
+                            <FiCheck />
+                          </button>
+                        </IconTooltip>
+                      )}
+                      {t.status !== 'rejected' && (
+                        <IconTooltip label="Reject">
+                          <button onClick={() => reject(t._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Reject">
+                            <FiX />
+                          </button>
+                        </IconTooltip>
+                      )}
+                      <IconTooltip label={t.isVisible ? 'Hide from public' : 'Show on public'}>
+                        <button onClick={() => toggleVisibility(t._id)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Toggle visibility">
+                          {t.isVisible ? <FiEye /> : <FiEyeOff />}
+                        </button>
+                      </IconTooltip>
+                      <IconTooltip label="Edit">
+                        <button onClick={() => setEditing(t)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Edit">
+                          <FiEdit2 />
+                        </button>
+                      </IconTooltip>
+                      <IconTooltip label="Move to Trash">
+                        <button onClick={() => remove(t._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Delete">
+                          <FiTrash2 />
+                        </button>
+                      </IconTooltip>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 

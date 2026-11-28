@@ -82,10 +82,20 @@ export default function MessagesPage() {
               <span className="mt-1 text-muted">{msg.isRead ? <FiCheckCircle /> : <FiMail className="text-primary" />}</span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className={`truncate text-sm ${msg.isRead ? '' : 'font-semibold'}`}>{msg.name}</p>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <p className={`truncate text-sm ${msg.isRead ? '' : 'font-semibold'}`}>{msg.name}</p>
+                    {msg.purpose && (
+                      <span className="shrink-0 rounded-full bg-[#E9E5DC] px-2 py-0.5 text-[11px] font-medium text-[#22221F]">
+                        {msg.purpose}
+                      </span>
+                    )}
+                    {msg.company && (
+                      <span className="hidden truncate text-xs text-muted sm:inline">· {msg.company}</span>
+                    )}
+                  </div>
                   <span className="shrink-0 text-xs text-muted">{new Date(msg.createdAt).toLocaleDateString()}</span>
                 </div>
-                <p className="truncate text-xs text-muted">{msg.subject || msg.message}</p>
+                <p className="truncate text-xs text-muted">{msg.message}</p>
               </div>
               <div className="flex shrink-0 gap-1">
                 <IconTooltip label={msg.isRead ? 'Mark as unread' : 'Mark as read'}>
@@ -109,10 +119,28 @@ export default function MessagesPage() {
       </div>
 
       {viewing && (
-        <AdminDrawer isOpen={!!viewing} title={viewing.subject || 'Message'} onClose={() => setViewing(null)}>
+        <AdminDrawer isOpen={!!viewing} title={viewing.purpose || viewing.subject || 'Message'} onClose={() => setViewing(null)}>
           <div className="space-y-4 text-sm">
-            <p><span className="text-muted">From:</span> {viewing.name} ({viewing.email})</p>
-            <p className="whitespace-pre-line leading-relaxed">{viewing.message}</p>
+            <div>
+              <p><span className="text-muted">From:</span> {viewing.name} ({viewing.email})</p>
+              {viewing.purpose && <p className="mt-1"><span className="text-muted">Purpose:</span> {viewing.purpose}</p>}
+              {viewing.company && <p className="mt-1"><span className="text-muted">Company / Organization:</span> {viewing.company}</p>}
+              {(viewing.linkedinUrl || viewing.githubUrl) && (
+                <p className="mt-1 flex flex-wrap gap-3">
+                  {viewing.linkedinUrl && (
+                    <a href={viewing.linkedinUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                      LinkedIn
+                    </a>
+                  )}
+                  {viewing.githubUrl && (
+                    <a href={viewing.githubUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                      GitHub
+                    </a>
+                  )}
+                </p>
+              )}
+            </div>
+            <p className="whitespace-pre-line border-t border-[#DCD9D1] pt-4 leading-relaxed">{viewing.message}</p>
             <p className="text-xs text-muted">{new Date(viewing.createdAt).toLocaleString()}</p>
           </div>
         </AdminDrawer>

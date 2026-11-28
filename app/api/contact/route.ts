@@ -19,7 +19,17 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, email, subject = "", message, turnstileToken } = body;
+    const {
+      name,
+      email,
+      subject = "",
+      purpose = "",
+      company = "",
+      linkedinUrl = "",
+      githubUrl = "",
+      message,
+      turnstileToken,
+    } = body;
 
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
       return fail("Name, email, and message are required", 400);
@@ -36,7 +46,11 @@ export async function POST(req: Request) {
       .insert({
         name: name.trim(),
         email: email.trim(),
-        subject: subject.trim(),
+        subject: subject.trim() || purpose.trim(),
+        purpose: purpose.trim(),
+        company: company.trim(),
+        linkedin_url: linkedinUrl.trim(),
+        github_url: githubUrl.trim(),
         message: message.trim(),
       })
       .select()

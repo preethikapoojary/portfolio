@@ -18,7 +18,15 @@ export default function ContactPage() {
       !['gmail', 'email'].includes((link.platform || '').toLowerCase()) &&
       !['gmail', 'email'].includes((link.icon || '').toLowerCase())
   );
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    purpose: '',
+    message: '',
+    company: '',
+    linkedinUrl: '',
+    githubUrl: '',
+  });
   const [turnstileToken, setTurnstileToken] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
@@ -27,15 +35,27 @@ export default function ContactPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    if (!form.purpose) {
+      setError('Please select a reason for contacting.');
+      return;
+    }
     if (turnstileSiteKey && !turnstileToken) {
       setError('Please complete the verification check.');
       return;
     }
     setSubmitting(true);
     try {
-      await api.submitContactMessage({ ...form, turnstileToken });
+      await api.submitContactMessage({ ...form, subject: form.purpose, turnstileToken });
       setSent(true);
-      setForm({ name: '', email: '', subject: '', message: '' });
+      setForm({
+        name: '',
+        email: '',
+        purpose: '',
+        message: '',
+        company: '',
+        linkedinUrl: '',
+        githubUrl: '',
+      });
     } catch (err) {
       setError(err?.response?.data?.message || 'Unable to send message. Please try again.');
     } finally {
@@ -118,6 +138,7 @@ export default function ContactPage() {
                     id="name"
                     type="text"
                     required
+                    placeholder="e.g., John Doe"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
@@ -132,6 +153,7 @@ export default function ContactPage() {
                     id="email"
                     type="email"
                     required
+                    placeholder="john@example.com"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
@@ -140,16 +162,24 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label htmlFor="subject" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
-                  Subject
+                <label htmlFor="purpose" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                  Purpose *
                 </label>
-                <input
-                  id="subject"
-                  type="text"
-                  value={form.subject}
-                  onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                <select
+                  id="purpose"
+                  required
+                  value={form.purpose}
+                  onChange={(e) => setForm({ ...form, purpose: e.target.value })}
                   className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
-                />
+                >
+                  <option value="">Select a reason for contacting</option>
+                  <option value="Internship Opportunity">Internship Opportunity</option>
+                  <option value="Collaboration">Collaboration</option>
+                  <option value="Project Discussion">Project Discussion</option>
+                  <option value="Networking">Networking</option>
+                  <option value="Feedback">Feedback</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
 
               <div>
@@ -160,10 +190,55 @@ export default function ContactPage() {
                   id="message"
                   rows={5}
                   required
+                  placeholder="How can I help you? Please share details..."
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="company" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                  Company / Organization
+                </label>
+                <input
+                  id="company"
+                  type="text"
+                  placeholder="e.g., Acme Corp (Optional)"
+                  value={form.company}
+                  onChange={(e) => setForm({ ...form, company: e.target.value })}
+                  className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                />
+              </div>
+
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="linkedinUrl" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                    LinkedIn URL
+                  </label>
+                  <input
+                    id="linkedinUrl"
+                    type="url"
+                    placeholder="https://linkedin.com/in/..."
+                    value={form.linkedinUrl}
+                    onChange={(e) => setForm({ ...form, linkedinUrl: e.target.value })}
+                    className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="githubUrl" className="mb-2 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]">
+                    GitHub URL
+                  </label>
+                  <input
+                    id="githubUrl"
+                    type="url"
+                    placeholder="https://github.com/..."
+                    value={form.githubUrl}
+                    onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
+                    className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
+                  />
+                </div>
               </div>
 
               {turnstileSiteKey && (
