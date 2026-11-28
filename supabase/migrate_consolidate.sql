@@ -324,6 +324,10 @@ alter table public.contact_messages
   add column if not exists linkedin_url text not null default '',
   add column if not exists github_url text not null default '';
 
+-- 15. Experience & Achievements home_order
+alter table public.experience
+  add column if not exists home_order integer check (home_order is null or home_order >= 0);
+
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;

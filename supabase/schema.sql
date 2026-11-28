@@ -125,6 +125,7 @@ create table if not exists public.experience (
   certificate jsonb not null default '{"url": null, "publicId": null, "alt": ""}'::jsonb,
   attachments jsonb not null default '[]'::jsonb,
   "order" integer not null default 0 check ("order" >= 0),
+  home_order integer check (home_order is null or home_order >= 0),
   is_visible boolean not null default true,
   is_archived boolean not null default false,
   archived_at timestamptz,

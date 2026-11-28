@@ -6,12 +6,20 @@ const fields = [
   { key: 'title', label: 'Title', type: 'text' },
   { key: 'description', label: 'Description', type: 'textarea' },
   { key: 'date', label: 'Date', type: 'date' },
+  { key: 'order', label: 'Sort Order (Experience Page)', type: 'number', min: 1 },
+  { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 1 },
 ];
 
 const columns = [
   { key: 'title', label: 'Title' },
   { key: 'description', label: 'Description' },
   { key: 'date', label: 'Date', render: (row) => (row.date ? new Date(row.date).toLocaleDateString() : '—') },
+  { key: 'order', label: 'Order', render: (row) => row.order ?? 0 },
+  {
+    key: 'homeOrder',
+    label: 'Home',
+    render: (row) => (row.homeOrder !== null && row.homeOrder !== undefined ? `#${row.homeOrder}` : '—'),
+  },
 ];
 
 export default function AchievementsPage() {
@@ -22,7 +30,7 @@ export default function AchievementsPage() {
       api={achievementsApi}
       columns={columns}
       fields={fields}
-      emptyValues={{ title: '', description: '', icon: 'FiAward' }}
+      emptyValues={{ title: '', description: '', icon: 'FiAward', order: 1, homeOrder: '' }}
     />
   );
 }

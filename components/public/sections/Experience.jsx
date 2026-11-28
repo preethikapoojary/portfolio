@@ -28,6 +28,14 @@ export default function Experience() {
     return null;
   }
 
+  const hasHomeOrder = items.some((e) => e.homeOrder !== null && e.homeOrder !== undefined);
+  const homeItems = hasHomeOrder
+    ? [...items]
+        .filter((e) => e.homeOrder !== null && e.homeOrder !== undefined)
+        .sort((a, b) => a.homeOrder - b.homeOrder)
+        .slice(0, 6)
+    : items;
+
   return (
     <section
       id="experience"
@@ -44,9 +52,9 @@ export default function Experience() {
         </div>
 
         {/* Internships & Roles */}
-        {items?.length > 0 && (
+        {homeItems?.length > 0 && (
           <div className="divide-y divide-[#DCD9D1]">
-            {items.map((exp) => (
+            {homeItems.map((exp) => (
               <article
                 key={exp._id}
                 className="grid gap-6 py-8 first:pt-2 last:pb-6 md:grid-cols-12 md:gap-10"

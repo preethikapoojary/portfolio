@@ -111,6 +111,8 @@ const fields = [
     type: 'custom',
     render: RelatedProjectsEditor,
   },
+  { key: 'order', label: 'Sort Order (Experience Page)', type: 'number', min: 1 },
+  { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 1 },
 ];
 
 const columns = [
@@ -123,6 +125,12 @@ const columns = [
       `${row.startDate ? new Date(row.startDate).getFullYear() : ''} — ${
         row.isCurrent ? 'Present' : row.endDate ? new Date(row.endDate).getFullYear() : ''
       }`,
+  },
+  { key: 'order', label: 'Order', render: (row) => row.order ?? 0 },
+  {
+    key: 'homeOrder',
+    label: 'Home',
+    render: (row) => (row.homeOrder !== null && row.homeOrder !== undefined ? `#${row.homeOrder}` : '—'),
   },
 ];
 
@@ -152,6 +160,8 @@ export default function ExperiencePage() {
         certificate: null,
         attachments: [],
         relatedProjects: [],
+        order: 1,
+        homeOrder: '',
       }}
     />
   );
