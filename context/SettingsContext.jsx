@@ -8,6 +8,7 @@ export function SettingsProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [settings, setSettings] = useState(null);
   const [sections, setSections] = useState([]);
+  const [hasBlogs, setHasBlogs] = useState(false);
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,11 +21,13 @@ export function SettingsProvider({ children }) {
         api.getProfile(),
         api.getSettings(),
         api.getSections(),
+        api.getBlogPosts(),
       ]);
 
       const profileRes = results[0];
       const settingsRes = results[1];
       const sectionsRes = results[2];
+      const blogRes = results[3];
 
       if (profileRes.status === 'fulfilled' && profileRes.value) {
         setProfile(profileRes.value);
@@ -34,6 +37,11 @@ export function SettingsProvider({ children }) {
       }
       if (sectionsRes.status === 'fulfilled') {
         setSections(sectionsRes.value || []);
+      }
+      if (blogRes.status === 'fulfilled') {
+        setHasBlogs(Array.isArray(blogRes.value) && blogRes.value.length > 0);
+      } else {
+        setHasBlogs(false);
       }
 
       if (profileRes.status === 'rejected' || !profileRes.value) {
@@ -77,6 +85,7 @@ export function SettingsProvider({ children }) {
         profile,
         settings,
         sections: orderedSections,
+        hasBlogs,
         isSectionVisible,
         ready,
         loading,

@@ -6,27 +6,18 @@ import { usePathname } from 'next/navigation';
 import { FiMoon, FiSun } from 'react-icons/fi';
 import { useSettings } from '@/context/SettingsContext';
 import { useTheme } from '@/context/ThemeContext';
-import api from '@/api/endpoints';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { profile } = useSettings();
+  const { profile, hasBlogs } = useSettings();
   const { mode, toggle } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [hasBlogs, setHasBlogs] = useState(false);
   const [activeKey, setActiveKey] = useState('home');
   const headerRef = useRef(null);
   const mobileNavRef = useRef(null);
   const menuBtnRef = useRef(null);
 
   const isHome = pathname === '/';
-
-  useEffect(() => {
-    api
-      .getBlogPosts()
-      .then((posts) => setHasBlogs(Array.isArray(posts) && posts.length > 0))
-      .catch(() => setHasBlogs(false));
-  }, []);
 
   useEffect(() => {
     setMobileOpen(false);
