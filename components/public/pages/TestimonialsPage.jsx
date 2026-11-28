@@ -17,6 +17,7 @@ import {
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
+import VerifiedProfileLinks from '@/components/public/common/VerifiedProfileLinks';
 import ImageCropModal from '@/components/common/ImageCropModal';
 import { downloadTestimonialImage } from '@/utils/downloadTestimonialImage';
 import { getCroppedImageStyle } from '@/utils/croppedImage';
@@ -97,6 +98,16 @@ export default function TestimonialsPage() {
     setError('');
     if (!form.name.trim() || !form.message.trim()) {
       setError('Full name and testimonial message are required.');
+      return;
+    }
+    const linkedin = form.linkedinUrl.trim();
+    if (!/^https:\/\/(www\.)?linkedin\.com\/in\/[^/\s]+/i.test(linkedin)) {
+      setError('Please enter a valid LinkedIn profile URL starting with https://www.linkedin.com/in/');
+      return;
+    }
+    const github = form.githubUrl.trim();
+    if (github && !/^https:\/\/(www\.)?github\.com\/[^/\s]+/i.test(github)) {
+      setError('GitHub URL must start with https://github.com/');
       return;
     }
     if (turnstileSiteKey && !turnstileToken) {
@@ -235,17 +246,16 @@ export default function TestimonialsPage() {
             Testimonial Message *
           </label>
           <span className="text-[11px] text-[#89877F]">
-            {form.message.length} / 140
+            {form.message.length} characters
           </span>
         </div>
         <textarea
           id="t-message"
           rows={4}
           required
-          maxLength={140}
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
-          placeholder="Share your experience working with me (max 140 characters with spaces)…"
+          placeholder="Share your experience…"
           className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
         />
       </div>
@@ -264,7 +274,7 @@ export default function TestimonialsPage() {
             required
             value={form.linkedinUrl}
             onChange={(e) => setForm({ ...form, linkedinUrl: e.target.value })}
-            placeholder="https://linkedin.com/in/..."
+            placeholder="https://www.linkedin.com/in/your-profile"
             className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
           />
         </div>
@@ -274,14 +284,14 @@ export default function TestimonialsPage() {
             htmlFor="t-github"
             className="mb-1.5 block text-xs font-medium uppercase tracking-[0.12em] text-[#89877F]"
           >
-            GitHub URL
+            GitHub URL (Optional)
           </label>
           <input
             id="t-github"
             type="url"
             value={form.githubUrl}
             onChange={(e) => setForm({ ...form, githubUrl: e.target.value })}
-            placeholder="https://github.com/..."
+            placeholder="https://github.com/your-username"
             className="w-full border border-[#DCD9D1] bg-[#F6F4EF] px-3.5 py-2.5 text-sm text-[#22221F] outline-none transition-colors focus:border-[#22221F]"
           />
         </div>
@@ -378,32 +388,7 @@ export default function TestimonialsPage() {
                 </Link>
 
                 <div className="flex shrink-0 items-center gap-2">
-                  {(item.linkedinUrl || item.githubUrl) && (
-                    <div className="flex items-center gap-2.5 text-[#89877F]">
-                      {item.linkedinUrl && (
-                        <a
-                          href={item.linkedinUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={`${item.name} LinkedIn`}
-                          className="transition-colors hover:text-[#22221F]"
-                        >
-                          <FiLinkedin size={13} />
-                        </a>
-                      )}
-                      {item.githubUrl && (
-                        <a
-                          href={item.githubUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={`${item.name} GitHub`}
-                          className="transition-colors hover:text-[#22221F]"
-                        >
-                          <FiGithub size={13} />
-                        </a>
-                      )}
-                    </div>
-                  )}
+                  <VerifiedProfileLinks item={item} />
                   <ShareMenu
                     path={itemPath}
                     title={`Testimonial by ${item.name}`}

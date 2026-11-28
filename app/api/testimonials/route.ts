@@ -55,6 +55,12 @@ export async function POST(req: Request) {
     if (!name?.trim() || !message?.trim()) {
       return fail("Name and message are required", 400);
     }
+    if (!/^https:\/\/(www\.)?linkedin\.com\/in\/[^/\s]+/i.test(linkedinUrl.trim())) {
+      return fail("A valid LinkedIn profile URL (https://www.linkedin.com/in/...) is required", 400);
+    }
+    if (githubUrl.trim() && !/^https:\/\/(www\.)?github\.com\/[^/\s]+/i.test(githubUrl.trim())) {
+      return fail("GitHub URL must start with https://github.com/", 400);
+    }
 
     const turnstile = await verifyTurnstileToken(turnstileToken, ip);
     if (!turnstile.ok) {

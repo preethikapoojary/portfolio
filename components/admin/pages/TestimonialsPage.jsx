@@ -20,7 +20,9 @@ const editFields = [
   { key: 'company', label: 'Company / College', type: 'text' },
   { key: 'email', label: 'Email', type: 'text' },
   { key: 'linkedinUrl', label: 'LinkedIn URL', type: 'text' },
+  { key: 'linkedinVerified', label: 'Verified LinkedIn Link (show on public site)', type: 'checkbox' },
   { key: 'githubUrl', label: 'GitHub URL', type: 'text' },
+  { key: 'githubVerified', label: 'Verified GitHub Link (show on public site)', type: 'checkbox' },
   { key: 'message', label: 'Testimonial', type: 'textarea', rows: 4 },
   { key: 'order', label: 'Sort Order (Testimonials Page)', type: 'number', min: 1 },
   { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 1 },
@@ -188,12 +190,12 @@ export default function TestimonialsPage() {
                             {t.email && <span>{t.email} </span>}
                             {t.linkedinUrl && (
                               <a href={t.linkedinUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                                LinkedIn
+                                LinkedIn{t.linkedinVerified ? ' ✓' : ' (unverified)'}
                               </a>
                             )}{' '}
                             {t.githubUrl && (
                               <a href={t.githubUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                                GitHub
+                                GitHub{t.githubVerified ? ' ✓' : ' (unverified)'}
                               </a>
                             )}
                           </p>

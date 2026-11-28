@@ -5,6 +5,7 @@ import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
+import VerifiedProfileLinks from '@/components/public/common/VerifiedProfileLinks';
 import { downloadTestimonialImage } from '@/utils/downloadTestimonialImage';
 import { getCroppedImageStyle } from '@/utils/croppedImage';
 
@@ -71,11 +72,14 @@ export default function Testimonials() {
                       )}
                     </div>
                   </Link>
-                  <ShareMenu
-                    path={itemPath}
-                    title={`Testimonial by ${t.name}`}
-                    onDownload={() => downloadTestimonialImage(t)}
-                  />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <VerifiedProfileLinks item={t} />
+                    <ShareMenu
+                      path={itemPath}
+                      title={`Testimonial by ${t.name}`}
+                      onDownload={() => downloadTestimonialImage(t)}
+                    />
+                  </div>
                 </footer>
               </blockquote>
               );
