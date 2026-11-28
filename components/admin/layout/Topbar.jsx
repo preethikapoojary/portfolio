@@ -1,11 +1,11 @@
 'use client';
 import { useEffect } from 'react';
-import { FiLogOut, FiMenu, FiMoon, FiSun } from 'react-icons/fi';
+import { FiMenu, FiMoon, FiSun } from 'react-icons/fi';
 import { useAuth } from '@/context/AdminAuthContext';
 import { useTheme } from '@/context/ThemeContext';
 
 export default function Topbar({ onMenuClick = () => {} }) {
-  const { admin, logout } = useAuth();
+  const { admin } = useAuth();
   const { mode, toggle } = useTheme();
 
   useEffect(() => {
@@ -62,15 +62,6 @@ export default function Topbar({ onMenuClick = () => {} }) {
         >
           View Site <span aria-hidden="true">↗</span>
         </a>
-        <button
-          type="button"
-          onClick={logout}
-          className="p-2 text-[#89877F] transition-colors hover:text-[#22221F]"
-          aria-label="Log out"
-          title="Log out"
-        >
-          <FiLogOut size={16} />
-        </button>
       </div>
     </header>
   );

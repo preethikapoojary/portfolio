@@ -9,8 +9,8 @@ const fields = [
   { key: 'image', label: 'Certificate Image', type: 'image' },
   { key: 'credentialUrl', label: 'Credential URL', type: 'text' },
   { key: 'issueDate', label: 'Issue Date', type: 'date' },
-  { key: 'order', label: 'Sort Order (Certificates Page)', type: 'number', min: 0 },
-  { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 0 },
+  { key: 'order', label: 'Sort Order (Certificates Page)', type: 'number', min: 1 },
+  { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 1 },
 ];
 
 const columns = [
@@ -53,7 +53,7 @@ export default function CertificatesPage() {
         issuer: '',
         image: null,
         credentialUrl: '',
-        order: 0,
+        order: 1,
         homeOrder: '',
       }}
     />

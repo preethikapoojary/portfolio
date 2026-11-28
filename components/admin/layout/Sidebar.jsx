@@ -1,11 +1,13 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FiX } from 'react-icons/fi';
+import { FiLogOut, FiX } from 'react-icons/fi';
 import { moduleRegistry } from '@/lib/adminConfig/moduleRegistry';
+import { useAuth } from '@/context/AdminAuthContext';
 
 export default function Sidebar({ open = false, onClose = () => {} }) {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   return (
     <>
@@ -17,7 +19,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-[#DCD9D1] bg-[#F6F4EF] p-5 transition-transform duration-200 md:static md:translate-x-0 md:bg-[#E9E5DC]/35 ${
+        className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-[#DCD9D1] bg-[#F6F4EF] p-5 transition-transform duration-200 md:static md:translate-x-0 md:bg-[#E9E5DC]/35 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -68,6 +70,18 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
               </Link>
             );
           })}
+
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              logout();
+            }}
+            className="mt-2 flex w-full items-center gap-3 border-l-2 border-transparent border-t border-[#DCD9D1] px-3 pb-2 pt-3 text-left text-[13px] text-[#89877F] transition-colors hover:bg-[#E9E5DC]/40 hover:text-[#22221F]"
+          >
+            <FiLogOut size={15} />
+            Log out
+          </button>
         </nav>
       </aside>
     </>

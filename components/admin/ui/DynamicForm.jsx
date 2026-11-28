@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import ImageUploader from './ImageUploader';
 import PdfUploader from './PdfUploader';
 import RichTextEditor from './RichTextEditor';
@@ -13,10 +14,24 @@ import RichTextEditor from './RichTextEditor';
  */
 function makeSlug(text) {
   return String(text || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .trim()
+    .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+function sanitizeSlugInput(text) {
+  return String(text || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]+/g, '')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+/, '');
 }
 
 function makeUniqueSlug(text, existingSlugs = []) {
@@ -34,22 +49,36 @@ function makeUniqueSlug(text, existingSlugs = []) {
 
 export default function DynamicForm({ fields, values, onChange, existingSlugs = [] }) {
   const hasSlugField = fields.some((f) => f.key === 'slug');
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+
+  useEffect(() => {
+    setSlugManuallyEdited(false);
+  }, [values?._id]);
+
   const takenSet = new Set(existingSlugs.map((s) => makeSlug(s)));
   const currentSlug = makeSlug(values.slug);
   const slugConflict = hasSlugField && currentSlug && takenSet.has(currentSlug);
 
+  const sourceKey = fields.some((f) => f.key === 'title')
+    ? 'title'
+    : fields.some((f) => f.key === 'role')
+      ? 'role'
+      : fields.some((f) => f.key === 'name')
+        ? 'name'
+        : null;
+
   const set = (key, value) => {
     const next = { ...values, [key]: value };
-    const sourceKey = fields.some((f) => f.key === 'title')
-      ? 'title'
-      : fields.some((f) => f.key === 'role')
-        ? 'role'
-        : null;
-    if (sourceKey && key === sourceKey && hasSlugField) {
-      const prevAutoSlug = makeUniqueSlug(values[sourceKey], existingSlugs);
-      if (!values.slug || values.slug === prevAutoSlug || values.slug === makeSlug(values[sourceKey])) {
-        next.slug = makeUniqueSlug(value, existingSlugs);
+    if (key === 'slug') {
+      if (!value) {
+        setSlugManuallyEdited(false);
+        next.slug = '';
+      } else {
+        setSlugManuallyEdited(true);
+        next.slug = sanitizeSlugInput(value);
       }
+    } else if (sourceKey && key === sourceKey && hasSlugField && !slugManuallyEdited) {
+      next.slug = makeUniqueSlug(value, existingSlugs);
     }
     onChange(next);
   };
@@ -201,6 +230,17 @@ function renderField(field, values, set) {
       return field.render(value, (v) => set(field.key, v));
 
     default:
-      return <input className="input" value={value || ''} onChange={(e) => set(field.key, e.target.value)} />;
+      return (
+        <input
+          className="input"
+          value={value || ''}
+          onChange={(e) => set(field.key, e.target.value)}
+          onBlur={
+            field.key === 'slug'
+              ? (e) => set('slug', makeSlug(e.target.value))
+              : undefined
+          }
+        />
+      );
   }
 }
