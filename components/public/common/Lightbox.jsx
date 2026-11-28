@@ -18,13 +18,11 @@ export default function Lightbox({ image, title, subtitle, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-[#22221F]/80 p-4 sm:p-8"
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
     >
       <div
         className="relative max-h-[90vh] w-full max-w-4xl overflow-hidden border border-[#DCD9D1] bg-[#F6F4EF] p-4 sm:p-6"
-        onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-start justify-between gap-4 border-b border-[#DCD9D1] pb-3">
           <div>
