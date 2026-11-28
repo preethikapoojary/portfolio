@@ -40,7 +40,7 @@ export default function Testimonials() {
         {homeItems.length > 0 ? (
           <div className="grid gap-8 md:grid-cols-2">
             {homeItems.map((t) => {
-              const itemPath = `/testimonials-${t.slug || t._id}`;
+              const itemPath = `/testimonials/${t.slug || t._id}`;
               return (
               <blockquote
                 key={t._id}

@@ -370,7 +370,7 @@ export default function TestimonialsPage() {
       ) : approved.length > 0 ? (
         <section className="mb-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {approved.map((item) => {
-            const itemPath = `/testimonials-${item.slug || item._id}`;
+            const itemPath = `/testimonials/${item.slug || item._id}`;
             return (
             <blockquote
               key={item._id}

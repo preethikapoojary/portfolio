@@ -34,7 +34,7 @@ export default function TestimonialDetail({ slug }) {
     );
   }
 
-  const sharePath = `/testimonials-${item.slug || item._id}`;
+  const sharePath = `/testimonials/${item.slug || item._id}`;
 
   const handleDownload = async () => {
     if (downloading) return;
