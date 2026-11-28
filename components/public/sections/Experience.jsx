@@ -7,6 +7,7 @@ import api from '@/api/endpoints';
 import { getExperienceCoverMedia } from '@/utils/experience';
 import { getCroppedImageStyle } from '@/utils/croppedImage';
 import { formatDateRange } from '@/utils/date';
+import ShareMenu from '@/components/public/common/ShareMenu';
 
 function summarizeDescription(text) {
   if (!text) return '';
@@ -115,10 +116,14 @@ export default function Experience() {
                     </ul>
                   )}
 
-                  <div className="mt-6">
+                  <div className="mt-6 flex items-center justify-between gap-4">
                     <Link href={`/experience/${exp.slug || exp._id}`} className="editorial-link text-[15px]">
                       View details <FiArrowRight size={15} />
                     </Link>
+                    <ShareMenu
+                      path={`/experience/${exp.slug || exp._id}`}
+                      title={`${exp.role}${exp.company ? ` — ${exp.company}` : ''}`}
+                    />
                   </div>
                 </div>
               </article>

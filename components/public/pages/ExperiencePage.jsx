@@ -5,6 +5,7 @@ import { FiArrowRight } from 'react-icons/fi';
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import PageHeader from '@/components/public/common/PageHeader';
+import ShareMenu from '@/components/public/common/ShareMenu';
 import { getExperienceCoverMedia } from '@/utils/experience';
 import { getCroppedImageStyle } from '@/utils/croppedImage';
 import { formatCalendarDate, formatDateRange } from '@/utils/date';
@@ -120,10 +121,14 @@ export default function ExperiencePage() {
                     </div>
                   )}
 
-                  <div className="mt-6">
+                  <div className="mt-6 flex items-center justify-between gap-4">
                     <Link href={`/experience/${exp.slug || exp._id}`} className="editorial-link">
                       View role details &amp; artifacts <FiArrowRight size={14} />
                     </Link>
+                    <ShareMenu
+                      path={`/experience/${exp.slug || exp._id}`}
+                      title={`${exp.role}${exp.company ? ` — ${exp.company}` : ''}`}
+                    />
                   </div>
                 </div>
               </article>
