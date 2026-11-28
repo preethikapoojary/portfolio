@@ -73,10 +73,31 @@ function isBareEmailAddress(url) {
  * This is about link *behavior*, not icon selection, so it doesn't
  * reintroduce icon-guessing.
  */
+const DEFAULT_MAILTO_SUBJECT = 'Reaching out via your Portfolio';
+const DEFAULT_MAILTO_BODY =
+  'Hi Preethika,\n\nI came across your portfolio and would love to connect regarding ';
+
+export function buildMailtoHref(
+  emailOrMailto,
+  {
+    subject = DEFAULT_MAILTO_SUBJECT,
+    body = DEFAULT_MAILTO_BODY,
+  } = {},
+) {
+  if (!emailOrMailto) return '';
+  const cleanEmail = emailOrMailto.replace(/^mailto:/i, '').split('?')[0].trim();
+  if (!cleanEmail) return '';
+  const params = new URLSearchParams();
+  if (subject) params.set('subject', subject);
+  if (body) params.set('body', body);
+  const query = params.toString().replace(/\+/g, '%20');
+  return query ? `mailto:${cleanEmail}?${query}` : `mailto:${cleanEmail}`;
+}
+
 function resolveHref(icon, url) {
   if (!url) return null;
-  if (icon === 'email' || isBareEmailAddress(url)) {
-    return url.startsWith('mailto:') ? url : `mailto:${url}`;
+  if (icon === 'email' || isBareEmailAddress(url) || url.startsWith('mailto:')) {
+    return url.includes('?') ? (url.startsWith('mailto:') ? url : `mailto:${url}`) : buildMailtoHref(url);
   }
   return url;
 }

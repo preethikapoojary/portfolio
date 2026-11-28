@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
 import { useSettings } from '@/context/SettingsContext';
-import { getContactEmail, getNonEmailSocialLinks } from '@/utils/socialLinks';
+import { buildMailtoHref, getContactEmail, getNonEmailSocialLinks } from '@/utils/socialLinks';
 
 export default function Contact() {
   const { profile } = useSettings();
@@ -28,7 +28,7 @@ export default function Contact() {
 
             {contactEmail && (
               <a
-                href={`mailto:${contactEmail}`}
+                href={buildMailtoHref(contactEmail)}
                 className="mt-8 inline-block border-b border-[#DCD9D1] pb-1 text-lg text-[#89877F] transition-colors hover:border-[#22221F] hover:text-[#22221F]"
               >
                 {contactEmail}

@@ -5,7 +5,7 @@ import { Turnstile } from '@marsidev/react-turnstile';
 import { FiCheck, FiSend } from 'react-icons/fi';
 import api from '@/api/endpoints';
 import { useSettings } from '@/context/SettingsContext';
-import { getContactEmail, getNonEmailSocialLinks } from '@/utils/socialLinks';
+import { buildMailtoHref, getContactEmail, getNonEmailSocialLinks } from '@/utils/socialLinks';
 import PageHeader from '@/components/public/common/PageHeader';
 
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -75,7 +75,7 @@ export default function ContactPage() {
             </p>
             {contactEmail && (
               <a
-                href={`mailto:${contactEmail}`}
+                href={buildMailtoHref(contactEmail)}
                 className="mt-2 inline-block border-b border-[#DCD9D1] pb-1 text-base font-medium text-[#22221F] transition-colors hover:border-[#22221F]"
               >
                 {contactEmail}
