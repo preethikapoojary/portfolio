@@ -25,6 +25,7 @@ const editFields = [
   { key: 'message', label: 'Testimonial', type: 'textarea', rows: 4 },
   { key: 'order', label: 'Sort Order (Testimonials Page)', type: 'number', min: 1 },
   { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 1 },
+  { key: 'status', label: 'Approval Status', type: 'select', options: ['pending', 'approved', 'rejected'] },
 ];
 
 export default function TestimonialsPage() {
