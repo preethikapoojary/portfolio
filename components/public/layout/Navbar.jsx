@@ -30,6 +30,9 @@ export default function Navbar() {
 
   useEffect(() => {
     setMobileOpen(false);
+    if (pathname === '/' && typeof window !== 'undefined' && !window.location.hash) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }, [pathname]);
 
   // Scroll-spy for homepage sections
@@ -155,8 +158,30 @@ export default function Navbar() {
     setMobileOpen(false);
     if (isHome) {
       e.preventDefault();
+      if (window.location.hash) {
+        window.history.replaceState(null, '', '/');
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setActiveKey('home');
+    }
+  };
+
+  const handleNavClick = (e, item) => {
+    if (item.key === 'home') {
+      handleHomeClick(e);
+      return;
+    }
+    setMobileOpen(false);
+    if (isHome && item.href?.startsWith('#')) {
+      e.preventDefault();
+      if (window.location.hash) {
+        window.history.replaceState(null, '', '/');
+      }
+      const target = document.getElementById(item.key);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActiveKey(item.key);
+      }
     }
   };
 
@@ -184,7 +209,7 @@ export default function Navbar() {
               <Link
                 key={item.key}
                 href={item.href}
-                onClick={item.key === 'home' ? handleHomeClick : undefined}
+                onClick={(e) => handleNavClick(e, item)}
                 className={`relative py-1 text-[13px] font-medium tracking-wide transition-colors ${
                   active ? 'text-[#22221F]' : 'text-[#89877F] hover:text-[#22221F]'
                 }`}
@@ -263,11 +288,7 @@ export default function Navbar() {
                 key={item.key}
                 href={item.href}
                 tabIndex={mobileOpen ? 0 : -1}
-                onClick={
-                  item.key === 'home'
-                    ? handleHomeClick
-                    : () => setMobileOpen(false)
-                }
+                onClick={(e) => handleNavClick(e, item)}
                 className={`py-0.5 text-[15px] font-medium tracking-wide transition-colors ${
                   active
                     ? 'font-semibold text-[#22221F] underline decoration-[#85806D] decoration-1 underline-offset-4'
