@@ -46,11 +46,11 @@ export default function Testimonials() {
                 key={t._id}
                 className="flex flex-col justify-between border border-[#DCD9D1] bg-[#E9E5DC]/25 p-7 transition-colors hover:border-[#85806D]"
               >
-                <Link href={itemPath} className="block flex-1">
+                <div className="flex-1">
                   <p className="text-base leading-relaxed text-[#22221F] sm:text-lg">
                     “{t.message}”
                   </p>
-                </Link>
+                </div>
                 <footer className="mt-6 flex items-center justify-between gap-3 border-t border-[#DCD9D1] pt-4">
                   <Link href={itemPath} className="flex min-w-0 flex-1 items-center gap-3">
                     {t.avatar?.url && (

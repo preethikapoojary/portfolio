@@ -354,11 +354,11 @@ export default function TestimonialsPage() {
               key={item._id}
               className="flex flex-col justify-between border border-[#DCD9D1] bg-[#E9E5DC]/25 p-6 transition-colors hover:border-[#85806D]"
             >
-              <Link href={itemPath} className="block flex-1">
+              <div className="flex-1">
                 <p className="text-center text-sm italic leading-relaxed text-[#22221F] sm:text-[15px]">
                   “{item.message}”
                 </p>
-              </Link>
+              </div>
 
               <footer className="mt-6 flex items-center gap-3.5 border-t border-[#DCD9D1] pt-4">
                 <Link href={itemPath} className="flex min-w-0 flex-1 items-center gap-3.5">
