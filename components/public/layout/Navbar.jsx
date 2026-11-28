@@ -126,10 +126,7 @@ export default function Navbar() {
       links.push({ key: 'experience', label: 'Experience', href: '/experience' });
     } else if (pathname?.startsWith('/certificates/') && pathname !== '/certificates') {
       links.push({ key: 'certificates', label: 'Certificates', href: '/certificates' });
-    } else if (
-      (pathname?.startsWith('/testimonials/') && pathname !== '/testimonials') ||
-      pathname?.startsWith('/testimonials-')
-    ) {
+    } else if (pathname?.startsWith('/testimonials/') && pathname !== '/testimonials') {
       links.push({ key: 'testimonials', label: 'Testimonials', href: '/testimonials' });
     } else if (pathname?.startsWith('/blog/') && pathname !== '/blog') {
       links.push({ key: 'blog', label: 'Blog', href: '/blog' });
