@@ -216,18 +216,30 @@ function renderField(field, values, set) {
 
     case 'images':
       return (
-        <div className="flex flex-wrap gap-3">
+        <div className="space-y-4">
           {(value || []).map((img, i) => (
-            <ImageUploader
-              key={i}
-              value={img}
-              onChange={(media) => {
-                const next = [...(value || [])];
-                if (media) next[i] = media;
-                else next.splice(i, 1);
-                set(field.key, next);
-              }}
-            />
+            <div key={i} className="space-y-2 border border-[#DCD9D1] bg-[#E9E5DC]/20 p-3">
+              <ImageUploader
+                value={img}
+                onChange={(media) => {
+                  const next = [...(value || [])];
+                  if (media) next[i] = { ...media, caption: img?.caption || media.caption || '' };
+                  else next.splice(i, 1);
+                  set(field.key, next);
+                }}
+              />
+              <input
+                type="text"
+                className="input text-xs"
+                placeholder="Caption / figcaption (optional)"
+                value={img?.caption ?? img?.alt ?? ''}
+                onChange={(e) => {
+                  const next = [...(value || [])];
+                  next[i] = { ...img, caption: e.target.value, alt: e.target.value };
+                  set(field.key, next);
+                }}
+              />
+            </div>
           ))}
           <ImageUploader value={null} onChange={(media) => media && set(field.key, [...(value || []), media])} />
         </div>

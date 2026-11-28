@@ -9,6 +9,7 @@ import api from '@/api/endpoints';
 import Lightbox from '@/components/public/common/Lightbox';
 import ShareMenu from '@/components/public/common/ShareMenu';
 import { getExperienceCoverUrl } from '@/utils/experience';
+import { getCroppedImageStyle } from '@/utils/croppedImage';
 import { formatDateRange } from '@/utils/date';
 
 export default function ExperienceDetail() {
@@ -168,23 +169,33 @@ export default function ExperienceDetail() {
             <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
               Supporting Images
             </p>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-8">
               {exp.attachments
                 .filter((a) => a?.url)
-                .map((att, idx) => (
-                  <button
-                    key={att.url + idx}
-                    type="button"
-                    onClick={() => setPreviewImg(att.url)}
-                    className="group overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 text-left"
-                  >
-                    <img
-                      src={att.url}
-                      alt={att.alt || `${exp.role} image ${idx + 1}`}
-                      className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                    />
-                  </button>
-                ))}
+                .map((att, idx) => {
+                  const caption = att.caption || att.alt || '';
+                  return (
+                    <figure key={att.url + idx} className="space-y-2.5">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewImg(att.url)}
+                        className="group block w-full overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2 text-left"
+                      >
+                        <img
+                          src={att.url}
+                          alt={caption || `${exp.role} image ${idx + 1}`}
+                          style={getCroppedImageStyle(att)}
+                          className="mx-auto max-h-[540px] w-full object-contain transition-transform duration-500 group-hover:scale-[1.01]"
+                        />
+                      </button>
+                      {caption && (
+                        <figcaption className="text-center text-xs leading-relaxed text-[#89877F]">
+                          {caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  );
+                })}
             </div>
           </section>
         )}

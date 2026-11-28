@@ -139,21 +139,30 @@ export default function ProjectDetail() {
 
       {project.screenshots?.length > 0 && (
         <section className="mt-12 border-t border-[#DCD9D1] pt-10">
-          <div className="grid gap-6 sm:grid-cols-2">
-            {project.screenshots.map((shot, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setPreviewImg(shot.url)}
-                className="overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2 text-left"
-              >
-                <img
-                  src={shot.url}
-                  alt={shot.alt || `${project.title} ${idx + 1}`}
-                  className="w-full object-contain"
-                />
-              </button>
-            ))}
+          <div className="space-y-8">
+            {project.screenshots.map((shot, idx) => {
+              const caption = shot.caption || shot.alt || '';
+              return (
+                <figure key={idx} className="space-y-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewImg(shot.url)}
+                    className="block w-full overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 p-2 text-left"
+                  >
+                    <img
+                      src={shot.url}
+                      alt={caption || `${project.title} ${idx + 1}`}
+                      className="mx-auto max-h-[540px] w-full object-contain"
+                    />
+                  </button>
+                  {caption && (
+                    <figcaption className="text-center text-xs leading-relaxed text-[#89877F]">
+                      {caption}
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            })}
           </div>
         </section>
       )}
