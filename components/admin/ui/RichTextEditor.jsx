@@ -210,8 +210,8 @@ export default function RichTextEditor({ value, onChange }) {
         onClose={() => setPickerOpen(false)}
         defaultCategory="images"
         title="Insert Image from /public/assets"
-        onSelect={(asset) => {
-          insertImage(asset.url, asset.name || '');
+        onSelect={(assetPath) => {
+          insertImage(assetPath, '');
           setPickerOpen(false);
         }}
       />
