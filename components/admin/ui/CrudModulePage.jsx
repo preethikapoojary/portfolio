@@ -93,17 +93,17 @@ export default function CrudModulePage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold">{title}</h1>
           {description && <p className="text-sm text-muted">{description}</p>}
         </div>
-        <button onClick={openCreate} className="btn-primary flex items-center gap-2">
+        <button onClick={openCreate} className="btn-primary flex w-fit items-center gap-2">
           <FiPlus /> Add new
         </button>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <SearchBar onSearch={setSearch} placeholder={`Search ${title.toLowerCase()}…`} />
         {hasOrder && (
           <button onClick={() => setReorderMode((m) => !m)} className="btn-secondary">

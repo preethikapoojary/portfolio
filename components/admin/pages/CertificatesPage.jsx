@@ -1,13 +1,15 @@
 'use client';
 import { useState } from 'react';
-import { FiCamera, FiTrash2, FiUpload } from 'react-icons/fi';
+import { FiCamera, FiFolder, FiTrash2, FiUpload } from 'react-icons/fi';
 import CrudModulePage from '@/components/admin/ui/CrudModulePage';
 import IconTooltip from '@/components/admin/ui/IconTooltip';
+import AssetPickerModal from '@/components/admin/ui/AssetPickerModal';
 import { certificatesApi } from '@/lib/adminApi/endpoints';
 import axiosClient from '@/lib/adminApi/axiosClient';
 
 function EventPhotosEditor({ value, onChange }) {
   const [uploading, setUploading] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [error, setError] = useState('');
   const photos = Array.isArray(value) ? value : [];
 
@@ -46,23 +48,32 @@ function EventPhotosEditor({ value, onChange }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="inline-flex items-center gap-2 text-xs font-medium text-[#22221F]">
           <FiCamera size={14} />
           Event Photos / Image Gallery ({photos.length})
         </span>
-        <label className="btn-secondary inline-flex cursor-pointer items-center gap-1.5 text-xs">
-          <FiUpload size={13} />
-          {uploading ? 'Uploading…' : 'Upload Photo'}
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleUpload}
-            disabled={uploading}
-          />
-        </label>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="btn-secondary inline-flex items-center gap-1.5 text-xs"
+          >
+            <FiFolder size={13} /> Assets
+          </button>
+          <label className="btn-secondary inline-flex cursor-pointer items-center gap-1.5 text-xs">
+            <FiUpload size={13} />
+            {uploading ? 'Uploading…' : 'Upload Photo'}
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleUpload}
+              disabled={uploading}
+            />
+          </label>
+        </div>
       </div>
 
       {error && <p className="text-xs text-red-600">{error}</p>}
@@ -100,6 +111,16 @@ function EventPhotosEditor({ value, onChange }) {
           ))}
         </div>
       )}
+
+      <AssetPickerModal
+        isOpen={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        defaultCategory="images"
+        title="Select Event Photo from /public/assets"
+        onSelect={(assetPath) =>
+          onChange([...photos, { url: assetPath, publicId: null, caption: '' }])
+        }
+      />
     </div>
   );
 }

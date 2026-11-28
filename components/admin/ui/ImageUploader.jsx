@@ -1,16 +1,16 @@
 'use client';
 import { useState } from 'react';
-import { FiUpload, FiX } from 'react-icons/fi';
+import { FiFolder, FiTrash2, FiUpload } from 'react-icons/fi';
 import axiosClient from '@/lib/adminApi/axiosClient';
+import AssetPickerModal from './AssetPickerModal';
 
 /**
- * Uploads a single file to POST /admin/upload/image and returns a
- * mediaSchema-shaped object ({ url, publicId, alt }) via onChange. Reused
- * anywhere a module stores an image (Certificate.image, GalleryImage.image,
- * Project.screenshots[n], SiteSettings.logo/favicon).
+ * Image field with live preview, manual path/URL input, Clear, /public/assets
+ * picker modal, and direct upload to POST /admin/upload/image.
  */
 export default function ImageUploader({ value, onChange, folder = 'portfolio/images' }) {
   const [uploading, setUploading] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [error, setError] = useState('');
 
   const handleFile = async (e) => {
@@ -30,31 +30,88 @@ export default function ImageUploader({ value, onChange, folder = 'portfolio/ima
       setError('Upload failed. Please try again.');
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 
+  const currentUrl = value?.url || '';
+  const isCertificateFolder = /certificate/i.test(folder);
+
   return (
-    <div>
-      {value?.url ? (
-        <div className="relative inline-block">
-          <img src={value.url} alt={value.alt || ''} className="h-28 w-28 rounded-lg object-cover" />
+    <div className="space-y-2.5">
+      <div className="flex flex-wrap items-center gap-2.5">
+        {currentUrl ? (
+          <img
+            src={currentUrl}
+            alt={value?.alt || ''}
+            className="h-11 w-11 shrink-0 rounded border border-[#DCD9D1] object-cover"
+          />
+        ) : (
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded border border-dashed border-[#DCD9D1] bg-[#E9E5DC]/30 text-[10px] text-[#89877F]">
+            No img
+          </div>
+        )}
+
+        <input
+          type="text"
+          className="input min-w-[160px] flex-1"
+          placeholder="/assets/... or https://..."
+          value={currentUrl}
+          onChange={(e) => {
+            const url = e.target.value;
+            onChange(url ? { url, publicId: null, alt: value?.alt || '' } : null);
+          }}
+        />
+
+        {currentUrl && (
           <button
             type="button"
             onClick={() => onChange(null)}
-            className="absolute -right-2 -top-2 rounded-full bg-white p-1 text-red-500 shadow"
-            aria-label="Remove image"
+            className="inline-flex items-center gap-1.5 border border-red-200 px-3 py-2 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
           >
-            <FiX size={14} />
+            <FiTrash2 size={13} /> Clear
           </button>
-        </div>
-      ) : (
-        <label className="flex h-28 w-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-slate-200 text-muted hover:border-primary hover:text-primary">
-          <FiUpload />
-          <span className="text-xs">{uploading ? 'Uploading…' : 'Upload'}</span>
-          <input type="file" accept="image/*" className="hidden" onChange={handleFile} disabled={uploading} />
+        )}
+
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
+          className="btn-secondary inline-flex items-center gap-1.5 text-xs"
+        >
+          <FiFolder size={13} /> Assets
+        </button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="btn-secondary inline-flex cursor-pointer items-center gap-1.5 text-xs">
+          <FiUpload size={13} />
+          {uploading ? 'Uploading…' : 'Upload Image'}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFile}
+            disabled={uploading}
+          />
         </label>
-      )}
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+        <span className="text-[11px] text-[#89877F]">
+          {isCertificateFolder
+            ? 'Auto-converts to PNG · or pick from /public/assets.'
+            : 'Auto-converts to WebP · or pick from /public/assets.'}
+        </span>
+      </div>
+
+      {error && <p className="text-xs text-red-500">{error}</p>}
+
+      <AssetPickerModal
+        isOpen={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        defaultCategory={isCertificateFolder ? 'documents' : 'images'}
+        title={isCertificateFolder ? 'Select Certificate Image' : 'Select Image from /public/assets'}
+        onSelect={(assetPath) =>
+          onChange({ url: assetPath, publicId: null, alt: value?.alt || '' })
+        }
+      />
     </div>
   );
 }
