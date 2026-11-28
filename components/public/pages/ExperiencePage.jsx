@@ -61,12 +61,37 @@ export default function ExperiencePage() {
                   {exp.location && (
                     <p className="mt-0.5 text-xs text-[#89877F]">{exp.location}</p>
                   )}
+                  {exp.coverImage?.url && (
+                    <Link
+                      href={`/experience/${exp.slug || exp._id}`}
+                      className="group mt-4 hidden overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 md:block"
+                    >
+                      <img
+                        src={exp.coverImage.url}
+                        alt={exp.role}
+                        className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                      />
+                    </Link>
+                  )}
                 </div>
 
                 <div className="md:col-span-8">
                   <h2 className="font-display text-2xl font-medium text-[#22221F] sm:text-3xl">
                     {exp.role}
                   </h2>
+
+                  {exp.coverImage?.url && (
+                    <Link
+                      href={`/experience/${exp.slug || exp._id}`}
+                      className="group my-4 block overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 md:hidden"
+                    >
+                      <img
+                        src={exp.coverImage.url}
+                        alt={exp.role}
+                        className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                      />
+                    </Link>
+                  )}
 
                   {exp.description && (
                     <p className="mt-3 text-sm leading-relaxed text-[#22221F]/85 sm:text-base">

@@ -56,6 +56,20 @@ export default function ExperienceDetail() {
       </header>
 
       <div className="space-y-10 py-10">
+        {exp.coverImage?.url && (
+          <button
+            type="button"
+            onClick={() => setPreviewImg(exp.coverImage.url)}
+            className="block w-full overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/40 text-left"
+          >
+            <img
+              src={exp.coverImage.url}
+              alt={exp.role}
+              className="aspect-[16/9] w-full object-cover"
+            />
+          </button>
+        )}
+
         {exp.description && (
           /<[a-z][\s\S]*>/i.test(exp.description) ? (
             <div

@@ -81,6 +81,7 @@ const fields = [
   { key: 'endDate', label: 'End Date', type: 'date' },
   { key: 'isCurrent', label: 'I currently work here (shows "Present")', type: 'checkbox' },
   { key: 'description', label: 'Short Professional Overview', type: 'textarea', rows: 2 },
+  { key: 'coverImage', label: 'Cover Image (shown on the experience card — separate from certificate)', type: 'image' },
   {
     key: 'responsibilities',
     label: 'What I Worked On (one per line)',
@@ -116,6 +117,20 @@ const fields = [
 ];
 
 const columns = [
+  {
+    key: 'thumb',
+    label: '',
+    render: (row) =>
+      row.coverImage?.url || row.certificate?.url || row.proofFile?.url ? (
+        <img
+          src={row.coverImage?.url || row.certificate?.url || row.proofFile?.url}
+          alt=""
+          className="h-10 w-14 rounded object-cover"
+        />
+      ) : (
+        <div className="h-10 w-14 rounded bg-slate-100" />
+      ),
+  },
   { key: 'role', label: 'Role' },
   { key: 'company', label: 'Company' },
   {
@@ -150,6 +165,7 @@ export default function ExperiencePage() {
         location: '',
         isCurrent: false,
         description: '',
+        coverImage: null,
         responsibilities: [],
         technologies: [],
         proofFile: null,

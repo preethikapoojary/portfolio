@@ -114,6 +114,7 @@ create table if not exists public.experience (
   is_current boolean not null default false,
   description text not null default '',
   icon text not null default '',
+  cover_image jsonb not null default '{"url": null, "publicId": null, "alt": ""}'::jsonb,
   responsibilities text[] not null default '{}',
   technologies text[] not null default '{}',
   proof_file jsonb not null default '{"url": null, "publicId": null, "alt": ""}'::jsonb,
