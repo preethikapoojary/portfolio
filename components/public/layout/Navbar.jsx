@@ -267,8 +267,8 @@ export default function Navbar() {
         aria-hidden={!mobileOpen}
         className={`fixed right-4 top-[4.5rem] z-50 w-56 max-w-[calc(100vw-2rem)] rounded-[22px] border border-[#DCD9D1] bg-[#F6F4EF] px-5 py-6 shadow-[0_14px_40px_rgba(34,34,31,0.12)] transition-all duration-200 ease-out md:hidden ${
           mobileOpen
-            ? 'pointer-events-auto translate-y-0 opacity-100'
-            : 'pointer-events-none -translate-y-2 opacity-0'
+            ? 'visible pointer-events-auto translate-y-0 opacity-100'
+            : 'invisible pointer-events-none -translate-y-2 opacity-0'
         }`}
       >
         <div className="flex flex-col items-center space-y-4">
@@ -294,9 +294,10 @@ export default function Navbar() {
           <button
             type="button"
             tabIndex={mobileOpen ? 0 : -1}
-            onClick={() => {
-              toggle();
+            onClick={(e) => {
+              e.stopPropagation();
               setMobileOpen(false);
+              toggle();
             }}
             aria-label={mode === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             className="mt-1 p-2 text-[#22221F] transition-colors hover:text-[#85806D]"
