@@ -23,11 +23,11 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="mb-6 flex items-center justify-between border-b border-[#DCD9D1] pb-4">
+        <div className="mb-5 flex items-center justify-between border-b border-[#DCD9D1] pb-4">
           <Link
             href="/admin"
             onClick={onClose}
-            className="font-display text-lg font-semibold text-[#22221F]"
+            className="font-display text-xl font-semibold text-[#22221F]"
           >
             Admin Panel
           </Link>
@@ -37,11 +37,11 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
             className="p-1 text-[#89877F] transition-colors hover:text-[#22221F] md:hidden"
             aria-label="Close navigation menu"
           >
-            <FiX size={18} />
+            <FiX size={20} />
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto">
+        <nav className="flex-1 space-y-1.5 overflow-y-auto">
           {moduleRegistry.map(({ key, label, icon: Icon, path, matchPaths, status }) => {
             const paths = matchPaths || [path];
             const isActive = paths.some((p) =>
@@ -52,14 +52,14 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
                 key={key}
                 href={path}
                 onClick={onClose}
-                className={`flex items-center justify-between border-l-2 px-3 py-2 text-[13px] transition-colors ${
+                className={`flex items-center justify-between border-l-2 px-3 py-2.5 text-[15px] transition-colors ${
                   isActive
                     ? 'border-[#22221F] bg-[#E9E5DC]/60 font-medium text-[#22221F]'
                     : 'border-transparent text-[#89877F] hover:bg-[#E9E5DC]/40 hover:text-[#22221F]'
                 }`}
               >
                 <span className="flex items-center gap-3">
-                  <Icon size={15} />
+                  <Icon size={17} />
                   {label}
                 </span>
                 {status === 'phase2' && (
@@ -70,19 +70,21 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
               </Link>
             );
           })}
+        </nav>
 
+        <div className="mt-auto border-t border-[#DCD9D1] pt-3">
           <button
             type="button"
             onClick={() => {
               onClose();
               logout();
             }}
-            className="mt-2 flex w-full items-center gap-3 border-l-2 border-transparent border-t border-[#DCD9D1] px-3 pb-2 pt-3 text-left text-[13px] text-[#89877F] transition-colors hover:bg-[#E9E5DC]/40 hover:text-[#22221F]"
+            className="flex w-full items-center gap-3 border-l-2 border-transparent px-3 py-2.5 text-left text-[15px] text-[#89877F] transition-colors hover:bg-[#E9E5DC]/40 hover:text-[#22221F]"
           >
-            <FiLogOut size={15} />
+            <FiLogOut size={17} />
             Log out
           </button>
-        </nav>
+        </div>
       </aside>
     </>
   );

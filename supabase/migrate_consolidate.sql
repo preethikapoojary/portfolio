@@ -303,6 +303,11 @@ where e.id = r.id and r.rn > 1;
 
 create unique index if not exists experience_slug_key on public.experience(slug);
 
+-- 12. Certificates event photos gallery and section heading
+alter table public.certificates
+  add column if not exists gallery_heading text not null default '',
+  add column if not exists event_photos jsonb not null default '[]'::jsonb;
+
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;

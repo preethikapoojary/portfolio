@@ -6,6 +6,7 @@ import { FiArrowLeft, FiArrowRight, FiDownload, FiExternalLink } from 'react-ico
 import { useFetch } from '@/hooks/useFetch';
 import api from '@/api/endpoints';
 import ShareMenu from '@/components/public/common/ShareMenu';
+import Lightbox from '@/components/public/common/Lightbox';
 import { downloadCertificatePdf } from '@/utils/downloadCertificatePdf';
 
 export default function CertificateDetail({ slug }) {
@@ -14,6 +15,7 @@ export default function CertificateDetail({ slug }) {
     [slug]
   );
   const [downloading, setDownloading] = useState(false);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(null);
 
   if (loading) {
     return (
@@ -107,11 +109,68 @@ export default function CertificateDetail({ slug }) {
         </div>
       )}
 
+      {cert.eventPhotos?.length > 0 && (
+        <section className="mt-12 border-t border-[#DCD9D1] pt-10">
+          <h2 className="font-display text-2xl font-medium tracking-tight text-[#22221F] sm:text-3xl">
+            {cert.galleryHeading || 'Event Photos'}
+          </h2>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2">
+            {cert.eventPhotos.map((photo, idx) => {
+              const caption = photo.caption || photo.alt || '';
+              return (
+                <figure
+                  key={`${photo.publicId || photo.url}-${idx}`}
+                  className="overflow-hidden border border-[#DCD9D1] bg-[#E9E5DC]/35 p-2.5"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setActivePhotoIndex(idx)}
+                    className="block w-full overflow-hidden text-left"
+                  >
+                    <img
+                      src={photo.url}
+                      alt={caption || `${cert.title} event photo ${idx + 1}`}
+                      className="aspect-[4/3] w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
+                    />
+                  </button>
+                  {caption && (
+                    <figcaption className="mt-2.5 px-1 text-xs leading-relaxed text-[#89877F]">
+                      {caption}
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <div className="mt-12 text-center">
         <Link href="/certificates" className="editorial-link text-base">
           All Certificates <FiArrowRight size={15} />
         </Link>
       </div>
+
+      {activePhotoIndex !== null && cert.eventPhotos?.[activePhotoIndex] && (
+        <Lightbox
+          image={cert.eventPhotos[activePhotoIndex].url}
+          caption={cert.eventPhotos[activePhotoIndex].caption || cert.eventPhotos[activePhotoIndex].alt}
+          onClose={() => setActivePhotoIndex(null)}
+          onPrev={
+            cert.eventPhotos.length > 1
+              ? () =>
+                  setActivePhotoIndex(
+                    (activePhotoIndex - 1 + cert.eventPhotos.length) % cert.eventPhotos.length
+                  )
+              : undefined
+          }
+          onNext={
+            cert.eventPhotos.length > 1
+              ? () => setActivePhotoIndex((activePhotoIndex + 1) % cert.eventPhotos.length)
+              : undefined
+          }
+        />
+      )}
     </div>
   );
 }

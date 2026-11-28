@@ -142,6 +142,8 @@ create table if not exists public.certificates (
   issue_date timestamptz,
   "order" integer not null default 0 check ("order" >= 0),
   home_order integer check (home_order is null or home_order >= 0),
+  gallery_heading text not null default '',
+  event_photos jsonb not null default '[]'::jsonb,
   is_visible boolean not null default true,
   is_archived boolean not null default false,
   archived_at timestamptz,
