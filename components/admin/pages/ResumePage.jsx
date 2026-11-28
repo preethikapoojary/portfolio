@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { FiUpload, FiCheckCircle, FiTrash2, FiFileText } from 'react-icons/fi';
 import { resumeApi } from '@/lib/adminApi/endpoints';
+import IconTooltip from '@/components/admin/ui/IconTooltip';
 
 export default function ResumePage() {
   const [versions, setVersions] = useState([]);
@@ -109,9 +110,11 @@ export default function ResumePage() {
                   </button>
                 )}
                 {!v.isActive && (
-                  <button onClick={() => remove(v._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Delete">
-                    <FiTrash2 />
-                  </button>
+                  <IconTooltip label="Move to Trash">
+                    <button onClick={() => remove(v._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Delete">
+                      <FiTrash2 />
+                    </button>
+                  </IconTooltip>
                 )}
               </div>
             </div>

@@ -4,6 +4,7 @@ import { FiCheck, FiX, FiEdit2, FiTrash2, FiEye, FiEyeOff } from 'react-icons/fi
 import { testimonialsApi } from '@/lib/adminApi/endpoints';
 import AdminDrawer from '@/components/admin/ui/AdminDrawer';
 import DynamicForm from '@/components/admin/ui/DynamicForm';
+import IconTooltip from '@/components/admin/ui/IconTooltip';
 
 const STATUS_STYLES = {
   pending: 'bg-amber-50 text-amber-600',
@@ -140,24 +141,34 @@ export default function TestimonialsPage() {
               <div className="flex shrink-0 flex-col items-end gap-2">
                 <div className="flex gap-1">
                   {t.status !== 'approved' && (
-                    <button onClick={() => approve(t._id)} className="rounded p-1.5 text-emerald-600 hover:bg-emerald-50" aria-label="Approve">
-                      <FiCheck />
-                    </button>
+                    <IconTooltip label="Approve">
+                      <button onClick={() => approve(t._id)} className="rounded p-1.5 text-emerald-600 hover:bg-emerald-50" aria-label="Approve">
+                        <FiCheck />
+                      </button>
+                    </IconTooltip>
                   )}
                   {t.status !== 'rejected' && (
-                    <button onClick={() => reject(t._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Reject">
-                      <FiX />
-                    </button>
+                    <IconTooltip label="Reject">
+                      <button onClick={() => reject(t._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Reject">
+                        <FiX />
+                      </button>
+                    </IconTooltip>
                   )}
-                  <button onClick={() => toggleVisibility(t._id)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Toggle visibility">
-                    {t.isVisible ? <FiEye /> : <FiEyeOff />}
-                  </button>
-                  <button onClick={() => setEditing(t)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Edit">
-                    <FiEdit2 />
-                  </button>
-                  <button onClick={() => remove(t._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Delete">
-                    <FiTrash2 />
-                  </button>
+                  <IconTooltip label={t.isVisible ? 'Hide from public' : 'Show on public'}>
+                    <button onClick={() => toggleVisibility(t._id)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Toggle visibility">
+                      {t.isVisible ? <FiEye /> : <FiEyeOff />}
+                    </button>
+                  </IconTooltip>
+                  <IconTooltip label="Edit">
+                    <button onClick={() => setEditing(t)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Edit">
+                      <FiEdit2 />
+                    </button>
+                  </IconTooltip>
+                  <IconTooltip label="Move to Trash">
+                    <button onClick={() => remove(t._id)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Delete">
+                      <FiTrash2 />
+                    </button>
+                  </IconTooltip>
                 </div>
               </div>
             </div>

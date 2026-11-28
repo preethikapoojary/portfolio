@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { FiMail, FiCheckCircle, FiTrash2 } from 'react-icons/fi';
 import { messagesApi } from '@/lib/adminApi/endpoints';
 import AdminDrawer from '@/components/admin/ui/AdminDrawer';
+import IconTooltip from '@/components/admin/ui/IconTooltip';
 
 export default function MessagesPage() {
   const [messages, setMessages] = useState([]);
@@ -87,16 +88,20 @@ export default function MessagesPage() {
                 <p className="truncate text-xs text-muted">{msg.subject || msg.message}</p>
               </div>
               <div className="flex shrink-0 gap-1">
-                <button
-                  onClick={(e) => toggleRead(msg, e)}
-                  className="rounded p-1.5 text-muted hover:bg-slate-100"
-                  aria-label={msg.isRead ? 'Mark unread' : 'Mark read'}
-                >
-                  {msg.isRead ? <FiMail /> : <FiCheckCircle />}
-                </button>
-                <button onClick={(e) => remove(msg, e)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Delete">
-                  <FiTrash2 />
-                </button>
+                <IconTooltip label={msg.isRead ? 'Mark as unread' : 'Mark as read'}>
+                  <button
+                    onClick={(e) => toggleRead(msg, e)}
+                    className="rounded p-1.5 text-muted hover:bg-slate-100"
+                    aria-label={msg.isRead ? 'Mark unread' : 'Mark read'}
+                  >
+                    {msg.isRead ? <FiMail /> : <FiCheckCircle />}
+                  </button>
+                </IconTooltip>
+                <IconTooltip label="Move to Trash">
+                  <button onClick={(e) => remove(msg, e)} className="rounded p-1.5 text-red-500 hover:bg-red-50" aria-label="Delete">
+                    <FiTrash2 />
+                  </button>
+                </IconTooltip>
               </div>
             </div>
           ))

@@ -198,7 +198,6 @@ async function run() {
       live_demo_url: p.liveDemoUrl || "",
       technologies: p.technologies || [],
       category: p.category || "General",
-      is_featured: p.isFeatured ?? false,
       order: p.order ?? i,
       is_visible: p.isVisible ?? true,
       seo: p.seo || { metaTitle: "", metaDescription: "", ogImage: EMPTY_MEDIA },

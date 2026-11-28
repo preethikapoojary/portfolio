@@ -310,7 +310,8 @@ alter table public.certificates
 
 -- 13. Projects and Testimonials sort order and home_order
 alter table public.projects
-  add column if not exists home_order integer check (home_order is null or home_order >= 0);
+  add column if not exists home_order integer check (home_order is null or home_order >= 0),
+  drop column if exists is_featured;
 
 alter table public.testimonials
   add column if not exists "order" integer not null default 0 check ("order" >= 0),

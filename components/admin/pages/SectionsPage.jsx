@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { sectionsApi } from '@/lib/adminApi/endpoints';
 import ReorderableList from '@/components/admin/ui/ReorderableList';
+import IconTooltip from '@/components/admin/ui/IconTooltip';
 
 export default function SectionsPage() {
   const [sections, setSections] = useState([]);
@@ -33,9 +34,11 @@ export default function SectionsPage() {
         renderItem={(section) => (
           <div className="flex items-center justify-between">
             <span className={section.isVisible ? '' : 'text-muted line-through'}>{section.label}</span>
-            <button onClick={() => toggleVisibility(section)} className="rounded p-1.5 text-muted hover:bg-slate-100">
-              {section.isVisible ? <FiEye /> : <FiEyeOff />}
-            </button>
+            <IconTooltip label={section.isVisible ? 'Hide section' : 'Show section'}>
+              <button onClick={() => toggleVisibility(section)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Toggle visibility">
+                {section.isVisible ? <FiEye /> : <FiEyeOff />}
+              </button>
+            </IconTooltip>
           </div>
         )}
       />

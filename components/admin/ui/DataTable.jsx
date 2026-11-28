@@ -1,5 +1,6 @@
 'use client';
 import { FiEdit2, FiTrash2, FiEye, FiEyeOff } from 'react-icons/fi';
+import IconTooltip from './IconTooltip';
 
 // Supports both boolean isVisible (most modules) and status-based modules
 // like Blog (draft/published) without every module needing its own icon logic.
@@ -55,28 +56,33 @@ export default function DataTable({
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
                     {onToggleVisibility && (
-                      <button
-                        onClick={() => onToggleVisibility(row)}
-                        className="rounded p-1.5 text-muted hover:bg-slate-100"
-                        aria-label={isRowVisible(row) ? 'Hide' : 'Show'}
-                        title={isRowVisible(row) ? 'Visible — click to hide' : 'Hidden — click to show'}
-                      >
-                        {isRowVisible(row) ? <FiEye /> : <FiEyeOff />}
-                      </button>
+                      <IconTooltip label={isRowVisible(row) ? 'Hide from public' : 'Show on public'}>
+                        <button
+                          onClick={() => onToggleVisibility(row)}
+                          className="rounded p-1.5 text-muted hover:bg-slate-100"
+                          aria-label={isRowVisible(row) ? 'Hide' : 'Show'}
+                        >
+                          {isRowVisible(row) ? <FiEye /> : <FiEyeOff />}
+                        </button>
+                      </IconTooltip>
                     )}
                     {onEdit && (
-                      <button onClick={() => onEdit(row)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Edit">
-                        <FiEdit2 />
-                      </button>
+                      <IconTooltip label="Edit">
+                        <button onClick={() => onEdit(row)} className="rounded p-1.5 text-muted hover:bg-slate-100" aria-label="Edit">
+                          <FiEdit2 />
+                        </button>
+                      </IconTooltip>
                     )}
                     {onDelete && (
-                      <button
-                        onClick={() => onDelete(row)}
-                        className="rounded p-1.5 text-red-500 hover:bg-red-50"
-                        aria-label="Delete"
-                      >
-                        <FiTrash2 />
-                      </button>
+                      <IconTooltip label="Move to Trash">
+                        <button
+                          onClick={() => onDelete(row)}
+                          className="rounded p-1.5 text-red-500 hover:bg-red-50"
+                          aria-label="Delete"
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </IconTooltip>
                     )}
                   </div>
                 </td>

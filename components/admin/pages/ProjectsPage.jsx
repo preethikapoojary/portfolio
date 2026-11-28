@@ -17,7 +17,6 @@ const fields = [
   { key: 'reportPdf', label: 'Project Report PDF (optional)', type: 'pdf' },
   { key: 'order', label: 'Sort Order (Projects Page)', type: 'number', min: 1 },
   { key: 'homeOrder', label: 'Home Page Order (1, 2, 3… leave empty to hide from Home priority)', type: 'number', min: 1 },
-  { key: 'isFeatured', label: 'Featured project', type: 'checkbox' },
 ];
 
 const columns = [
@@ -39,7 +38,6 @@ const columns = [
     label: 'Home',
     render: (row) => (row.homeOrder !== null && row.homeOrder !== undefined ? `#${row.homeOrder}` : '—'),
   },
-  { key: 'isFeatured', label: 'Featured', render: (row) => (row.isFeatured ? '★' : '') },
 ];
 
 export default function ProjectsPage() {
@@ -66,7 +64,6 @@ export default function ProjectsPage() {
         reportPdf: null,
         order: 1,
         homeOrder: '',
-        isFeatured: false,
       }}
     />
   );

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { FiCamera, FiTrash2, FiUpload } from 'react-icons/fi';
 import CrudModulePage from '@/components/admin/ui/CrudModulePage';
+import IconTooltip from '@/components/admin/ui/IconTooltip';
 import { certificatesApi } from '@/lib/adminApi/endpoints';
 import axiosClient from '@/lib/adminApi/axiosClient';
 
@@ -85,14 +86,16 @@ function EventPhotosEditor({ value, onChange }) {
                 value={photo.caption ?? photo.alt ?? ''}
                 onChange={(e) => updateCaption(idx, e.target.value)}
               />
-              <button
-                type="button"
-                onClick={() => removePhoto(idx)}
-                className="rounded border border-red-200 p-2 text-red-500 transition-colors hover:bg-red-50"
-                aria-label="Remove photo"
-              >
-                <FiTrash2 size={14} />
-              </button>
+              <IconTooltip label="Remove photo">
+                <button
+                  type="button"
+                  onClick={() => removePhoto(idx)}
+                  className="rounded border border-red-200 p-2 text-red-500 transition-colors hover:bg-red-50"
+                  aria-label="Remove photo"
+                >
+                  <FiTrash2 size={14} />
+                </button>
+              </IconTooltip>
             </div>
           ))}
         </div>

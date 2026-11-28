@@ -89,7 +89,6 @@ create table if not exists public.projects (
   live_demo_url text not null default '',
   technologies text[] not null default '{}',
   category text not null default 'General',
-  is_featured boolean not null default false,
   "order" integer not null default 0 check ("order" >= 0),
   home_order integer check (home_order is null or home_order >= 0),
   is_visible boolean not null default true,

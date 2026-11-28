@@ -5,7 +5,6 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");
-    const featured = searchParams.get("featured");
 
     const supabase = getServiceSupabase();
     let query = supabase
@@ -17,7 +16,6 @@ export async function GET(req: Request) {
       .order("created_at", { ascending: false });
 
     if (category && category !== "All") query = query.eq("category", category);
-    if (featured === "true") query = query.eq("is_featured", true);
 
     const { data, error } = await query;
     if (error) return fail(error.message, 500);
