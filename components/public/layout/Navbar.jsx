@@ -294,7 +294,10 @@ export default function Navbar() {
           <button
             type="button"
             tabIndex={mobileOpen ? 0 : -1}
-            onClick={toggle}
+            onClick={() => {
+              toggle();
+              setMobileOpen(false);
+            }}
             aria-label={mode === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             className="mt-1 p-2 text-[#22221F] transition-colors hover:text-[#85806D]"
           >
