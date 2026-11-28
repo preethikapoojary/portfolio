@@ -100,14 +100,6 @@ export default function ProfilePage() {
                 folder="portfolio/profile"
               />
             </div>
-            <div>
-              <label className="label">Cover / Banner Image</label>
-              <ImageUploader
-                value={profile.coverBanner}
-                onChange={(media) => setProfile({ ...profile, coverBanner: media || {} })}
-                folder="portfolio/profile"
-              />
-            </div>
           </div>
         </section>
 
