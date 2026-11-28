@@ -26,7 +26,6 @@ export default function AdminDrawer({
     <>
       <div
         className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] transition-opacity"
-        onClick={onClose}
       />
       <aside
         style={{ maxWidth }}
