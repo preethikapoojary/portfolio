@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync:assets": "node scripts/sync-assets.mjs"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.5.2",

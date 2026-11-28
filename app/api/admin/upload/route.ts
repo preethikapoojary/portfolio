@@ -5,6 +5,7 @@ import {
   ok,
   fail,
 } from "@/lib/adminAuth";
+import { processUploadedFile } from "@/lib/imageUpload";
 
 export async function POST(req: Request) {
   const admin = await verifyAdminRequest(req);
@@ -18,13 +19,12 @@ export async function POST(req: Request) {
 
     const supabase = getServiceSupabase();
     const bucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-media";
-    const ext = file.name.split(".").pop() || "bin";
     const cleanFolder = folder.replace(/[^a-zA-Z0-9_-]/g, "");
+    const { buffer, ext, contentType } = await processUploadedFile(file, folder);
     const path = `${cleanFolder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-    const buffer = Buffer.from(await file.arrayBuffer());
     const { error } = await supabase.storage.from(bucket).upload(path, buffer, {
-      contentType: file.type || "application/octet-stream",
+      contentType,
       upsert: false,
     });
 

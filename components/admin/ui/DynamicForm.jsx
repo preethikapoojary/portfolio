@@ -202,7 +202,13 @@ function renderField(field, values, set) {
       );
 
     case 'image':
-      return <ImageUploader value={value} onChange={(media) => set(field.key, media)} />;
+      return (
+        <ImageUploader
+          value={value}
+          onChange={(media) => set(field.key, media)}
+          folder={field.folder || 'portfolio/images'}
+        />
+      );
 
     case 'pdf':
       return <PdfUploader value={value} onChange={(media) => set(field.key, media)} />;

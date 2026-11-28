@@ -108,7 +108,7 @@ const fields = [
   { key: 'title', label: 'Title', type: 'text' },
   { key: 'slug', label: 'Slug (optional — auto-generated from title)', type: 'text' },
   { key: 'issuer', label: 'Issuer', type: 'text' },
-  { key: 'image', label: 'Certificate Image', type: 'image' },
+  { key: 'image', label: 'Certificate Image', type: 'image', folder: 'portfolio/certificates' },
   { key: 'credentialUrl', label: 'Credential URL', type: 'text' },
   { key: 'issueDate', label: 'Issue Date', type: 'date' },
   { key: 'order', label: 'Sort Order (Certificates Page)', type: 'number', min: 1 },

@@ -1,4 +1,5 @@
 import { getServiceSupabase, ok, fail } from "@/lib/adminAuth";
+import { processUploadedFile } from "@/lib/imageUpload";
 
 export async function POST(req: Request) {
   try {
@@ -8,12 +9,11 @@ export async function POST(req: Request) {
 
     const supabase = getServiceSupabase();
     const bucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET || "portfolio-media";
-    const ext = file.name.split(".").pop() || "png";
+    const { buffer, ext, contentType } = await processUploadedFile(file, "testimonials");
     const path = `testimonials/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-    const buffer = Buffer.from(await file.arrayBuffer());
     const { error } = await supabase.storage.from(bucket).upload(path, buffer, {
-      contentType: file.type || "image/png",
+      contentType,
       upsert: false,
     });
 
