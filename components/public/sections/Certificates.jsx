@@ -42,7 +42,7 @@ export default function Certificates() {
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-8">
         <div className="mb-10 border-b border-[#DCD9D1] pb-6 text-center">
           <h2 className="font-display text-4xl font-medium tracking-tight text-[#22221F] sm:text-5xl">
-            Certificates
+            My Certificates
           </h2>
           <p className="mt-2.5 text-sm text-[#89877F] sm:text-base">
             Verified coursework, technical specializations, and workshop credentials.
