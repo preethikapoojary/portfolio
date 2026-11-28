@@ -202,6 +202,24 @@ html.dark body:not(.admin-body) .editorial-link {
   color: #89877F;
 }
 
+html.dark body:not(.admin-body) .editorial-prose h1,
+html.dark body:not(.admin-body) .editorial-prose h2,
+html.dark body:not(.admin-body) .editorial-prose h3,
+html.dark body:not(.admin-body) .editorial-prose h4,
+html.dark body:not(.admin-body) .editorial-prose strong {
+  color: #F2EFE9;
+}
+
+html.dark body:not(.admin-body) .editorial-prose blockquote,
+html.dark body:not(.admin-body) .editorial-prose figcaption {
+  color: #A6A39B;
+}
+
+html.dark body:not(.admin-body) .editorial-prose figure {
+  border-color: #32322E;
+  background-color: #232320;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
