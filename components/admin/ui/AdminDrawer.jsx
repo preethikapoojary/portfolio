@@ -31,8 +31,8 @@ export default function AdminDrawer({
         style={{ maxWidth }}
         className="fixed inset-y-0 right-0 z-[51] flex w-full flex-col border-l border-[#DCD9D1] bg-[#F6F4EF] text-[#22221F] shadow-2xl"
       >
-        <div className="flex items-center justify-between border-b border-[#DCD9D1] px-6 py-4">
-          <h2 className="font-display text-xl font-medium text-ink">{title}</h2>
+        <div className="flex items-center justify-between border-b border-[#DCD9D1] px-4 py-3.5 sm:px-6 sm:py-4">
+          <h2 className="font-display text-lg font-medium text-ink sm:text-xl">{title}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -42,7 +42,7 @@ export default function AdminDrawer({
             <FiX size={18} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-6">{children}</div>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</div>
       </aside>
     </>
   );

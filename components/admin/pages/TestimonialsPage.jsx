@@ -89,12 +89,70 @@ export default function TestimonialsPage() {
         </div>
       </div>
 
-      <div className="overflow-x-auto border border-[#DCD9D1] bg-[#F6F4EF]">
+      <div className="border border-[#DCD9D1] bg-[#F6F4EF]">
         {loading ? (
           <p className="p-6 text-sm text-muted">Loading testimonials…</p>
         ) : items.length === 0 ? (
           <p className="p-6 text-sm text-muted">No testimonials in this filter.</p>
         ) : (
+          <>
+          {/* Mobile Card View */}
+          <div className="divide-y divide-[#DCD9D1] md:hidden">
+            {items.map((t) => (
+              <div key={t._id} className="space-y-3 p-4">
+                <div className="flex items-start gap-3">
+                  {t.avatar?.url ? (
+                    <img src={t.avatar.url} alt={t.name} className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                  ) : (
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-muted">
+                      {t.name?.[0]}
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-[#22221F]">{t.name}</p>
+                    {(t.role || t.company) && (
+                      <p className="text-xs text-muted">
+                        {t.role} {t.company ? `· ${t.company}` : ''}
+                      </p>
+                    )}
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      <span className={`rounded-full px-2 py-0.5 text-xs ${STATUS_STYLES[t.status]}`}>{t.status}</span>
+                      {!t.isVisible && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-muted">Hidden</span>}
+                      <span className="text-xs text-muted">Order: {t.order ?? 0}</span>
+                      {t.homeOrder !== null && t.homeOrder !== undefined && (
+                        <span className="text-xs text-muted">Home: #{t.homeOrder}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-[#22221F]">{t.message}</p>
+                <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[#DCD9D1]/60 pt-2.5">
+                  {t.status !== 'approved' && (
+                    <button onClick={() => approve(t._id)} className="inline-flex h-8 w-8 items-center justify-center border border-emerald-200 text-emerald-600 hover:bg-emerald-50" aria-label="Approve">
+                      <FiCheck size={14} />
+                    </button>
+                  )}
+                  {t.status !== 'rejected' && (
+                    <button onClick={() => reject(t._id)} className="inline-flex h-8 w-8 items-center justify-center border border-red-200 text-red-500 hover:bg-red-50" aria-label="Reject">
+                      <FiX size={14} />
+                    </button>
+                  )}
+                  <button onClick={() => toggleVisibility(t._id)} className="inline-flex h-8 w-8 items-center justify-center border border-[#DCD9D1] text-muted hover:border-[#22221F]" aria-label="Toggle visibility">
+                    {t.isVisible ? <FiEye size={14} /> : <FiEyeOff size={14} />}
+                  </button>
+                  <button onClick={() => setEditing(t)} className="inline-flex h-8 w-8 items-center justify-center border border-[#DCD9D1] text-[#22221F] hover:border-[#22221F]" aria-label="Edit">
+                    <FiEdit2 size={14} />
+                  </button>
+                  <button onClick={() => remove(t._id)} className="inline-flex h-8 w-8 items-center justify-center border border-red-200 text-red-500 hover:bg-red-50" aria-label="Delete">
+                    <FiTrash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden overflow-x-auto md:block">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-[#DCD9D1] bg-[#E9E5DC]/40 text-xs uppercase tracking-wider text-muted">
               <tr>
@@ -190,6 +248,8 @@ export default function TestimonialsPage() {
               ))}
             </tbody>
           </table>
+          </div>
+          </>
         )}
       </div>
 

@@ -33,7 +33,7 @@ export default function SettingsPage() {
       <form onSubmit={save} className="space-y-6">
         <section className="card space-y-4">
           <h2 className="font-medium">Theme</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <ColorField label="Primary" value={settings.theme?.primaryColor} onChange={setTheme('primaryColor')} />
             <ColorField label="Secondary" value={settings.theme?.secondaryColor} onChange={setTheme('secondaryColor')} />
             <ColorField label="Accent" value={settings.theme?.accentColor} onChange={setTheme('accentColor')} />
@@ -65,7 +65,7 @@ export default function SettingsPage() {
             <label className="label">Subheadline</label>
             <textarea className="input" rows={2} value={settings.hero?.subheadline || ''} onChange={setHero('subheadline')} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label">CTA Text</label>
               <input className="input" value={settings.hero?.ctaText || ''} onChange={setHero('ctaText')} />

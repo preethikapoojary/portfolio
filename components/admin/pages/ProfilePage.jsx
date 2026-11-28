@@ -120,7 +120,7 @@ export default function ProfilePage() {
             <label className="label">Career Objective</label>
             <textarea className="input" rows={3} value={profile.careerObjective || ''} onChange={set('careerObjective')} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label">Email</label>
               <input className="input" value={profile.email || ''} onChange={set('email')} />
