@@ -3,16 +3,12 @@
 import Link from 'next/link';
 import { FiArrowRight } from 'react-icons/fi';
 import { useSettings } from '@/context/SettingsContext';
-import { getSocialLinks } from '@/utils/socialLinks';
+import { getContactEmail, getNonEmailSocialLinks } from '@/utils/socialLinks';
 
 export default function Contact() {
   const { profile } = useSettings();
-  const socialLinks = getSocialLinks(profile).filter(
-    (link) =>
-      !link.url?.startsWith('mailto:') &&
-      !['gmail', 'email'].includes((link.platform || '').toLowerCase()) &&
-      !['gmail', 'email'].includes((link.icon || '').toLowerCase())
-  );
+  const socialLinks = getNonEmailSocialLinks(profile);
+  const contactEmail = getContactEmail(profile);
 
   return (
     <section
@@ -30,12 +26,12 @@ export default function Contact() {
               Have an interesting idea? Let&apos;s build something meaningful.
             </h2>
 
-            {profile?.email && (
+            {contactEmail && (
               <a
-                href={`mailto:${profile.email}`}
+                href={`mailto:${contactEmail}`}
                 className="mt-8 inline-block border-b border-[#DCD9D1] pb-1 text-lg text-[#89877F] transition-colors hover:border-[#22221F] hover:text-[#22221F]"
               >
-                {profile.email}
+                {contactEmail}
               </a>
             )}
           </div>

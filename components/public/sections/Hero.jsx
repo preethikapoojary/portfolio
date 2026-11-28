@@ -3,18 +3,13 @@
 import Link from 'next/link';
 import { FiArrowRight, FiDownload, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 import { useSettings } from '@/context/SettingsContext';
-import { getSocialLinks } from '@/utils/socialLinks';
+import { getNonEmailSocialLinks } from '@/utils/socialLinks';
 import api from '@/api/endpoints';
 
 export default function Hero() {
   const { profile, settings, loading, error, retry } = useSettings();
   const hero = settings?.hero || {};
-  const socialLinks = getSocialLinks(profile).filter(
-    (link) =>
-      !link.url?.startsWith('mailto:') &&
-      !['gmail', 'email'].includes((link.platform || '').toLowerCase()) &&
-      !['gmail', 'email'].includes((link.icon || '').toLowerCase())
-  );
+  const socialLinks = getNonEmailSocialLinks(profile);
   const isHeroLoading = loading || (!profile && !error);
 
   if (isHeroLoading) {

@@ -5,19 +5,15 @@ import { Turnstile } from '@marsidev/react-turnstile';
 import { FiCheck, FiSend } from 'react-icons/fi';
 import api from '@/api/endpoints';
 import { useSettings } from '@/context/SettingsContext';
-import { getSocialLinks } from '@/utils/socialLinks';
+import { getContactEmail, getNonEmailSocialLinks } from '@/utils/socialLinks';
 import PageHeader from '@/components/public/common/PageHeader';
 
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 export default function ContactPage() {
   const { profile } = useSettings();
-  const socialLinks = getSocialLinks(profile).filter(
-    (link) =>
-      !link.url?.startsWith('mailto:') &&
-      !['gmail', 'email'].includes((link.platform || '').toLowerCase()) &&
-      !['gmail', 'email'].includes((link.icon || '').toLowerCase())
-  );
+  const socialLinks = getNonEmailSocialLinks(profile);
+  const contactEmail = getContactEmail(profile);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -77,12 +73,12 @@ export default function ContactPage() {
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#89877F]">
               Direct Email
             </p>
-            {profile?.email && (
+            {contactEmail && (
               <a
-                href={`mailto:${profile.email}`}
+                href={`mailto:${contactEmail}`}
                 className="mt-2 inline-block border-b border-[#DCD9D1] pb-1 text-base font-medium text-[#22221F] transition-colors hover:border-[#22221F]"
               >
-                {profile.email}
+                {contactEmail}
               </a>
             )}
           </div>

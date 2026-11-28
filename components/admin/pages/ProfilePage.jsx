@@ -142,10 +142,10 @@ export default function ProfilePage() {
               <h2 className="font-medium">Social Links</h2>
               <p className="text-xs text-muted">
                 These appear automatically in the Hero, Contact, and Footer sections of the public
-                site — in this order. Choose an icon for each link from the dropdown; it's always
-                used exactly as selected, with no guessing from the platform name. Pick "Custom" to
-                use your own icon image instead. For Email, just enter the address — no need to type
-                "mailto:".
+                site — in this order (Email links are shown only in the Contact section and /contact
+                page). Choose an icon for each link from the dropdown; it's always used exactly as
+                selected, with no guessing from the platform name. Pick "Custom" to use your own
+                icon image instead. For Email, just enter the address — no need to type "mailto:".
               </p>
             </div>
             <button type="button" onClick={addSocialLink} className="btn-secondary flex shrink-0 items-center gap-1 text-xs">

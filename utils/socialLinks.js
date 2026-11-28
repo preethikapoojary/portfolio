@@ -97,10 +97,30 @@ function resolveIcon(iconValue) {
 export function getSocialLinks(profile) {
   return (profile?.socialLinks || [])
     .filter((link) => link.url)
-    .map((link) => ({
-      platform: link.platform || 'Link',
-      url: link.url,
-      href: resolveHref(link.icon, link.url),
-      Icon: resolveIcon(link.icon),
-    }));
+    .map((link) => {
+      const platform = link.platform || 'Link';
+      const isEmail =
+        link.icon === 'email' ||
+        isBareEmailAddress(link.url) ||
+        link.url.startsWith('mailto:') ||
+        ['gmail', 'email'].includes(platform.toLowerCase());
+      return {
+        platform,
+        url: link.url,
+        icon: link.icon || '',
+        isEmail,
+        href: resolveHref(link.icon, link.url),
+        Icon: resolveIcon(link.icon),
+      };
+    });
+}
+
+export function getNonEmailSocialLinks(profile) {
+  return getSocialLinks(profile).filter((link) => !link.isEmail);
+}
+
+export function getContactEmail(profile) {
+  if (profile?.email?.trim()) return profile.email.trim();
+  const emailLink = getSocialLinks(profile).find((link) => link.isEmail);
+  return emailLink ? emailLink.url.replace(/^mailto:/i, '').trim() : '';
 }

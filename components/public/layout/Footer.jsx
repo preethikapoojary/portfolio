@@ -2,16 +2,11 @@
 
 import Link from 'next/link';
 import { useSettings } from '@/context/SettingsContext';
-import { getSocialLinks } from '@/utils/socialLinks';
+import { getNonEmailSocialLinks } from '@/utils/socialLinks';
 
 export default function Footer() {
   const { profile } = useSettings();
-  const socialLinks = getSocialLinks(profile).filter(
-    (link) =>
-      !link.url?.startsWith('mailto:') &&
-      !['gmail', 'email'].includes((link.platform || '').toLowerCase()) &&
-      !['gmail', 'email'].includes((link.icon || '').toLowerCase())
-  );
+  const socialLinks = getNonEmailSocialLinks(profile);
   const fullName = profile?.name ? `${profile.name} Poojary` : 'Preethika Poojary';
   const startYear = 2026;
   const currentYear = new Date().getFullYear();
