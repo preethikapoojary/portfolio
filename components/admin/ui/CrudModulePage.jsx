@@ -32,6 +32,7 @@ export default function CrudModulePage({
   const [editing, setEditing] = useState(null);
   const [formValues, setFormValues] = useState(emptyValues);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const load = async (page = 1) => {
     const res = await api.list({ page, search: search || undefined });
@@ -47,23 +48,28 @@ export default function CrudModulePage({
   const openCreate = () => {
     setEditing(null);
     setFormValues(emptyValues);
+    setFormError('');
     setModalOpen(true);
   };
 
   const openEdit = (row) => {
     setEditing(row);
     setFormValues(row);
+    setFormError('');
     setModalOpen(true);
   };
 
   const submit = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setFormError('');
     try {
       if (editing) await api.update(editing._id, formValues);
       else await api.create(formValues);
       setModalOpen(false);
       await load(meta.page);
+    } catch (err) {
+      setFormError(err?.response?.data?.message || 'Failed to save changes.');
     } finally {
       setSaving(false);
     }
@@ -133,6 +139,11 @@ export default function CrudModulePage({
           maxWidth={wideForm ? '760px' : '560px'}
         >
           <form onSubmit={submit}>
+            {formError && (
+              <p className="mb-4 border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                {formError}
+              </p>
+            )}
             <DynamicForm
               fields={fields}
               values={formValues}

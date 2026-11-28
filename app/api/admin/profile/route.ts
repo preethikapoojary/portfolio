@@ -11,14 +11,14 @@ import { rowToCamel, camelToRow } from "@/lib/mappers";
 const PROFILE_FIELDS = [
   "name",
   "title",
-  "about_me",
-  "career_objective",
-  "profile_photo",
-  "cover_banner",
+  "aboutMe",
+  "careerObjective",
+  "profilePhoto",
+  "coverBanner",
   "email",
   "phone",
   "location",
-  "social_links",
+  "socialLinks",
 ];
 
 export async function GET(req: Request) {

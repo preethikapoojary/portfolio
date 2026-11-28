@@ -37,8 +37,8 @@ export function camelToRow(
   const skip = new Set(["_id", "id", "createdAt", "updatedAt", "created_at", "updated_at"]);
   for (const [key, value] of Object.entries(payload || {})) {
     if (skip.has(key)) continue;
-    if (allowedCamelKeys && !allowedCamelKeys.includes(key)) continue;
     const snake = toSnakeKey(key);
+    if (allowedCamelKeys && !allowedCamelKeys.includes(key) && !allowedCamelKeys.includes(snake)) continue;
     if (value === "" && (snake.endsWith("_date") || snake.endsWith("_at") || snake === "home_order")) {
       out[snake] = null;
     } else if (snake === "home_order") {

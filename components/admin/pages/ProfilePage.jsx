@@ -35,6 +35,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     profileApi.get().then((res) => setProfile(res.data));
@@ -43,10 +44,13 @@ export default function ProfilePage() {
   const save = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setError('');
     try {
       const res = await profileApi.update(profile);
       setProfile(res.data);
       setSavedAt(new Date());
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Failed to save profile changes.');
     } finally {
       setSaving(false);
     }
@@ -244,6 +248,12 @@ export default function ProfilePage() {
             })}
           </div>
         </section>
+
+        {error && (
+          <p className="border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+            {error}
+          </p>
+        )}
 
         <div className="flex items-center gap-3">
           <button type="submit" disabled={saving} className="btn-primary">
