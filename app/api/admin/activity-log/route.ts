@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
   try {
     const { searchParams } = new URL(req.url);
-    const limit = Math.min(100, Number(searchParams.get("limit")) || 50);
+    const limit = Math.min(100, Number(searchParams.get("limit")) || 15);
 
     const supabase = getServiceSupabase();
     const { data, error } = await supabase

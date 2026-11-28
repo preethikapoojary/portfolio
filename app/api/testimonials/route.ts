@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServiceSupabase, ok, fail } from "@/lib/adminAuth";
+import { getServiceSupabase, ok, fail, logAdminActivity } from "@/lib/adminAuth";
 import { resolveUniqueSlug } from "@/lib/crudHandler";
 import { rowToCamel, rowsToCamel } from "@/lib/mappers";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
@@ -87,6 +87,15 @@ export async function POST(req: Request) {
       .single();
 
     if (error) return fail(error.message, 400);
+
+    await logAdminActivity(
+      { email: email.trim() || "Visitor" },
+      "TESTIMONIAL_RECEIVED",
+      "Testimonial",
+      `Received testimonial from ${name.trim()}`,
+      data?.id
+    );
+
     return ok(rowToCamel(data), 201);
   } catch (err: any) {
     return fail(err.message || "Failed to submit testimonial", 500);

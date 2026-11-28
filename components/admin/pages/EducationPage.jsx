@@ -10,6 +10,7 @@ const fields = [
   { key: 'endDate', label: 'End Date', type: 'date' },
   { key: 'grade', label: 'Grade', type: 'text' },
   { key: 'description', label: 'Description', type: 'textarea' },
+  { key: 'order', label: 'Sort Order', type: 'number', min: 1 },
 ];
 
 const columns = [
@@ -23,6 +24,7 @@ const columns = [
         row.endDate ? new Date(row.endDate).getFullYear() : 'Present'
       }`,
   },
+  { key: 'order', label: 'Order', render: (row) => row.order ?? 0 },
 ];
 
 export default function EducationPage() {
@@ -33,7 +35,7 @@ export default function EducationPage() {
       api={educationApi}
       columns={columns}
       fields={fields}
-      emptyValues={{ institution: '', degree: '', fieldOfStudy: '', description: '' }}
+      emptyValues={{ institution: '', degree: '', fieldOfStudy: '', description: '', order: 1 }}
     />
   );
 }

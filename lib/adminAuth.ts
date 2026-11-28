@@ -67,7 +67,7 @@ export function fail(message: string, status = 400) {
 }
 
 export async function logAdminActivity(
-  admin: AdminUser,
+  admin: Partial<AdminUser> | null,
   action: string,
   resource: string,
   description: string,
@@ -76,8 +76,8 @@ export async function logAdminActivity(
   try {
     const supabase = getServiceSupabase();
     await supabase.from("activity_logs").insert({
-      admin_id: admin.id,
-      admin_email: admin.email,
+      admin_id: admin?.id || null,
+      admin_email: admin?.email || "",
       action,
       resource,
       resource_id: resourceId || null,

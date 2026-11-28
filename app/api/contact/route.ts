@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServiceSupabase, ok, fail } from "@/lib/adminAuth";
+import { getServiceSupabase, ok, fail, logAdminActivity } from "@/lib/adminAuth";
 import { rowToCamel } from "@/lib/mappers";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
@@ -57,6 +57,15 @@ export async function POST(req: Request) {
       .single();
 
     if (error) return fail(error.message, 500);
+
+    await logAdminActivity(
+      { email: email.trim() },
+      "MESSAGE_RECEIVED",
+      "ContactMessage",
+      `Received message from ${name.trim()} (${email.trim()})`,
+      data?.id
+    );
+
     return ok(rowToCamel(data), 201);
   } catch (err: any) {
     return fail(err.message || "Failed to send message", 500);

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getServiceSupabase, fail } from "@/lib/adminAuth";
+import { getServiceSupabase, fail, logAdminActivity } from "@/lib/adminAuth";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
@@ -60,6 +60,13 @@ export async function POST(req: Request) {
     if (!isAdmin) {
       return fail("Unauthorized: not an admin account", 403);
     }
+
+    await logAdminActivity(
+      { id: data.user.id, email: data.user.email || email },
+      "LOGIN",
+      "Auth",
+      `Admin signed in (${data.user.email || email})`
+    );
 
     return NextResponse.json({
       success: true,
